@@ -87,6 +87,8 @@ static const uint8_t chTemplate_default[] = {
 #define IEEE802154E_MLME_IE_GROUPID                        0x01
 #define IEEE802154E_ACK_NACK_TIMECORRECTION_ELEMENTID      0x1E
 
+#define IEEE802154E_NB_TOTAL                   			   10
+
 /**
 When a packet is received, it is written inside the OpenQueueEntry_t->packet
 buffer, starting at the byte defined below. When a packet is relayed, it
@@ -252,6 +254,10 @@ typedef struct {
    int16_t                   timeCorrection;          // store the timeCorrection, prepend and retrieve it inside of frame header
    
    uint16_t                  slotDuration;            // 
+
+   //EB
+   uint16_t               	 eb_neighbors[IEEE802154E_NB_TOTAL];
+   uint16_t                  eb_received_count[IEEE802154E_NB_TOTAL];
 } ieee154e_vars_t;
 
 BEGIN_PACK
@@ -273,6 +279,10 @@ typedef struct {
    PORT_RADIOTIMER_WIDTH     num_endOfFrame;
 } ieee154e_dbg_t;
 
+typedef struct {
+    uint16_t *top_nb;
+    uint16_t *top_nb_count;
+} ieee154e_top_nb_eb_count_t;
 //=========================== prototypes ======================================
 
 // admin
@@ -296,7 +306,16 @@ bool               debugPrint_asn(void);
 bool               debugPrint_isSync(void);
 bool               debugPrint_macStats(void);
 
+//EB
+ieee154e_top_nb_eb_count_t ieee154e_get_top_nb_eb_stats(uint8_t top);
+void ieee154e_reset_eb_stats();
+
+
 /**
+
+
+
+
 \}
 \}
 */

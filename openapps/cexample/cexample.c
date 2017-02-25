@@ -19,7 +19,7 @@
 
 /// inter-packet period (in ms)
 #define CEXAMPLEPERIOD  10000
-#define PAYLOADLEN      40
+#define PAYLOADLEN      1
 
 const uint8_t cexample_path0[] = "ex";
 
@@ -75,13 +75,10 @@ void cexample_timer_cb(opentimer_id_t id){
 void cexample_task_cb() {
    OpenQueueEntry_t*    pkt;
    owerror_t            outcome;
-   uint8_t              i;
-   
-   uint16_t             x_int       = 0;
-   uint16_t             sum         = 0;
-   uint16_t             avg         = 0;
-   uint8_t              N_avg       = 10;
-   
+   uint8_t              asnArray[5];
+   uint8_t              top,i,j,reserved_payload_size,offset;
+   ieee154e_top_nb_eb_count_t  ieee154e_top_nb_eb_count;
+
    // don't run if not synch
    if (ieee154e_isSynch() == FALSE) return;
    
@@ -90,12 +87,7 @@ void cexample_task_cb() {
       opentimers_stop(cexample_vars.timerId);
       return;
    }
-   
-   for (i = 0; i < N_avg; i++) {
-      sum += x_int;
-   }
-   avg = sum/N_avg;
-   
+  
    // create a CoAP RD packet
    pkt = openqueue_getFreePacketBuffer(COMPONENT_CEXAMPLE);
    if (pkt==NULL) {
@@ -111,15 +103,38 @@ void cexample_task_cb() {
    // take ownership over that packet
    pkt->creator                   = COMPONENT_CEXAMPLE;
    pkt->owner                     = COMPONENT_CEXAMPLE;
+   
+   
    // CoAP payload
-   packetfunctions_reserveHeaderSize(pkt,PAYLOADLEN);
-   for (i=0;i<PAYLOADLEN;i++) {
-      pkt->payload[i]             = i;
-   }
-   avg = openrandom_get16b();
-   pkt->payload[0]                = (avg>>8)&0xff;
-   pkt->payload[1]                = (avg>>0)&0xff;
+    
+    ieee154e_getAsn(asnArray);
+    top = 3;
+    offset = 5;
+    reserved_payload_size = 17;
 
+    packetfunctions_reserveHeaderSize(pkt,reserved_payload_size);
+    pkt->payload[0] = asnArray[0];
+    pkt->payload[1] = asnArray[1];
+    pkt->payload[2] = asnArray[2];
+    pkt->payload[3] = asnArray[3];
+    pkt->payload[4] = asnArray[4];
+    
+   
+    ieee154e_top_nb_eb_count = ieee154e_get_top_nb_eb_stats(top);
+   
+    uint16_t *nb = ieee154e_top_nb_eb_count.top_nb;
+    uint16_t *nb_count = ieee154e_top_nb_eb_count.top_nb_count;
+
+    for (i = offset; i < reserved_payload_size; i=i+4) {
+        pkt->payload[i]   = (uint8_t)(*nb & 0x00FF);
+        pkt->payload[i+1] = (uint8_t)((*nb & 0xFF00)>>8);
+        pkt->payload[i+2] = (uint8_t)(*nb_count & 0x00FF);
+        pkt->payload[i+3] = (uint8_t)((*nb_count & 0xFF00)>>8);
+
+        nb++;
+        nb_count++;
+    }
+   
    packetfunctions_reserveHeaderSize(pkt,1);
    pkt->payload[0] = COAP_PAYLOAD_MARKER;
    
@@ -127,7 +142,7 @@ void cexample_task_cb() {
    packetfunctions_reserveHeaderSize(pkt,2);
    pkt->payload[0]                = (COAP_OPTION_NUM_CONTENTFORMAT - COAP_OPTION_NUM_URIPATH) << 4
                                     | 1;
-   pkt->payload[1]                = COAP_MEDTYPE_APPOCTETSTREAM;
+   pkt->payload[1]                = COAP_MEDTYPE_TEXTPLAIN;
    // location-path option
    packetfunctions_reserveHeaderSize(pkt,sizeof(cexample_path0)-1);
    memcpy(&pkt->payload[0],cexample_path0,sizeof(cexample_path0)-1);
@@ -135,9 +150,9 @@ void cexample_task_cb() {
    pkt->payload[0]                = ((COAP_OPTION_NUM_URIPATH) << 4) | (sizeof(cexample_path0)-1);
    
    // metadata
-   pkt->l4_destination_port       = WKP_UDP_COAP;
+   pkt->l4_destination_port       = 5683;
    pkt->l3_destinationAdd.type    = ADDR_128B;
-   memcpy(&pkt->l3_destinationAdd.addr_128b[0],&ipAddr_motesEecs,16);
+   memcpy(&pkt->l3_destinationAdd.addr_128b[0],&ipAddr_iotlab,16);
    
    // send
    outcome = opencoap_send(
@@ -153,9 +168,11 @@ void cexample_task_cb() {
       openqueue_freePacketBuffer(pkt);
    }
    
+   
    return;
 }
 
 void cexample_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
    openqueue_freePacketBuffer(msg);
+   //ieee154e_reset_eb_stats();
 }

@@ -30,10 +30,10 @@
 
 void openapps_init(void) {
    // CoAP
-   c6t_init();
-   cinfo_init();
-   //cexample_init();
-   cleds__init();
+   //c6t_init();
+   //cinfo_init();
+   cexample_init();
+   //cleds__init();
    cstorm_init();
    cwellknown_init();
    rrt_init();

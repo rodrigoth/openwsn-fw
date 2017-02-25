@@ -7,13 +7,13 @@ sys.path.insert(0,os.path.join(here,'..','..','..','coap'))
 from coap import coap
 import signal
 
-MOTE_IP = 'bbbb::1415:92cc:0:2'
+MOTE_IP = '::1'
 
 c = coap.coap()
 
 # read the information about the board status
-p = c.GET('coap://[{0}]/i'.format(MOTE_IP))
-print ''.join([chr(b) for b in p])
+c.POST('coap://[{0}]/res'.format(MOTE_IP),False,[],[10])
+
 
 
 while True:

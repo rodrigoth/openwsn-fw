@@ -19,10 +19,9 @@
 
 //=========================== variables =======================================
 
-ieee154e_vars_t    ieee154e_vars;
-ieee154e_stats_t   ieee154e_stats;
-ieee154e_dbg_t     ieee154e_dbg;
-
+ieee154e_vars_t             ieee154e_vars;
+ieee154e_stats_t            ieee154e_stats;
+ieee154e_dbg_t              ieee154e_dbg;
 //=========================== prototypes ======================================
 
 // SYNCHRONIZING
@@ -99,6 +98,10 @@ bool     debugPrint_isSync(void);
 void     isr_ieee154e_newSlot(void);
 void     isr_ieee154e_timer(void);
 
+uint8_t get_index(uint16_t sender);
+void ordernate_arrays_if_necessary();
+bool flag = 0;
+
 //=========================== admin ===========================================
 
 /**
@@ -118,6 +121,9 @@ void ieee154e_init() {
    ieee154e_vars.isSecurityEnabled = FALSE;
    ieee154e_vars.slotDuration      = TsSlotDuration;
    ieee154e_vars.numOfSleepSlots   = 1;
+   
+   ieee154e_reset_eb_stats();
+
    
    // default hopping template
    memcpy(
@@ -820,7 +826,44 @@ port_INLINE bool ieee154e_processIEs(OpenQueueEntry_t* pkt, uint16_t* lenIE) {
          (errorparameter_t)1
       );
    }
+
+   if (!idmanager_getIsDAGroot()) {
+	   uint16_t sender = ((uint16_t)pkt->l2_nextORpreviousHop.addr_64b[6] << 8) | pkt->l2_nextORpreviousHop.addr_64b[7];
+	   ieee154e_vars.eb_neighbors[get_index(sender)] = sender;
+	   ieee154e_vars.eb_received_count[get_index(sender)]++;
+       ordernate_arrays_if_necessary();
+   }
    return TRUE;
+}
+
+void ordernate_arrays_if_necessary() {
+    uint8_t i, j;
+    uint16_t current_eb_count, current_nb;
+    
+    for (i = 0; i < IEEE802154E_NB_TOTAL; i++) {
+        for (j = i +1; j < IEEE802154E_NB_TOTAL; j++ ) {
+            if (ieee154e_vars.eb_received_count[i] < ieee154e_vars.eb_received_count[j]) {
+                current_eb_count = ieee154e_vars.eb_received_count[i];
+                current_nb = ieee154e_vars.eb_neighbors[i];
+
+                ieee154e_vars.eb_received_count[i] = ieee154e_vars.eb_received_count[j];
+                ieee154e_vars.eb_received_count[j] = current_eb_count;
+
+                ieee154e_vars.eb_neighbors[i] = ieee154e_vars.eb_neighbors[j];
+                ieee154e_vars.eb_neighbors[j] = current_nb;
+            }
+        }
+    }
+}
+
+uint8_t get_index(uint16_t sender) {
+    uint8_t i;
+    for(i = 0; i < IEEE802154E_NB_TOTAL; i++) {
+    if(ieee154e_vars.eb_neighbors[i] == sender || ieee154e_vars.eb_neighbors[i] == 0 ) {
+        return i;
+    }
+}
+    return 0;
 }
 
 //======= TX
@@ -2475,7 +2518,7 @@ void endSlot() {
    
    // clean up dataToSend
    if (ieee154e_vars.dataToSend!=NULL) {
-      // if everything went well, dataToSend was set to NULL in ti9
+      // if everything went well, dataToSend was set to NULL in ti9f
       // getting here means transmit failed
       
       // indicate Tx fail to schedule to update stats
@@ -2529,4 +2572,28 @@ void endSlot() {
 
 bool ieee154e_isSynch(){
    return ieee154e_vars.isSync;
+}
+
+//TODO: validate input -- show error if top > number of neighbors
+ieee154e_top_nb_eb_count_t ieee154e_get_top_nb_eb_stats(uint8_t top) {
+    uint16_t top_nb[top],top_nb_count[top];
+    ieee154e_top_nb_eb_count_t  ieee154e_top_nb_eb_count;
+   
+    memcpy(top_nb, ieee154e_vars.eb_neighbors, sizeof(uint16_t) * top );
+    memcpy(top_nb_count, ieee154e_vars.eb_received_count, sizeof(uint16_t) * top);
+    
+    ieee154e_top_nb_eb_count.top_nb = top_nb;
+    ieee154e_top_nb_eb_count.top_nb_count = top_nb_count;
+
+    ieee154e_reset_eb_stats();
+
+    return ieee154e_top_nb_eb_count;
+}
+
+void ieee154e_reset_eb_stats() {
+    uint8_t i;
+    for (i = 0; i < IEEE802154E_NB_TOTAL; i++) {
+	   ieee154e_vars.eb_neighbors[i] = 0;
+	   ieee154e_vars.eb_received_count[i] = 0;
+    }
 }
