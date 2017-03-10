@@ -168,6 +168,9 @@ enum {
    COMPONENT_RRT                       = 0x25,
    COMPONENT_SECURITY                  = 0x26,
    COMPONENT_USERIALBRIDGE             = 0x27,
+   COMPONENT_CEXAMPLE2				   = 0x28,
+   COMPONENT_CEXAMPLE3				   = 0x29,
+   COMPONENT_CEXAMPLE4				   = 0x30,
 };
 
 /**

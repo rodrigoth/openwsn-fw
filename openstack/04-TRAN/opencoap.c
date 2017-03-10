@@ -485,10 +485,6 @@ owerror_t opencoap_send(
    msg->payload[3]                  = (request->messageID>>0) & 0xff;
 
    memcpy(&msg->payload[4],&token,request->TKL);
-    openserial_printError(COMPONENT_PACKETFUNCTIONS,ERR_IEEE154_UNSUPPORTED,
-                               (errorparameter_t)23,
-                               (errorparameter_t)23);
-   
    return openudp_send(msg);
 }
 

@@ -4,6 +4,7 @@
 
 //=========================== defines =========================================
 
+
 //=========================== variables =======================================
 
 //=========================== prototypes ======================================
@@ -56,10 +57,8 @@ bool topology_isAcceptablePacket(ieee802154_header_iht* ieee802514_header) {
    
    returnVal=FALSE;
    switch (idmanager_getMyID(ADDR_64B)->addr_64b[7]) {
-      case 0xdf:
-         if (
-               ieee802514_header->src.addr_64b[7]==0x66
-            ) {
+      case 0x86:
+         if (ieee802514_header->src.addr_64b[7]==0x88 || ieee802514_header->src.addr_64b[7] == 0x87) {
             returnVal=TRUE;
          }
          break;

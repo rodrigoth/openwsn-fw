@@ -55,19 +55,19 @@ void schedule_init() {
       );
    }
 
-   open_addr_t sink;
+   open_addr_t node_60;
    uint8_t slotoffset = 10;
    uint8_t choffset   = 11;
 
-   sink.type = ADDR_64B;
-   sink.addr_64b[0]=0x05;
-   sink.addr_64b[1]=0x43;
-   sink.addr_64b[2]=0x32;
-   sink.addr_64b[3]=0xff;
-   sink.addr_64b[4]=0x03;
-   sink.addr_64b[5]=0xda;
-   sink.addr_64b[6]=0x98;
-   sink.addr_64b[7]=0x87;
+   node_60.type = ADDR_64B;
+   node_60.addr_64b[0]=0x05;
+   node_60.addr_64b[1]=0x43;
+   node_60.addr_64b[2]=0x32;
+   node_60.addr_64b[3]=0xff;
+   node_60.addr_64b[4]=0x03;
+   node_60.addr_64b[5]=0xdb;
+   node_60.addr_64b[6]=0xa6;
+   node_60.addr_64b[7]=0x86;
 
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
    open_addr_t node_64,node_62,node_61;
@@ -104,7 +104,7 @@ void schedule_init() {
 
 
    if (packetfunctions_sameAddress(my_address,&node_62)) {
-	   schedule_addActiveSlot(20,CELLTYPE_TX,FALSE,7,&sink);
+	   schedule_addActiveSlot(20,CELLTYPE_TX,FALSE,7,&node_60);
 	   schedule_addActiveSlot(21,CELLTYPE_TX,FALSE,7,&node_61);
 	   schedule_addActiveSlot(22,CELLTYPE_TX,FALSE,7,&node_64);
    }
@@ -116,6 +116,11 @@ void schedule_init() {
 
    if (packetfunctions_sameAddress(my_address,&node_64)) {
 	   schedule_addActiveSlot(22,CELLTYPE_RX,FALSE,7,&node_62);
+   }
+
+
+   if (packetfunctions_sameAddress(my_address,&node_60)) {
+	   schedule_addActiveSlot(20,CELLTYPE_RX,FALSE,7,&node_62);
    }
 }
 

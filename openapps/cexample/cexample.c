@@ -92,16 +92,16 @@ void cexample_task_cb() {
 	}
 
 
-	open_addr_t sink;//sink
-	sink.type = ADDR_64B;
-	sink.addr_64b[0]=0x05;
-	sink.addr_64b[1]=0x43;
-	sink.addr_64b[2]=0x32;
-	sink.addr_64b[3]=0xff;
-	sink.addr_64b[4]=0x03;
-	sink.addr_64b[5]=0xda;
-	sink.addr_64b[6]=0x98;
-	sink.addr_64b[7]=0x87;
+	open_addr_t node_60;//sink
+	node_60.type = ADDR_64B;
+	node_60.addr_64b[0]=0x05;
+	node_60.addr_64b[1]=0x43;
+	node_60.addr_64b[2]=0x32;
+	node_60.addr_64b[3]=0xff;
+	node_60.addr_64b[4]=0x03;
+	node_60.addr_64b[5]=0xdb;
+	node_60.addr_64b[6]=0xa6;
+	node_60.addr_64b[7]=0x86;
 
 
 	open_addr_t node_64,node_61;
@@ -125,7 +125,7 @@ void cexample_task_cb() {
 	node_61.addr_64b[6]=0xa9;
 	node_61.addr_64b[7]=0x88;//61
 
-	neighbors_pushEbSerial(&sink);
+	neighbors_pushEbSerial(&node_60);
 	neighbors_pushEbSerial(&node_64);
 	neighbors_pushEbSerial(&node_61);
 }
