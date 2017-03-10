@@ -93,6 +93,10 @@ void          neighbors_removeOld(void);
 // debug
 bool          debugPrint_neighbors(void);
 
+//eb
+void 		  neighbors_pushEbSerial(open_addr_t *neighbor);
+void 		  neighbors_updateEBStats(open_addr_t *neighbor);
+
 /**
 \}
 \}

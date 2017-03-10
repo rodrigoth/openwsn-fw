@@ -27,7 +27,7 @@ static const uint8_t chTemplate_default[] = {
 #define TX_POWER                    31 // 1=-25dBm, 31=0dBm (max value)
 #define RESYNCHRONIZATIONGUARD       5 // in 32kHz ticks. min distance to the end of the slot to successfully synchronize
 #define US_PER_TICK                 30 // number of us per 32kHz clock tick
-#define EBPERIOD                  2000 // in miliseconds: 2000 -> EB every 2000 miseconds
+#define EBPERIOD                  30000 // in miliseconds: 2000 -> EB every 2000 miseconds
 #define MAXKAPERIOD               2000 // in slots: @15ms per slot -> ~30 seconds. Max value used by adaptive synchronization.
 #define DESYNCTIMEOUT             2333 // in slots: @15ms per slot -> ~35 seconds. A larger DESYNCTIMEOUT is needed if using a larger KATIMEOUT.
 #define LIMITLARGETIMECORRECTION     5 // threshold number of ticks to declare a timeCorrection "large"
@@ -254,10 +254,6 @@ typedef struct {
    int16_t                   timeCorrection;          // store the timeCorrection, prepend and retrieve it inside of frame header
    
    uint16_t                  slotDuration;            // 
-
-   //EB
-   uint16_t               	 eb_neighbors[IEEE802154E_NB_TOTAL];
-   uint16_t                  eb_received_count[IEEE802154E_NB_TOTAL];
 } ieee154e_vars_t;
 
 BEGIN_PACK
@@ -279,10 +275,6 @@ typedef struct {
    PORT_RADIOTIMER_WIDTH     num_endOfFrame;
 } ieee154e_dbg_t;
 
-typedef struct {
-    uint16_t *top_nb;
-    uint16_t *top_nb_count;
-} ieee154e_top_nb_eb_count_t;
 //=========================== prototypes ======================================
 
 // admin
@@ -305,12 +297,6 @@ void               ieee154e_endOfFrame(PORT_RADIOTIMER_WIDTH capturedTime);
 bool               debugPrint_asn(void);
 bool               debugPrint_isSync(void);
 bool               debugPrint_macStats(void);
-
-//EB
-ieee154e_top_nb_eb_count_t ieee154e_get_top_nb_eb_stats(uint8_t top);
-void ieee154e_reset_eb_stats();
-
-
 /**
 
 

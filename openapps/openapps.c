@@ -34,11 +34,11 @@ void openapps_init(void) {
    //cinfo_init();
    cexample_init();
    //cleds__init();
-   cstorm_init();
-   cwellknown_init();
-   rrt_init();
+  // cstorm_init();
+  // cwellknown_init();
+  // rrt_init();
    // TCP
-   techo_init();
+  // techo_init();
    // UDP
 //   uecho_init();
 }

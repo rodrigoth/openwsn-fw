@@ -54,6 +54,69 @@ void schedule_init() {
          &temp_neighbor                         // neighbor
       );
    }
+
+   open_addr_t sink;
+   uint8_t slotoffset = 10;
+   uint8_t choffset   = 11;
+
+   sink.type = ADDR_64B;
+   sink.addr_64b[0]=0x05;
+   sink.addr_64b[1]=0x43;
+   sink.addr_64b[2]=0x32;
+   sink.addr_64b[3]=0xff;
+   sink.addr_64b[4]=0x03;
+   sink.addr_64b[5]=0xda;
+   sink.addr_64b[6]=0x98;
+   sink.addr_64b[7]=0x87;
+
+   open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
+   open_addr_t node_64,node_62,node_61;
+   node_64.type = ADDR_64B;
+   node_64.addr_64b[0]=0x05;
+   node_64.addr_64b[1]=0x43;
+   node_64.addr_64b[2]=0x32;
+   node_64.addr_64b[3]=0xff;
+   node_64.addr_64b[4]=0x03;
+   node_64.addr_64b[5]=0xd2;
+   node_64.addr_64b[6]=0x96;
+   node_64.addr_64b[7]=0x87; //64
+
+   node_62.type = ADDR_64B;
+   node_62.addr_64b[0]=0x05;
+   node_62.addr_64b[1]=0x43;
+   node_62.addr_64b[2]=0x32;
+   node_62.addr_64b[3]=0xff;
+   node_62.addr_64b[4]=0x03;
+   node_62.addr_64b[5]=0xd9;
+   node_62.addr_64b[6]=0xb3;
+   node_62.addr_64b[7]=0x86; //62
+
+   node_61.type = ADDR_64B;
+   node_61.addr_64b[0]=0x05;
+   node_61.addr_64b[1]=0x43;
+   node_61.addr_64b[2]=0x32;
+   node_61.addr_64b[3]=0xff;
+   node_61.addr_64b[4]=0x03;
+   node_61.addr_64b[5]=0xda;
+   node_61.addr_64b[6]=0xa9;
+   node_61.addr_64b[7]=0x88;//61
+
+
+
+   if (packetfunctions_sameAddress(my_address,&node_62)) {
+	   schedule_addActiveSlot(20,CELLTYPE_TX,FALSE,7,&sink);
+	   schedule_addActiveSlot(21,CELLTYPE_TX,FALSE,7,&node_61);
+	   schedule_addActiveSlot(22,CELLTYPE_TX,FALSE,7,&node_64);
+   }
+
+   if (packetfunctions_sameAddress(my_address,&node_61)) {
+	   schedule_addActiveSlot(21,CELLTYPE_RX,FALSE,7,&node_62);
+   }
+
+
+   if (packetfunctions_sameAddress(my_address,&node_64)) {
+	   schedule_addActiveSlot(22,CELLTYPE_RX,FALSE,7,&node_62);
+   }
 }
 
 /**
@@ -580,7 +643,7 @@ void schedule_advanceSlot() {
    if (schedule_vars.currentScheduleEntry->slotOffset >= ((scheduleEntry_t*)schedule_vars.currentScheduleEntry->next)->slotOffset
        ) {
        // one slotframe has elapsed
-       sf0_notifyNewSlotframe();
+       //sf0_notifyNewSlotframe();
    }   
    schedule_vars.currentScheduleEntry = schedule_vars.currentScheduleEntry->next;
    
@@ -826,7 +889,8 @@ void schedule_indicateTx(asn_t* asnTimestamp, bool succesfullTx) {
 
 
 void schedule_housekeeping(){
-    uint8_t     i;
+    /*
+	uint8_t     i;
     open_addr_t neighbor;
     
     
@@ -850,6 +914,7 @@ void schedule_housekeeping(){
     }
    
     ENABLE_INTERRUPTS();
+    */
 }
 
 //=========================== private =========================================

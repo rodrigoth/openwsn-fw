@@ -108,6 +108,7 @@ enum {
    STATUS_NEIGHBORS                    =  9,
    STATUS_KAPERIOD                     = 10,
    STATUS_MAX                          = 11,
+   STATUS_EB						   = 12,
 };
 
 //component identifiers
@@ -348,6 +349,8 @@ typedef struct {
    asn_t            asn;
    uint8_t          joinPrio;
    bool             f6PNORES;
+   uint8_t          totalEBReceived;
+
 } neighborRow_t;
 END_PACK
 

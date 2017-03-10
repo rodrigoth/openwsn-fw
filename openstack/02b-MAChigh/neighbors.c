@@ -619,6 +619,31 @@ void removeNeighbor(uint8_t neighborIndex) {
    neighbors_vars.neighbors[neighborIndex].f6PNORES                  = FALSE;
 }
 
+//eb
+
+void neighbors_pushEbSerial(open_addr_t *neighbor) {
+	uint8_t i;
+
+	for (i=0;i<MAXNUMNEIGHBORS;i++) {
+	   if (packetfunctions_sameAddress(neighbor, &neighbors_vars.neighbors[i].addr_64b)) {
+		  debugNeighborEntry_t temp;
+		  temp.neighborEntry=neighbors_vars.neighbors[i];
+		  openserial_printStatus(STATUS_EB,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
+		  neighbors_vars.neighbors[i].totalEBReceived = 0;
+	   }
+	}
+}
+
+void neighbors_updateEBStats(open_addr_t *neighbor) {
+	uint8_t i;
+
+	for (i=0;i<MAXNUMNEIGHBORS;i++) {
+	   if (packetfunctions_sameAddress(neighbor, &neighbors_vars.neighbors[i].addr_64b)) {
+		  neighbors_vars.neighbors[i].totalEBReceived++;
+	   }
+	}
+}
+
 //=========================== helpers =========================================
 
 bool isThisRowMatching(open_addr_t* address, uint8_t rowNumber) {
