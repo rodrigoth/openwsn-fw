@@ -13,10 +13,11 @@
 
 uinject_vars_t uinject_vars;
 
-static const uint8_t uinject_dst_addr[]   = {
-   0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
-}; 
+static const uint8_t node_60[]         =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xdb, 0xa6, 0x86};
+static const uint8_t ipAddr_node_61[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xda, 0xa9, 0x88};
+static const uint8_t ipAddr_node_64[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xd2, 0x96, 0x87};
+
+uint8_t order = 1;
 
 //=========================== prototypes ======================================
 
@@ -45,15 +46,7 @@ void uinject_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
 }
 
 void uinject_receive(OpenQueueEntry_t* pkt) {
-   
    openqueue_freePacketBuffer(pkt);
-   
-   openserial_printError(
-      COMPONENT_UINJECT,
-      ERR_RCVD_ECHO_REPLY,
-      (errorparameter_t)0,
-      (errorparameter_t)0
-   );
 }
 
 //=========================== private =========================================
@@ -69,7 +62,23 @@ void uinject_timer_cb(opentimer_id_t id){
 
 void uinject_task_cb() {
    OpenQueueEntry_t*    pkt;
-   uint8_t              asnArray[5];
+  
+   open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
+   open_addr_t node_62;
+
+   node_62.type = ADDR_64B;
+   node_62.addr_64b[0]=0x05;
+   node_62.addr_64b[1]=0x43;
+   node_62.addr_64b[2]=0x32;
+   node_62.addr_64b[3]=0xff;
+   node_62.addr_64b[4]=0x03;
+   node_62.addr_64b[5]=0xd9;  
+   node_62.addr_64b[6]=0xb3;
+   node_62.addr_64b[7]=0x86; //62
+
+   if (!packetfunctions_sameAddress(my_address,&node_62)) {
+        return; 
+   }
    
    // don't run if not synch
    if (ieee154e_isSynch() == FALSE) return;
@@ -79,9 +88,7 @@ void uinject_task_cb() {
       opentimers_stop(uinject_vars.timerId);
       return;
    }
-   
-   // if you get here, send a packet
-   
+  
    // get a free packet buffer
    pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
    if (pkt==NULL) {
@@ -100,20 +107,24 @@ void uinject_task_cb() {
    pkt->l4_destination_port           = WKP_UDP_INJECT;
    pkt->l4_sourcePortORicmpv6Type     = WKP_UDP_INJECT;
    pkt->l3_destinationAdd.type        = ADDR_128B;
-   memcpy(&pkt->l3_destinationAdd.addr_128b[0],uinject_dst_addr,16);
+    
+   if (order == 1) {
+       memcpy(&pkt->l3_destinationAdd.addr_128b[0],node_60,16);
+   }
+
+   if (order == 2) {
+       memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_61,16);
+   }
+
+   if (order == 3) {
+       memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_64,16);
+       order = 0;
+   }
+    
+   order++;
    
-   packetfunctions_reserveHeaderSize(pkt,sizeof(uint16_t));
-   pkt->payload[1] = (uint8_t)((uinject_vars.counter & 0xff00)>>8);
-   pkt->payload[0] = (uint8_t)(uinject_vars.counter & 0x00ff);
-   uinject_vars.counter++;
-   
-   packetfunctions_reserveHeaderSize(pkt,sizeof(asn_t));
-   ieee154e_getAsn(asnArray);
-   pkt->payload[0] = asnArray[0];
-   pkt->payload[1] = asnArray[1];
-   pkt->payload[2] = asnArray[2];
-   pkt->payload[3] = asnArray[3];
-   pkt->payload[4] = asnArray[4];
+    packetfunctions_reserveHeaderSize(pkt,sizeof(uint16_t));
+    *((uint16_t*)&pkt->payload[0]) = uinject_vars.counter++;
    
    if ((openudp_send(pkt))==E_FAIL) {
       openqueue_freePacketBuffer(pkt);
