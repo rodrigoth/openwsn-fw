@@ -8,7 +8,7 @@
 
 // CoAP
 #include "uinject.h"
-#include "cexample.h"
+
 
 //=========================== variables =======================================
 
@@ -20,5 +20,4 @@
 
 void openapps_init(void) {
    uinject_init();
-   cexample_init();
 }
