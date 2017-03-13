@@ -4,16 +4,16 @@
 
 #include "opendefs.h"
 #include "cexample.h"
-#include "opencoap.h"
+//#include "opencoap.h"
 #include "opentimers.h"
-#include "openqueue.h"
-#include "packetfunctions.h"
-#include "openserial.h"
+//#include "openqueue.h"
+//#include "packetfunctions.h"
+//#include "openserial.h"
 #include "openrandom.h"
 #include "scheduler.h"
 //#include "ADC_Channel.h"
 #include "idmanager.h"
-#include "IEEE802154E.h"
+//#include "IEEE802154E.h"
 #include "neighbors.h"
 
 //=========================== defines =========================================
@@ -104,7 +104,8 @@ void cexample_task_cb() {
 	node_60.addr_64b[7]=0x86;
 
 
-	open_addr_t node_64,node_61;
+	open_addr_t node_64,node_61,node_55,node_48,node_51,node_52,node_22;
+
 	node_64.type = ADDR_64B;
 	node_64.addr_64b[0]=0x05;
 	node_64.addr_64b[1]=0x43;
@@ -125,9 +126,66 @@ void cexample_task_cb() {
 	node_61.addr_64b[6]=0xa9;
 	node_61.addr_64b[7]=0x88;//61
 
+	node_55.type = ADDR_64B;
+   	node_55.addr_64b[0]=0x05;
+   	node_55.addr_64b[1]=0x43;
+   	node_55.addr_64b[2]=0x32;
+   	node_55.addr_64b[3]=0xff;
+   	node_55.addr_64b[4]=0x03;
+   	node_55.addr_64b[5]=0xdb;
+   	node_55.addr_64b[6]=0xb4;
+   	node_55.addr_64b[7]=0x86;//55
+
+
+   	node_48.type = ADDR_64B;
+   	node_48.addr_64b[0]=0x05;
+   	node_48.addr_64b[1]=0x43;
+   	node_48.addr_64b[2]=0x32;
+   	node_48.addr_64b[3]=0xff;
+   	node_48.addr_64b[4]=0x03;
+   	node_48.addr_64b[5]=0xd4;
+   	node_48.addr_64b[6]=0x97;
+   	node_48.addr_64b[7]=0x89;//48
+
+   	node_51.type = ADDR_64B;
+   	node_51.addr_64b[0]=0x05;
+   	node_51.addr_64b[1]=0x43;
+   	node_51.addr_64b[2]=0x32;
+   	node_51.addr_64b[3]=0xff;
+   	node_51.addr_64b[4]=0x03;
+   	node_51.addr_64b[5]=0xde;
+   	node_51.addr_64b[6]=0xa5;
+   	node_51.addr_64b[7]=0x85;//51
+
+
+   	node_52.type = ADDR_64B;
+   	node_52.addr_64b[0]=0x05;
+   	node_52.addr_64b[1]=0x43;
+   	node_52.addr_64b[2]=0x32;
+   	node_52.addr_64b[3]=0xff;
+   	node_52.addr_64b[4]=0x03;
+   	node_52.addr_64b[5]=0xd7;
+   	node_52.addr_64b[6]=0x96;
+   	node_52.addr_64b[7]=0x89;//52
+
+   	node_22.type = ADDR_64B;
+   	node_22.addr_64b[0]=0x05;
+   	node_22.addr_64b[1]=0x43;
+   	node_22.addr_64b[2]=0x32;
+   	node_22.addr_64b[3]=0xff;
+   	node_22.addr_64b[4]=0x03;
+   	node_22.addr_64b[5]=0xdd;
+   	node_22.addr_64b[6]=0xa4;
+   	node_22.addr_64b[7]=0x88;
+
 	neighbors_pushEbSerial(&node_60);
 	neighbors_pushEbSerial(&node_64);
 	neighbors_pushEbSerial(&node_61);
+	neighbors_pushEbSerial(&node_55);
+	neighbors_pushEbSerial(&node_48);
+	neighbors_pushEbSerial(&node_51);
+	neighbors_pushEbSerial(&node_52);
+	neighbors_pushEbSerial(&node_22);
 }
 
 void cexample_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
