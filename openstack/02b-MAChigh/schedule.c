@@ -70,7 +70,7 @@ void schedule_init() {
    node_60.addr_64b[7]=0x86;
 
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-   open_addr_t node_64,node_62,node_61,node_55,node_48,node_51,node_52,node_22;
+   open_addr_t node_64,node_62,node_61,node_6,node_8,node_47,node_32,node_22;
    node_64.type = ADDR_64B;
    node_64.addr_64b[0]=0x05;
    node_64.addr_64b[1]=0x43;
@@ -101,47 +101,47 @@ void schedule_init() {
    node_61.addr_64b[6]=0xa9;
    node_61.addr_64b[7]=0x88;//61
 
-   node_55.type = ADDR_64B;
-   node_55.addr_64b[0]=0x05;
-   node_55.addr_64b[1]=0x43;
-   node_55.addr_64b[2]=0x32;
-   node_55.addr_64b[3]=0xff;
-   node_55.addr_64b[4]=0x03;
-   node_55.addr_64b[5]=0xdb;
-   node_55.addr_64b[6]=0xb4;
-   node_55.addr_64b[7]=0x86;//55
+   node_6.type = ADDR_64B;
+   node_6.addr_64b[0]=0x05;
+   node_6.addr_64b[1]=0x43;
+   node_6.addr_64b[2]=0x32;
+   node_6.addr_64b[3]=0xff;
+   node_6.addr_64b[4]=0x03;
+   node_6.addr_64b[5]=0xd9;
+   node_6.addr_64b[6]=0x92;
+   node_6.addr_64b[7]=0x87;//6
 
 
-   node_48.type = ADDR_64B;
-   node_48.addr_64b[0]=0x05;
-   node_48.addr_64b[1]=0x43;
-   node_48.addr_64b[2]=0x32;
-   node_48.addr_64b[3]=0xff;
-   node_48.addr_64b[4]=0x03;
-   node_48.addr_64b[5]=0xd4;
-   node_48.addr_64b[6]=0x97;
-   node_48.addr_64b[7]=0x89;//48
+   node_8.type = ADDR_64B;
+   node_8.addr_64b[0]=0x05;
+   node_8.addr_64b[1]=0x43;
+   node_8.addr_64b[2]=0x32;
+   node_8.addr_64b[3]=0xff;
+   node_8.addr_64b[4]=0x03;
+   node_8.addr_64b[5]=0xd8;
+   node_8.addr_64b[6]=0xa8;
+   node_8.addr_64b[7]=0x87;//8
 
-   node_51.type = ADDR_64B;
-   node_51.addr_64b[0]=0x05;
-   node_51.addr_64b[1]=0x43;
-   node_51.addr_64b[2]=0x32;
-   node_51.addr_64b[3]=0xff;
-   node_51.addr_64b[4]=0x03;
-   node_51.addr_64b[5]=0xde;
-   node_51.addr_64b[6]=0xa5;
-   node_51.addr_64b[7]=0x85;//51
+   node_47.type = ADDR_64B;
+   node_47.addr_64b[0]=0x05;
+   node_47.addr_64b[1]=0x43;
+   node_47.addr_64b[2]=0x32;
+   node_47.addr_64b[3]=0xff;
+   node_47.addr_64b[4]=0x03;
+   node_47.addr_64b[5]=0xd6;
+   node_47.addr_64b[6]=0xa4;
+   node_47.addr_64b[7]=0x87;//47
 
 
-   node_52.type = ADDR_64B;
-   node_52.addr_64b[0]=0x05;
-   node_52.addr_64b[1]=0x43;
-   node_52.addr_64b[2]=0x32;
-   node_52.addr_64b[3]=0xff;
-   node_52.addr_64b[4]=0x03;
-   node_52.addr_64b[5]=0xd7;
-   node_52.addr_64b[6]=0x96;
-   node_52.addr_64b[7]=0x89;//52
+   node_32.type = ADDR_64B;
+   node_32.addr_64b[0]=0x05;
+   node_32.addr_64b[1]=0x43;
+   node_32.addr_64b[2]=0x32;
+   node_32.addr_64b[3]=0xff;
+   node_32.addr_64b[4]=0x03;
+   node_32.addr_64b[5]=0xd7;
+   node_32.addr_64b[6]=0xb2;
+   node_32.addr_64b[7]=0x87;//32
 
    node_22.type = ADDR_64B;
    node_22.addr_64b[0]=0x05;
@@ -158,10 +158,10 @@ void schedule_init() {
 	   schedule_addActiveSlot(20,CELLTYPE_TX,FALSE,7,&node_60);
 	   schedule_addActiveSlot(21,CELLTYPE_TX,FALSE,7,&node_61);
 	   schedule_addActiveSlot(22,CELLTYPE_TX,FALSE,7,&node_64);
-      schedule_addActiveSlot(23,CELLTYPE_TX,FALSE,7,&node_55);
-      schedule_addActiveSlot(24,CELLTYPE_TX,FALSE,7,&node_48);
-      schedule_addActiveSlot(25,CELLTYPE_TX,FALSE,7,&node_51);
-      schedule_addActiveSlot(26,CELLTYPE_TX,FALSE,7,&node_52);
+      schedule_addActiveSlot(23,CELLTYPE_TX,FALSE,7,&node_6);
+      schedule_addActiveSlot(24,CELLTYPE_TX,FALSE,7,&node_8);
+      schedule_addActiveSlot(25,CELLTYPE_TX,FALSE,7,&node_47);
+      schedule_addActiveSlot(26,CELLTYPE_TX,FALSE,7,&node_32);
       schedule_addActiveSlot(27,CELLTYPE_TX,FALSE,7,&node_22);
    }
 
@@ -179,19 +179,19 @@ void schedule_init() {
 	   schedule_addActiveSlot(20,CELLTYPE_RX,FALSE,7,&node_62);
    }
 
-   if (packetfunctions_sameAddress(my_address,&node_55)) {
+   if (packetfunctions_sameAddress(my_address,&node_6)) {
       schedule_addActiveSlot(23,CELLTYPE_RX,FALSE,7,&node_62);
    }
 
-   if (packetfunctions_sameAddress(my_address,&node_48)) {
+   if (packetfunctions_sameAddress(my_address,&node_8)) {
       schedule_addActiveSlot(24,CELLTYPE_RX,FALSE,7,&node_62);
    }
 
-   if (packetfunctions_sameAddress(my_address,&node_51)) {
+   if (packetfunctions_sameAddress(my_address,&node_47)) {
       schedule_addActiveSlot(25,CELLTYPE_RX,FALSE,7,&node_62);
    }
 
-   if (packetfunctions_sameAddress(my_address,&node_52)) {
+   if (packetfunctions_sameAddress(my_address,&node_32)) {
       schedule_addActiveSlot(26,CELLTYPE_RX,FALSE,7,&node_62);
    }
 
