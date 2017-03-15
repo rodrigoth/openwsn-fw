@@ -483,11 +483,11 @@ bool debugPrint_outBufferIndexes() {
     temp_buffer[1] = openserial_vars.outputBufIdxR;
     ENABLE_INTERRUPTS();
     
-    openserial_printStatus(
+    /*openserial_printStatus(
         STATUS_OUTBUFFERINDEXES,
         (uint8_t*)temp_buffer,
         sizeof(temp_buffer)
-    );
+    );*/
     
     return TRUE;
 }

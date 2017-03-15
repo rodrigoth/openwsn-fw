@@ -384,7 +384,7 @@ bool debugPrint_asn() {
    output.byte4         =  ieee154e_vars.asn.byte4;
    output.bytes2and3    =  ieee154e_vars.asn.bytes2and3;
    output.bytes0and1    =  ieee154e_vars.asn.bytes0and1;
-   openserial_printStatus(STATUS_ASN,(uint8_t*)&output,sizeof(output));
+   //openserial_printStatus(STATUS_ASN,(uint8_t*)&output,sizeof(output));
    return TRUE;
 }
 
@@ -399,7 +399,7 @@ status information about several modules in the OpenWSN stack.
 bool debugPrint_isSync() {
    uint8_t output=0;
    output = ieee154e_vars.isSync;
-   openserial_printStatus(STATUS_ISSYNC,(uint8_t*)&output,sizeof(uint8_t));
+   //openserial_printStatus(STATUS_ISSYNC,(uint8_t*)&output,sizeof(uint8_t));
    return TRUE;
 }
 
@@ -413,7 +413,7 @@ status information about several modules in the OpenWSN stack.
 */
 bool debugPrint_macStats() {
    // send current stats over serial
-   openserial_printStatus(STATUS_MACSTATS,(uint8_t*)&ieee154e_stats,sizeof(ieee154e_stats_t));
+   //openserial_printStatus(STATUS_MACSTATS,(uint8_t*)&ieee154e_stats,sizeof(ieee154e_stats_t));
    return TRUE;
 }
 

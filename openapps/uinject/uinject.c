@@ -8,17 +8,24 @@
 #include "scheduler.h"
 #include "IEEE802154E.h"
 #include "idmanager.h"
-//#include "neighbors.h"
+#include "neighbors.h"
 
 //=========================== variables =======================================
 
 uinject_vars_t uinject_vars;
 
-static const uint8_t node_60[]         =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xdb, 0xa6, 0x86};
-static const uint8_t ipAddr_node_61[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xda, 0xa9, 0x88};
-static const uint8_t ipAddr_node_64[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xd2, 0x96, 0x87};
+static const uint8_t ipAddr_node_87[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xd7, 0x92, 0x77};
+static const uint8_t ipAddr_node_78[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xd8, 0xa3, 0x82};
+static const uint8_t ipAddr_node_76[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xd8, 0x91, 0x77};
+static const uint8_t ipAddr_node_74[]  =    {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xd7, 0xa1, 0x71};
+static const uint8_t ipAddr_node_71[]  =    {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xda, 0xa7, 0x79};
+static const uint8_t ipAddr_node_70[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xd7, 0x90, 0x67};
+static const uint8_t ipAddr_node_92[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xdb, 0xb0, 0x78};
+static const uint8_t ipAddr_node_94[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x02, 0xda, 0x29, 0x60};
+
 
 uint8_t order = 1;
+uint8_t order_eb = 1;
 
 //=========================== prototypes ======================================
 
@@ -35,21 +42,21 @@ void uinject_init() {
    memset(&uinject_vars,0,sizeof(uinject_vars_t));
      
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-   open_addr_t node_62;
-   node_62.type = ADDR_64B;
-   node_62.addr_64b[0]=0x05;
-   node_62.addr_64b[1]=0x43;
-   node_62.addr_64b[2]=0x32;
-   node_62.addr_64b[3]=0xff;
-   node_62.addr_64b[4]=0x03;
-   node_62.addr_64b[5]=0xd9;
-   node_62.addr_64b[6]=0xb3;
-   node_62.addr_64b[7]=0x86; //62
+   open_addr_t node_86;
+   node_86.type = ADDR_64B;
+   node_86.addr_64b[0]=0x05;
+   node_86.addr_64b[1]=0x43;
+   node_86.addr_64b[2]=0x32;
+   node_86.addr_64b[3]=0xff;
+   node_86.addr_64b[4]=0x03;
+   node_86.addr_64b[5]=0xd9;
+   node_86.addr_64b[6]=0xa4;
+   node_86.addr_64b[7]=0x71;
    
-   if (packetfunctions_sameAddress(my_address,&node_62)) {	
+   if (packetfunctions_sameAddress(my_address,&node_86)) {	
        uinject_vars.period = UINJECT_PERIOD_MS;   
 
-       uinject_vars.ebTimer = opentimers_start(360000,TIMER_PERIODIC,TIME_MS,uinject_timer_eb);
+       uinject_vars.ebTimer = opentimers_start(UINJECT_EB_PERIOD_MS,TIMER_PERIODIC,TIME_MS,uinject_timer_eb);
        uinject_vars.timerId = opentimers_start(uinject_vars.period,TIMER_PERIODIC,TIME_MS,uinject_timer_cb);
    }
 }
@@ -82,100 +89,122 @@ void uinject_task_eb() {
 	// don't run if not synch
    	if (ieee154e_isSynch() == FALSE) return;	
 	
-	open_addr_t node_60;//sink
-	node_60.type = ADDR_64B;
-	node_60.addr_64b[0]=0x05;
-	node_60.addr_64b[1]=0x43;
-	node_60.addr_64b[2]=0x32;
-	node_60.addr_64b[3]=0xff;
-	node_60.addr_64b[4]=0x03;
-	node_60.addr_64b[5]=0xdb;
-	node_60.addr_64b[6]=0xa6;
-	node_60.addr_64b[7]=0x86;
+	open_addr_t node_87,node_78,node_76,node_74,node_71,node_70,node_92,node_94;
+   node_87.type = ADDR_64B;
+   node_87.addr_64b[0]=0x05;
+   node_87.addr_64b[1]=0x43;
+   node_87.addr_64b[2]=0x32;
+   node_87.addr_64b[3]=0xff;
+   node_87.addr_64b[4]=0x03;
+   node_87.addr_64b[5]=0xd7;
+   node_87.addr_64b[6]=0x92;
+   node_87.addr_64b[7]=0x77; //64
 
-        open_addr_t node_64,node_61,node_6,node_8,node_32,node_47,node_22;
+   node_78.type = ADDR_64B;
+   node_78.addr_64b[0]=0x05;
+   node_78.addr_64b[1]=0x43;
+   node_78.addr_64b[2]=0x32;
+   node_78.addr_64b[3]=0xff;
+   node_78.addr_64b[4]=0x03;
+   node_78.addr_64b[5]=0xd8;
+   node_78.addr_64b[6]=0xa3;
+   node_78.addr_64b[7]=0x82; //62
 
-	node_64.type = ADDR_64B;
-	node_64.addr_64b[0]=0x05;
-	node_64.addr_64b[1]=0x43;
-	node_64.addr_64b[2]=0x32;
-	node_64.addr_64b[3]=0xff;
-	node_64.addr_64b[4]=0x03;
-	node_64.addr_64b[5]=0xd2;
-	node_64.addr_64b[6]=0x96;
-	node_64.addr_64b[7]=0x87; //64
+   node_76.type = ADDR_64B;
+   node_76.addr_64b[0]=0x05;
+   node_76.addr_64b[1]=0x43;
+   node_76.addr_64b[2]=0x32;
+   node_76.addr_64b[3]=0xff;
+   node_76.addr_64b[4]=0x03;
+   node_76.addr_64b[5]=0xd8;
+   node_76.addr_64b[6]=0x91;
+   node_76.addr_64b[7]=0x77;//61
 
-	node_61.type = ADDR_64B;
-	node_61.addr_64b[0]=0x05;
-	node_61.addr_64b[1]=0x43;
-	node_61.addr_64b[2]=0x32;
-	node_61.addr_64b[3]=0xff;
-	node_61.addr_64b[4]=0x03;
-	node_61.addr_64b[5]=0xda;
-	node_61.addr_64b[6]=0xa9;
-	node_61.addr_64b[7]=0x88;//61
-
-	node_6.type = ADDR_64B;
-   node_6.addr_64b[0]=0x05;
-   node_6.addr_64b[1]=0x43;
-   node_6.addr_64b[2]=0x32;
-   node_6.addr_64b[3]=0xff;
-   node_6.addr_64b[4]=0x03;
-   node_6.addr_64b[5]=0xd9;
-   node_6.addr_64b[6]=0x92;
-   node_6.addr_64b[7]=0x87;//6
+   node_74.type = ADDR_64B;
+   node_74.addr_64b[0]=0x05;
+   node_74.addr_64b[1]=0x43;
+   node_74.addr_64b[2]=0x32;
+   node_74.addr_64b[3]=0xff;
+   node_74.addr_64b[4]=0x03;
+   node_74.addr_64b[5]=0xd7;
+   node_74.addr_64b[6]=0xa1;
+   node_74.addr_64b[7]=0x71;//6
 
 
-   node_8.type = ADDR_64B;
-   node_8.addr_64b[0]=0x05;
-   node_8.addr_64b[1]=0x43;
-   node_8.addr_64b[2]=0x32;
-   node_8.addr_64b[3]=0xff;
-   node_8.addr_64b[4]=0x03;
-   node_8.addr_64b[5]=0xd8;
-   node_8.addr_64b[6]=0xa8;
-   node_8.addr_64b[7]=0x87;//8
+   node_71.type = ADDR_64B;
+   node_71.addr_64b[0]=0x05;
+   node_71.addr_64b[1]=0x43;
+   node_71.addr_64b[2]=0x32;
+   node_71.addr_64b[3]=0xff;
+   node_71.addr_64b[4]=0x03;
+   node_71.addr_64b[5]=0xda;
+   node_71.addr_64b[6]=0xa7;
+   node_71.addr_64b[7]=0x79;
 
-   node_47.type = ADDR_64B;
-   node_47.addr_64b[0]=0x05;
-   node_47.addr_64b[1]=0x43;
-   node_47.addr_64b[2]=0x32;
-   node_47.addr_64b[3]=0xff;
-   node_47.addr_64b[4]=0x03;
-   node_47.addr_64b[5]=0xd6;
-   node_47.addr_64b[6]=0xa4;
-   node_47.addr_64b[7]=0x87;//47
+   node_70.type = ADDR_64B;
+   node_70.addr_64b[0]=0x05;
+   node_70.addr_64b[1]=0x43;
+   node_70.addr_64b[2]=0x32;
+   node_70.addr_64b[3]=0xff;
+   node_70.addr_64b[4]=0x03;
+   node_70.addr_64b[5]=0xd7;
+   node_70.addr_64b[6]=0x90;
+   node_70.addr_64b[7]=0x67;//47
 
 
-   node_32.type = ADDR_64B;
-   node_32.addr_64b[0]=0x05;
-   node_32.addr_64b[1]=0x43;
-   node_32.addr_64b[2]=0x32;
-   node_32.addr_64b[3]=0xff;
-   node_32.addr_64b[4]=0x03;
-   node_32.addr_64b[5]=0xd7;
-   node_32.addr_64b[6]=0xb2;
-   node_32.addr_64b[7]=0x87;//32
+   node_92.type = ADDR_64B;
+   node_92.addr_64b[0]=0x05;
+   node_92.addr_64b[1]=0x43;
+   node_92.addr_64b[2]=0x32;
+   node_92.addr_64b[3]=0xff;
+   node_92.addr_64b[4]=0x03;
+   node_92.addr_64b[5]=0xdb;
+   node_92.addr_64b[6]=0xb0;
+   node_92.addr_64b[7]=0x78;//32
 
-   	node_22.type = ADDR_64B;
-   	node_22.addr_64b[0]=0x05;
-   	node_22.addr_64b[1]=0x43;
-   	node_22.addr_64b[2]=0x32;
-   	node_22.addr_64b[3]=0xff;
-   	node_22.addr_64b[4]=0x03;
-   	node_22.addr_64b[5]=0xdd;
-   	node_22.addr_64b[6]=0xa4;
-   	node_22.addr_64b[7]=0x88;
+   node_94.type = ADDR_64B;
+   node_94.addr_64b[0]=0x05;
+   node_94.addr_64b[1]=0x43;
+   node_94.addr_64b[2]=0x32;
+   node_94.addr_64b[3]=0xff;
+   node_94.addr_64b[4]=0x02;
+   node_94.addr_64b[5]=0xda;
+   node_94.addr_64b[6]=0x29;
+   node_94.addr_64b[7]=0x60;
 
-	/*neighbors_pushEbSerial(&node_60);
-	neighbors_pushEbSerial(&node_64);
-	neighbors_pushEbSerial(&node_61);
-	neighbors_pushEbSerial(&node_6);
-	neighbors_pushEbSerial(&node_8);
-	neighbors_pushEbSerial(&node_47);
-	neighbors_pushEbSerial(&node_32);
-	neighbors_pushEbSerial(&node_22);*/
+	if(order_eb == 1) {
+        neighbors_pushEbSerial(&node_87);
+    }
 
+    if(order_eb == 2) {
+        neighbors_pushEbSerial(&node_78);
+    }
+    
+    if(order_eb == 3) {
+        neighbors_pushEbSerial(&node_74);
+    }
+
+    if (order_eb == 4) {
+        neighbors_pushEbSerial(&node_71);
+    }
+
+    if (order_eb == 5) {
+	    neighbors_pushEbSerial(&node_70);
+    }
+
+    if(order_eb == 6) {
+        neighbors_pushEbSerial(&node_92);
+    }
+
+    if(order_eb == 7) {
+	    neighbors_pushEbSerial(&node_94);
+    }
+
+    if(order_eb == 8) {
+	    neighbors_pushEbSerial(&node_76);
+        order_eb = 0;
+    }
+    order_eb++;
 }
 
 
@@ -205,15 +234,35 @@ void uinject_task_cb() {
    pkt->l3_destinationAdd.type        = ADDR_128B;
     
    if (order == 1) {
-       memcpy(&pkt->l3_destinationAdd.addr_128b[0],node_60,16);
+       memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_87,16);
    }
 
    if (order == 2) {
-       memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_61,16);
+       memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_78,16);
    }
 
    if (order == 3) {
-       memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_64,16);
+       memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_76,16);
+   }
+
+   if (order == 4) {
+       memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_74,16);
+   }
+
+   if (order == 5) {
+       memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_71,16);
+   }
+
+   if (order == 6) {
+       memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_70,16);
+   }
+
+   if (order == 7) {
+       memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_92,16);
+   }
+
+   if (order == 8) {
+       memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_94,16);
        order = 0;
    }
     

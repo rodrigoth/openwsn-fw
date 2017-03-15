@@ -55,148 +55,146 @@ void schedule_init() {
       );
    }
 
-   open_addr_t node_60;
+   open_addr_t node_86;
    uint8_t slotoffset = 10;
    uint8_t choffset   = 11;
 
-   node_60.type = ADDR_64B;
-   node_60.addr_64b[0]=0x05;
-   node_60.addr_64b[1]=0x43;
-   node_60.addr_64b[2]=0x32;
-   node_60.addr_64b[3]=0xff;
-   node_60.addr_64b[4]=0x03;
-   node_60.addr_64b[5]=0xdb;
-   node_60.addr_64b[6]=0xa6;
-   node_60.addr_64b[7]=0x86;
+   node_86.type = ADDR_64B;
+   node_86.addr_64b[0]=0x05;
+   node_86.addr_64b[1]=0x43;
+   node_86.addr_64b[2]=0x32;
+   node_86.addr_64b[3]=0xff;
+   node_86.addr_64b[4]=0x03;
+   node_86.addr_64b[5]=0xd7;
+   node_86.addr_64b[6]=0x92;
+   node_86.addr_64b[7]=0x77;
 
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-   open_addr_t node_64,node_62,node_61,node_6,node_8,node_47,node_32,node_22;
-   node_64.type = ADDR_64B;
-   node_64.addr_64b[0]=0x05;
-   node_64.addr_64b[1]=0x43;
-   node_64.addr_64b[2]=0x32;
-   node_64.addr_64b[3]=0xff;
-   node_64.addr_64b[4]=0x03;
-   node_64.addr_64b[5]=0xd2;
-   node_64.addr_64b[6]=0x96;
-   node_64.addr_64b[7]=0x87; //64
+   open_addr_t node_87,node_78,node_76,node_74,node_71,node_70,node_92,node_94;
+   node_87.type = ADDR_64B;
+   node_87.addr_64b[0]=0x05;
+   node_87.addr_64b[1]=0x43;
+   node_87.addr_64b[2]=0x32;
+   node_87.addr_64b[3]=0xff;
+   node_87.addr_64b[4]=0x03;
+   node_87.addr_64b[5]=0xd7;
+   node_87.addr_64b[6]=0x92;
+   node_87.addr_64b[7]=0x77; //64
 
-   node_62.type = ADDR_64B;
-   node_62.addr_64b[0]=0x05;
-   node_62.addr_64b[1]=0x43;
-   node_62.addr_64b[2]=0x32;
-   node_62.addr_64b[3]=0xff;
-   node_62.addr_64b[4]=0x03;
-   node_62.addr_64b[5]=0xd9;
-   node_62.addr_64b[6]=0xb3;
-   node_62.addr_64b[7]=0x86; //62
+   node_78.type = ADDR_64B;
+   node_78.addr_64b[0]=0x05;
+   node_78.addr_64b[1]=0x43;
+   node_78.addr_64b[2]=0x32;
+   node_78.addr_64b[3]=0xff;
+   node_78.addr_64b[4]=0x03;
+   node_78.addr_64b[5]=0xd8;
+   node_78.addr_64b[6]=0xa3;
+   node_78.addr_64b[7]=0x82; //62
 
-   node_61.type = ADDR_64B;
-   node_61.addr_64b[0]=0x05;
-   node_61.addr_64b[1]=0x43;
-   node_61.addr_64b[2]=0x32;
-   node_61.addr_64b[3]=0xff;
-   node_61.addr_64b[4]=0x03;
-   node_61.addr_64b[5]=0xda;
-   node_61.addr_64b[6]=0xa9;
-   node_61.addr_64b[7]=0x88;//61
+   node_76.type = ADDR_64B;
+   node_76.addr_64b[0]=0x05;
+   node_76.addr_64b[1]=0x43;
+   node_76.addr_64b[2]=0x32;
+   node_76.addr_64b[3]=0xff;
+   node_76.addr_64b[4]=0x03;
+   node_76.addr_64b[5]=0xd8;
+   node_76.addr_64b[6]=0x91;
+   node_76.addr_64b[7]=0x77;//61
 
-   node_6.type = ADDR_64B;
-   node_6.addr_64b[0]=0x05;
-   node_6.addr_64b[1]=0x43;
-   node_6.addr_64b[2]=0x32;
-   node_6.addr_64b[3]=0xff;
-   node_6.addr_64b[4]=0x03;
-   node_6.addr_64b[5]=0xd9;
-   node_6.addr_64b[6]=0x92;
-   node_6.addr_64b[7]=0x87;//6
-
-
-   node_8.type = ADDR_64B;
-   node_8.addr_64b[0]=0x05;
-   node_8.addr_64b[1]=0x43;
-   node_8.addr_64b[2]=0x32;
-   node_8.addr_64b[3]=0xff;
-   node_8.addr_64b[4]=0x03;
-   node_8.addr_64b[5]=0xd8;
-   node_8.addr_64b[6]=0xa8;
-   node_8.addr_64b[7]=0x87;//8
-
-   node_47.type = ADDR_64B;
-   node_47.addr_64b[0]=0x05;
-   node_47.addr_64b[1]=0x43;
-   node_47.addr_64b[2]=0x32;
-   node_47.addr_64b[3]=0xff;
-   node_47.addr_64b[4]=0x03;
-   node_47.addr_64b[5]=0xd6;
-   node_47.addr_64b[6]=0xa4;
-   node_47.addr_64b[7]=0x87;//47
+   node_74.type = ADDR_64B;
+   node_74.addr_64b[0]=0x05;
+   node_74.addr_64b[1]=0x43;
+   node_74.addr_64b[2]=0x32;
+   node_74.addr_64b[3]=0xff;
+   node_74.addr_64b[4]=0x03;
+   node_74.addr_64b[5]=0xd7;
+   node_74.addr_64b[6]=0xa1;
+   node_74.addr_64b[7]=0x71;//6
 
 
-   node_32.type = ADDR_64B;
-   node_32.addr_64b[0]=0x05;
-   node_32.addr_64b[1]=0x43;
-   node_32.addr_64b[2]=0x32;
-   node_32.addr_64b[3]=0xff;
-   node_32.addr_64b[4]=0x03;
-   node_32.addr_64b[5]=0xd7;
-   node_32.addr_64b[6]=0xb2;
-   node_32.addr_64b[7]=0x87;//32
+   node_71.type = ADDR_64B;
+   node_71.addr_64b[0]=0x05;
+   node_71.addr_64b[1]=0x43;
+   node_71.addr_64b[2]=0x32;
+   node_71.addr_64b[3]=0xff;
+   node_71.addr_64b[4]=0x03;
+   node_71.addr_64b[5]=0xda;
+   node_71.addr_64b[6]=0xa7;
+   node_71.addr_64b[7]=0x79;//8
 
-   node_22.type = ADDR_64B;
-   node_22.addr_64b[0]=0x05;
-   node_22.addr_64b[1]=0x43;
-   node_22.addr_64b[2]=0x32;
-   node_22.addr_64b[3]=0xff;
-   node_22.addr_64b[4]=0x03;
-   node_22.addr_64b[5]=0xdd;
-   node_22.addr_64b[6]=0xa4;
-   node_22.addr_64b[7]=0x88;//22
+   node_70.type = ADDR_64B;
+   node_70.addr_64b[0]=0x05;
+   node_70.addr_64b[1]=0x43;
+   node_70.addr_64b[2]=0x32;
+   node_70.addr_64b[3]=0xff;
+   node_70.addr_64b[4]=0x03;
+   node_70.addr_64b[5]=0xd7;
+   node_70.addr_64b[6]=0x90;
+   node_70.addr_64b[7]=0x67;//47
 
 
-   if (packetfunctions_sameAddress(my_address,&node_62)) {
-	   schedule_addActiveSlot(20,CELLTYPE_TX,FALSE,7,&node_60);
-	   schedule_addActiveSlot(21,CELLTYPE_TX,FALSE,7,&node_61);
-	   schedule_addActiveSlot(22,CELLTYPE_TX,FALSE,7,&node_64);
-      schedule_addActiveSlot(23,CELLTYPE_TX,FALSE,7,&node_6);
-      schedule_addActiveSlot(24,CELLTYPE_TX,FALSE,7,&node_8);
-      schedule_addActiveSlot(25,CELLTYPE_TX,FALSE,7,&node_47);
-      schedule_addActiveSlot(26,CELLTYPE_TX,FALSE,7,&node_32);
-      schedule_addActiveSlot(27,CELLTYPE_TX,FALSE,7,&node_22);
+   node_92.type = ADDR_64B;
+   node_92.addr_64b[0]=0x05;
+   node_92.addr_64b[1]=0x43;
+   node_92.addr_64b[2]=0x32;
+   node_92.addr_64b[3]=0xff;
+   node_92.addr_64b[4]=0x03;
+   node_92.addr_64b[5]=0xdb;
+   node_92.addr_64b[6]=0xb0;
+   node_92.addr_64b[7]=0x78;//32
+
+   node_94.type = ADDR_64B;
+   node_94.addr_64b[0]=0x05;
+   node_94.addr_64b[1]=0x43;
+   node_94.addr_64b[2]=0x32;
+   node_94.addr_64b[3]=0xff;
+   node_94.addr_64b[4]=0x02;
+   node_94.addr_64b[5]=0xda;
+   node_94.addr_64b[6]=0x29;
+   node_94.addr_64b[7]=0x60;
+
+   if (packetfunctions_sameAddress(my_address,&node_86)) {
+	   schedule_addActiveSlot(20,CELLTYPE_TX,FALSE,7,&node_87);
+	   schedule_addActiveSlot(21,CELLTYPE_TX,FALSE,7,&node_78);
+	   schedule_addActiveSlot(22,CELLTYPE_TX,FALSE,7,&node_76);
+      schedule_addActiveSlot(23,CELLTYPE_TX,FALSE,7,&node_74);
+      schedule_addActiveSlot(24,CELLTYPE_TX,FALSE,7,&node_71);
+      schedule_addActiveSlot(25,CELLTYPE_TX,FALSE,7,&node_70);
+      schedule_addActiveSlot(26,CELLTYPE_TX,FALSE,7,&node_92);
+      schedule_addActiveSlot(27,CELLTYPE_TX,FALSE,7,&node_94);
    }
 
-   if (packetfunctions_sameAddress(my_address,&node_61)) {
-	   schedule_addActiveSlot(21,CELLTYPE_RX,FALSE,7,&node_62);
+   if (packetfunctions_sameAddress(my_address,&node_87)) {
+	   schedule_addActiveSlot(20,CELLTYPE_RX,FALSE,7,&node_86);
+   }
+   
+   if (packetfunctions_sameAddress(my_address,&node_78)) {
+	   schedule_addActiveSlot(21,CELLTYPE_RX,FALSE,7,&node_86);
    }
 
 
-   if (packetfunctions_sameAddress(my_address,&node_64)) {
-	   schedule_addActiveSlot(22,CELLTYPE_RX,FALSE,7,&node_62);
+   if (packetfunctions_sameAddress(my_address,&node_76)) {
+	   schedule_addActiveSlot(22,CELLTYPE_RX,FALSE,7,&node_86);
    }
 
-
-   if (packetfunctions_sameAddress(my_address,&node_60)) {
-	   schedule_addActiveSlot(20,CELLTYPE_RX,FALSE,7,&node_62);
+   if (packetfunctions_sameAddress(my_address,&node_74)) {
+      schedule_addActiveSlot(23,CELLTYPE_RX,FALSE,7,&node_86);
    }
 
-   if (packetfunctions_sameAddress(my_address,&node_6)) {
-      schedule_addActiveSlot(23,CELLTYPE_RX,FALSE,7,&node_62);
+   if (packetfunctions_sameAddress(my_address,&node_71)) {
+      schedule_addActiveSlot(24,CELLTYPE_RX,FALSE,7,&node_86);
    }
 
-   if (packetfunctions_sameAddress(my_address,&node_8)) {
-      schedule_addActiveSlot(24,CELLTYPE_RX,FALSE,7,&node_62);
+   if (packetfunctions_sameAddress(my_address,&node_70)) {
+      schedule_addActiveSlot(25,CELLTYPE_RX,FALSE,7,&node_86);
    }
 
-   if (packetfunctions_sameAddress(my_address,&node_47)) {
-      schedule_addActiveSlot(25,CELLTYPE_RX,FALSE,7,&node_62);
+   if (packetfunctions_sameAddress(my_address,&node_92)) {
+      schedule_addActiveSlot(26,CELLTYPE_RX,FALSE,7,&node_86);
    }
 
-   if (packetfunctions_sameAddress(my_address,&node_32)) {
-      schedule_addActiveSlot(26,CELLTYPE_RX,FALSE,7,&node_62);
-   }
-
-   if (packetfunctions_sameAddress(my_address,&node_22)) {
-      schedule_addActiveSlot(27,CELLTYPE_RX,FALSE,7,&node_62);
+   if (packetfunctions_sameAddress(my_address,&node_94)) {
+      schedule_addActiveSlot(27,CELLTYPE_RX,FALSE,7,&node_86);
    }
 }
 
@@ -275,11 +273,11 @@ bool debugPrint_schedule() {
    );
    
    // send status data over serial port
-   openserial_printStatus(
+ /*  openserial_printStatus(
       STATUS_SCHEDULE,
       (uint8_t*)&temp,
       sizeof(debugScheduleEntry_t)
-   );
+   );*/
    
    return TRUE;
 }
@@ -300,11 +298,11 @@ bool debugPrint_backoff() {
    temp[1] = schedule_vars.backoff;
    
    // send status data over serial port
-   openserial_printStatus(
+   /*openserial_printStatus(
       STATUS_BACKOFF,
       (uint8_t*)&temp,
       sizeof(temp)
-   );
+   );*/
    
    return TRUE;
 }

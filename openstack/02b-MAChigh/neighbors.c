@@ -534,7 +534,7 @@ bool debugPrint_neighbors() {
    neighbors_vars.debugRow=(neighbors_vars.debugRow+1)%MAXNUMNEIGHBORS;
    temp.row=neighbors_vars.debugRow;
    temp.neighborEntry=neighbors_vars.neighbors[neighbors_vars.debugRow];
-   openserial_printStatus(STATUS_NEIGHBORS,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
+   //openserial_printStatus(STATUS_NEIGHBORS,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
    return TRUE;
 }
 
@@ -571,7 +571,7 @@ void registerNewNeighbor(open_addr_t* address,
             neighbors_vars.neighbors[i].numRx                  = 1;
             neighbors_vars.neighbors[i].numTx                  = 0;
             neighbors_vars.neighbors[i].numTxACK               = 0;
-            //neighbors_vars.neighbors[i].totalEBReceived        = 0;
+            neighbors_vars.neighbors[i].totalEBReceived        = 0;
             memcpy(&neighbors_vars.neighbors[i].asn,asnTimestamp,sizeof(asn_t));
             //update jp
             if (joinPrioPresent==TRUE){
@@ -618,7 +618,7 @@ void removeNeighbor(uint8_t neighborIndex) {
    neighbors_vars.neighbors[neighborIndex].asn.bytes2and3            = 0;
    neighbors_vars.neighbors[neighborIndex].asn.byte4                 = 0;
    neighbors_vars.neighbors[neighborIndex].f6PNORES                  = FALSE;
-   //neighbors_vars.neighbors[neighborIndex].totalEBReceived           = 0;
+   neighbors_vars.neighbors[neighborIndex].totalEBReceived           = 0;
 }
 
 //eb
@@ -628,6 +628,9 @@ void neighbors_pushEbSerial(open_addr_t *neighbor) {
 
 	for (i=0;i<MAXNUMNEIGHBORS;i++) {
 	   if (packetfunctions_sameAddress(neighbor, &neighbors_vars.neighbors[i].addr_64b)) {
+            openserial_printError(COMPONENT_IEEE802154E,ERR_WRONG_STATE_IN_ENDFRAME_SYNC,
+                            (errorparameter_t)2,
+                            (errorparameter_t)2);
 		  debugNeighborEntry_t temp;
 		  temp.neighborEntry=neighbors_vars.neighbors[i];
 		  openserial_printStatus(STATUS_EB,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
@@ -637,13 +640,13 @@ void neighbors_pushEbSerial(open_addr_t *neighbor) {
 }
 
 void neighbors_updateEBStats(open_addr_t *neighbor) {
-	/*uint8_t i;
+	uint8_t i;
 
 	for (i=0;i<MAXNUMNEIGHBORS;i++) {
 	   if (packetfunctions_sameAddress(neighbor, &neighbors_vars.neighbors[i].addr_64b)) {
 		  neighbors_vars.neighbors[i].totalEBReceived++;
 	   }
-	}*/
+	}
 }
 
 //=========================== helpers =========================================
