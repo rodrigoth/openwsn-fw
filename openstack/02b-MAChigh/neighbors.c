@@ -534,7 +534,7 @@ bool debugPrint_neighbors() {
    neighbors_vars.debugRow=(neighbors_vars.debugRow+1)%MAXNUMNEIGHBORS;
    temp.row=neighbors_vars.debugRow;
    temp.neighborEntry=neighbors_vars.neighbors[neighbors_vars.debugRow];
-   //openserial_printStatus(STATUS_NEIGHBORS,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
+   openserial_printStatus(STATUS_NEIGHBORS,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
    return TRUE;
 }
 
@@ -628,9 +628,6 @@ void neighbors_pushEbSerial(open_addr_t *neighbor) {
 
 	for (i=0;i<MAXNUMNEIGHBORS;i++) {
 	   if (packetfunctions_sameAddress(neighbor, &neighbors_vars.neighbors[i].addr_64b)) {
-            openserial_printError(COMPONENT_IEEE802154E,ERR_WRONG_STATE_IN_ENDFRAME_SYNC,
-                            (errorparameter_t)2,
-                            (errorparameter_t)2);
 		  debugNeighborEntry_t temp;
 		  temp.neighborEntry=neighbors_vars.neighbors[i];
 		  openserial_printStatus(STATUS_EB,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));

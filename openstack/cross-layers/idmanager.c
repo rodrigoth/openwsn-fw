@@ -263,7 +263,7 @@ bool debugPrint_id() {
    memcpy(output.my64bID,idmanager_vars.my64bID.addr_64b,8);
    memcpy(output.myPrefix,idmanager_vars.myPrefix.prefix,8);
    
-   //openserial_printStatus(STATUS_ID,(uint8_t*)&output,sizeof(debugIDManagerEntry_t));
+   openserial_printStatus(STATUS_ID,(uint8_t*)&output,sizeof(debugIDManagerEntry_t));
    return TRUE;
 }
 
