@@ -20,7 +20,7 @@ The superframe repears over time and can be arbitrarly long.
 #define SLOTFRAME_LENGTH    101 //should be 101
 
 //draft-ietf-6tisch-minimal-06
-#define SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS                      1
+#define SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS                      3
 #define SCHEDULE_MINIMAL_6TISCH_SLOTOFFSET                        0
 #define SCHEDULE_MINIMAL_6TISCH_CHANNELOFFSET                     0
 #define SCHEDULE_MINIMAL_6TISCH_DEFAULT_SLOTFRAME_HANDLE          1 //id of slotframe
@@ -74,6 +74,7 @@ See MINBE for an explanation of backoff.
 */
 #define PDR_THRESHOLD      80 // 80 means 80%
 #define MIN_NUMTX_FOR_PDR  50 // don't calculate PDR when numTx is lower than this value 
+#define NUMBER_OF_NODES    8
 
 //=========================== typedef =========================================
 

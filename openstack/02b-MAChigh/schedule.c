@@ -10,6 +10,8 @@
 //=========================== variables =======================================
 
 schedule_vars_t schedule_vars;
+uint8_t schedule_index = 19;
+
 
 //=========================== prototypes ======================================
 
@@ -70,57 +72,13 @@ void schedule_init() {
    node_229.addr_64b[7]=0x68;
 
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-   open_addr_t node_231,node_237,node_247;
-   node_231.type = ADDR_64B;
-   node_231.addr_64b[0]=0x05;
-   node_231.addr_64b[1]=0x43;
-   node_231.addr_64b[2]=0x32;
-   node_231.addr_64b[3]=0xff;
-   node_231.addr_64b[4]=0x03;
-   node_231.addr_64b[5]=0xd8;
-   node_231.addr_64b[6]=0x87;
-   node_231.addr_64b[7]=0x79; 
-
-   node_237.type = ADDR_64B;
-   node_237.addr_64b[0]=0x05;
-   node_237.addr_64b[1]=0x43;
-   node_237.addr_64b[2]=0x32;
-   node_237.addr_64b[3]=0xff;
-   node_237.addr_64b[4]=0x02;
-   node_237.addr_64b[5]=0xd6;
-   node_237.addr_64b[6]=0x15;
-   node_237.addr_64b[7]=0x62;
-
-   node_247.type = ADDR_64B;
-   node_247.addr_64b[0]=0x05;
-   node_247.addr_64b[1]=0x43;
-   node_247.addr_64b[2]=0x32;
-   node_247.addr_64b[3]=0xff;
-   node_247.addr_64b[4]=0x03;
-   node_247.addr_64b[5]=0xda;
-   node_247.addr_64b[6]=0xa9;
-   node_247.addr_64b[7]=0x82;
-
-
-   if (packetfunctions_sameAddress(my_address,&node_229)) {
-	   schedule_addActiveSlot(20,CELLTYPE_TX,FALSE,7,&node_231);
-	   schedule_addActiveSlot(21,CELLTYPE_TX,FALSE,7,&node_237);
-	   schedule_addActiveSlot(22,CELLTYPE_TX,FALSE,7,&node_247);
-   }
-
-   if (packetfunctions_sameAddress(my_address,&node_231)) {
-	   schedule_addActiveSlot(20,CELLTYPE_RX,FALSE,7,&node_229);
-   }
    
-   if (packetfunctions_sameAddress(my_address,&node_237)) {
-	   schedule_addActiveSlot(21,CELLTYPE_RX,FALSE,7,&node_229);
+   if (!packetfunctions_sameAddress(my_address,&node_229)) {
+	   uint8_t i = 0;
+      for(i = 0; i<3; i++) {
+         schedule_addActiveSlot(schedule_index++,CELLTYPE_RX,FALSE,7,&node_229);
+      }
    }
-
-    
-   if (packetfunctions_sameAddress(my_address,&node_247)) {
-	   schedule_addActiveSlot(22,CELLTYPE_RX,FALSE,7,&node_229);
-   }
-
 }
 
 /**
@@ -344,6 +302,10 @@ owerror_t schedule_addActiveSlot(
    scheduleEntry_t* slotContainer;
    scheduleEntry_t* previousSlotWalker;
    scheduleEntry_t* nextSlotWalker;
+
+   if(slotOffset == 100) {
+      slotOffset = schedule_index++;
+   }
    
    INTERRUPT_DECLARATION();
    DISABLE_INTERRUPTS();

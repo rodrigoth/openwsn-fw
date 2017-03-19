@@ -18,7 +18,7 @@ static const uint8_t ipAddr_node_231[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00,
 static const uint8_t ipAddr_node_237[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x02, 0xd6, 0x15, 0x62};
 static const uint8_t ipAddr_node_247[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xda, 0xa9, 0x82};
 
-uint8_t order = 1;
+uint8_t order = 0;
 
 //=========================== prototypes ======================================
 
@@ -82,7 +82,7 @@ void uinject_task_eb() {
 	// don't run if not synch
    	if (ieee154e_isSynch() == FALSE) return;	
 	
-   open_addr_t node_231,node_237,node_247;
+   /*open_addr_t node_231,node_237,node_247;
    node_231.type = ADDR_64B;
    node_231.addr_64b[0]=0x05;
    node_231.addr_64b[1]=0x43;
@@ -111,7 +111,7 @@ void uinject_task_eb() {
    node_247.addr_64b[4]=0x03;
    node_247.addr_64b[5]=0xda;
    node_247.addr_64b[6]=0xa9;
-   node_247.addr_64b[7]=0x82;
+   node_247.addr_64b[7]=0x82;*/
 
 
 	 neighbors_pushEbSerial(&node_231);
@@ -122,30 +122,45 @@ void uinject_task_eb() {
 
 void uinject_task_cb() {
    OpenQueueEntry_t*    pkt;
+
    // don't run if not synch
    if (ieee154e_isSynch() == FALSE) return;
    
-  
-   // get a free packet buffer
-   pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
-   if (pkt==NULL) {
-      openserial_printError(
-         COMPONENT_UINJECT,
-         ERR_NO_FREE_PACKET_BUFFER,
-         (errorparameter_t)0,
-         (errorparameter_t)0
-      );
-      return;
+   uint8_t* ip_128;
+   ip_128 = get_neighbors_vars(order);
+   if(ip_128 != NULL) {
+         pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
+
+         if (pkt==NULL) {
+            openserial_printError(COMPONENT_UINJECT,ERR_NO_FREE_PACKET_BUFFER,(errorparameter_t)0,(errorparameter_t)0);
+            return;
+         }
+
+         pkt->owner                         = COMPONENT_UINJECT;
+         pkt->creator                       = COMPONENT_UINJECT;
+         pkt->l4_protocol                   = IANA_UDP;
+         pkt->l4_destination_port           = WKP_UDP_INJECT;
+         pkt->l4_sourcePortORicmpv6Type     = WKP_UDP_INJECT;
+         pkt->l3_destinationAdd.type        = ADDR_128B;
+
+         memcpy(&pkt->l3_destinationAdd.addr_128b[0],ip_128,16);
+         packetfunctions_reserveHeaderSize(pkt,sizeof(uint16_t));
+         *((uint16_t*)&pkt->payload[0]) = uinject_vars.counter++;
+
+         if ((openudp_send(pkt))==E_FAIL) {
+            openqueue_freePacketBuffer(pkt);
+         }
    }
    
-   pkt->owner                         = COMPONENT_UINJECT;
-   pkt->creator                       = COMPONENT_UINJECT;
-   pkt->l4_protocol                   = IANA_UDP;
-   pkt->l4_destination_port           = WKP_UDP_INJECT;
-   pkt->l4_sourcePortORicmpv6Type     = WKP_UDP_INJECT;
-   pkt->l3_destinationAdd.type        = ADDR_128B;
-    
-   if (order == 1) {
+   order++;
+
+   if (order == MAXNUMNEIGHBORS) {
+      order = 0;
+   }
+
+   
+
+   /*if (order == 1) {
        memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_231,16);
    }
 
@@ -158,12 +173,7 @@ void uinject_task_cb() {
        order = 0;
    }
     
-   order++;
+   order++;*/
    
-    packetfunctions_reserveHeaderSize(pkt,sizeof(uint16_t));
-    *((uint16_t*)&pkt->payload[0]) = uinject_vars.counter++;
    
-   if ((openudp_send(pkt))==E_FAIL) {
-      openqueue_freePacketBuffer(pkt);
-   }
 }

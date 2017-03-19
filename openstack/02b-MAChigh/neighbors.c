@@ -9,6 +9,8 @@
 //=========================== variables =======================================
 
 static neighbors_vars_t neighbors_vars;
+uint8_t ipAddr_node[16] =   {0x00};
+
 
 //=========================== prototypes ======================================
 
@@ -553,8 +555,38 @@ void registerNewNeighbor(open_addr_t* address,
                             (errorparameter_t)2);
       return;
    }
+  
+
+
    // add this neighbor
    if (isNeighbor(address)==FALSE) {
+     open_addr_t node_229,sink;
+     node_229.type = ADDR_64B;
+     node_229.addr_64b[0]=0x05;
+     node_229.addr_64b[1]=0x43;
+     node_229.addr_64b[2]=0x32;
+     node_229.addr_64b[3]=0xff;
+     node_229.addr_64b[4]=0x03;
+     node_229.addr_64b[5]=0xd7;
+     node_229.addr_64b[6]=0xb0;
+     node_229.addr_64b[7]=0x68;
+
+     sink.type = ADDR_64B;
+     sink.addr_64b[0]=0x05;
+     sink.addr_64b[1]=0x43;
+     sink.addr_64b[2]=0x32;
+     sink.addr_64b[3]=0xff;
+     sink.addr_64b[4]=0x03;
+     sink.addr_64b[5]=0xde;
+     sink.addr_64b[6]=0xb2;
+     sink.addr_64b[7]=0x68;
+
+     open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
+
+     if (packetfunctions_sameAddress(my_address,&node_229) && !packetfunctions_sameAddress(address,&sink)) {
+        schedule_addActiveSlot(100,CELLTYPE_TX,FALSE,7,address);
+     }
+
       i=0;
       while(i<MAXNUMNEIGHBORS) {
          if (neighbors_vars.neighbors[i].used==FALSE) {
@@ -623,15 +655,15 @@ void removeNeighbor(uint8_t neighborIndex) {
 
 //eb
 
-void neighbors_pushEbSerial(open_addr_t *neighbor) {
+void neighbors_pushEbSerial() {
 	uint8_t i;
 
 	for (i=0;i<MAXNUMNEIGHBORS;i++) {
-	   if (packetfunctions_sameAddress(neighbor, &neighbors_vars.neighbors[i].addr_64b)) {
-		  debugNeighborEntry_t temp;
-		  temp.neighborEntry=neighbors_vars.neighbors[i];
-		  openserial_printStatus(STATUS_EB,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
-		  neighbors_vars.neighbors[i].totalEBReceived = 0;
+	   if (neighbors_vars.neighbors[i].used == TRUE) {
+		    debugNeighborEntry_t temp;
+		    temp.neighborEntry=neighbors_vars.neighbors[i];
+		    openserial_printStatus(STATUS_EB,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
+		    neighbors_vars.neighbors[i].totalEBReceived = 0;
 	   }
 	}
 }
@@ -660,3 +692,30 @@ bool isThisRowMatching(open_addr_t* address, uint8_t rowNumber) {
          return FALSE;
    }
 }
+
+
+uint8_t * get_neighbors_vars(uint8_t order) {
+  uint8_t prefix[8] = {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+  open_addr_t sink;
+
+  sink.type = ADDR_64B;
+  sink.addr_64b[0]=0x05;
+  sink.addr_64b[1]=0x43;
+  sink.addr_64b[2]=0x32;
+  sink.addr_64b[3]=0xff;
+  sink.addr_64b[4]=0x03;
+  sink.addr_64b[5]=0xde;
+  sink.addr_64b[6]=0xb2;
+  sink.addr_64b[7]=0x68;
+
+  memset(ipAddr_node, 0x00, sizeof(ipAddr_node));
+  
+  if (!packetfunctions_sameAddress(&sink, &neighbors_vars.neighbors[order].addr_64b) && neighbors_vars.neighbors[order].used == TRUE) {
+        memcpy(&(ipAddr_node[0]),&(prefix[0]),8);
+        memcpy(&(ipAddr_node[8]),&neighbors_vars.neighbors[order].addr_64b.addr_64b[0],8);
+        return ipAddr_node;
+  }
+  
+  return NULL;
+}
+
