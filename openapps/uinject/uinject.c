@@ -14,11 +14,9 @@
 
 uinject_vars_t uinject_vars;
 
-static const uint8_t ipAddr_node_231[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xd8, 0x87, 0x79};
-static const uint8_t ipAddr_node_237[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x02, 0xd6, 0x15, 0x62};
-static const uint8_t ipAddr_node_247[]  =   {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x43, 0x32, 0xff, 0x03, 0xda, 0xa9, 0x82};
-
 uint8_t order = 0;
+uint8_t from = 0;
+uint8_t to = 3;
 
 //=========================== prototypes ======================================
 
@@ -48,9 +46,15 @@ void uinject_init() {
    
    if (packetfunctions_sameAddress(my_address,&node_229)) {	
        uinject_vars.period = UINJECT_PERIOD_MS;   
+       uinject_vars.timerId = opentimers_start(uinject_vars.period,TIMER_PERIODIC,TIME_MS,uinject_timer_cb);
+
+
+    
 
        uinject_vars.ebTimer = opentimers_start(UINJECT_EB_PERIOD_MS,TIMER_PERIODIC,TIME_MS,uinject_timer_eb);
-       uinject_vars.timerId = opentimers_start(uinject_vars.period,TIMER_PERIODIC,TIME_MS,uinject_timer_cb);
+       uinject_vars.ebTimer2 = opentimers_start(UINJECT_EB_PERIOD_MS+1000,TIMER_PERIODIC,TIME_MS,uinject_timer_eb);
+       uinject_vars.ebTimer3 = opentimers_start(UINJECT_EB_PERIOD_MS+2000,TIMER_PERIODIC,TIME_MS,uinject_timer_eb);
+       uinject_vars.ebTimer4 = opentimers_start(UINJECT_EB_PERIOD_MS+3000,TIMER_PERIODIC,TIME_MS,uinject_timer_eb);
    }
 }
 
@@ -78,45 +82,21 @@ void uinject_timer_eb(opentimer_id_t id){
    scheduler_push_task(uinject_task_eb,TASKPRIO_COAP);
 }
 
+
 void uinject_task_eb() {
-	// don't run if not synch
-   	if (ieee154e_isSynch() == FALSE) return;	
-	
-   /*open_addr_t node_231,node_237,node_247;
-   node_231.type = ADDR_64B;
-   node_231.addr_64b[0]=0x05;
-   node_231.addr_64b[1]=0x43;
-   node_231.addr_64b[2]=0x32;
-   node_231.addr_64b[3]=0xff;
-   node_231.addr_64b[4]=0x03;
-   node_231.addr_64b[5]=0xd8;
-   node_231.addr_64b[6]=0x87;
-   node_231.addr_64b[7]=0x79; 
+   // don't run if not synch
+   if (ieee154e_isSynch() == FALSE) return;  
+   
+   neighbors_pushEbSerial(from,to);
+   from = from + 3;
+   to = to + 3;
 
-   node_237.type = ADDR_64B;
-   node_237.addr_64b[0]=0x05;
-   node_237.addr_64b[1]=0x43;
-   node_237.addr_64b[2]=0x32;
-   node_237.addr_64b[3]=0xff;
-   node_237.addr_64b[4]=0x02;
-   node_237.addr_64b[5]=0xd6;
-   node_237.addr_64b[6]=0x15;
-   node_237.addr_64b[7]=0x62;
+   if(to >= MAXNUMNEIGHBORS+3) {
+      from = 0;
+      to = 3;
+   }
+   
 
-   node_247.type = ADDR_64B;
-   node_247.addr_64b[0]=0x05;
-   node_247.addr_64b[1]=0x43;
-   node_247.addr_64b[2]=0x32;
-   node_247.addr_64b[3]=0xff;
-   node_247.addr_64b[4]=0x03;
-   node_247.addr_64b[5]=0xda;
-   node_247.addr_64b[6]=0xa9;
-   node_247.addr_64b[7]=0x82;*/
-
-
-	 neighbors_pushEbSerial(&node_231);
-   neighbors_pushEbSerial(&node_237);
-   neighbors_pushEbSerial(&node_247);
 }
 
 

@@ -13,8 +13,8 @@
 //=========================== define ==========================================
 
 #define MAXPREFERENCE             2
-#define BADNEIGHBORMAXRSSI        -80 //dBm
-#define GOODNEIGHBORMINRSSI       -90 //dBm
+#define BADNEIGHBORMAXRSSI        -95 //dBm
+#define GOODNEIGHBORMINRSSI       -100 //dBm
 #define SWITCHSTABILITYTHRESHOLD  3
 #define DEFAULTLINKCOST           15
 
@@ -94,7 +94,7 @@ void          neighbors_removeOld(void);
 bool          debugPrint_neighbors(void);
 
 //eb
-void 		  neighbors_pushEbSerial(void);
+void 		  neighbors_pushEbSerial(uint8_t from, uint8_t to);
 void 		  neighbors_updateEBStats(open_addr_t *neighbor);
 
 uint8_t* get_neighbors_vars(uint8_t index);

@@ -75,7 +75,7 @@ void schedule_init() {
    
    if (!packetfunctions_sameAddress(my_address,&node_229)) {
 	   uint8_t i = 0;
-      for(i = 0; i<3; i++) {
+      for(i = 0; i<NUMBER_OF_NODES; i++) {
          schedule_addActiveSlot(schedule_index++,CELLTYPE_RX,FALSE,7,&node_229);
       }
    }

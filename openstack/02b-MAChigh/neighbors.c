@@ -536,7 +536,24 @@ bool debugPrint_neighbors() {
    neighbors_vars.debugRow=(neighbors_vars.debugRow+1)%MAXNUMNEIGHBORS;
    temp.row=neighbors_vars.debugRow;
    temp.neighborEntry=neighbors_vars.neighbors[neighbors_vars.debugRow];
-   openserial_printStatus(STATUS_NEIGHBORS,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
+   
+   open_addr_t node_229;
+   node_229.type = ADDR_64B;
+   node_229.addr_64b[0]=0x05;
+   node_229.addr_64b[1]=0x43;
+   node_229.addr_64b[2]=0x32;
+   node_229.addr_64b[3]=0xff;
+   node_229.addr_64b[4]=0x03;
+   node_229.addr_64b[5]=0xd7;
+   node_229.addr_64b[6]=0xb0;
+   node_229.addr_64b[7]=0x68;
+
+   open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
+
+
+   if (packetfunctions_sameAddress(my_address,&node_229)) {
+      openserial_printStatus(STATUS_NEIGHBORS,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
+  }
    return TRUE;
 }
 
@@ -655,16 +672,37 @@ void removeNeighbor(uint8_t neighborIndex) {
 
 //eb
 
-void neighbors_pushEbSerial() {
+void neighbors_pushEbSerial(uint8_t from, uint8_t to) {
 	uint8_t i;
+  open_addr_t sink;
+  sink.type = ADDR_64B;
+  sink.addr_64b[0]=0x05;
+  sink.addr_64b[1]=0x43;
+  sink.addr_64b[2]=0x32;
+  sink.addr_64b[3]=0xff;
+  sink.addr_64b[4]=0x03;
+  sink.addr_64b[5]=0xde;
+  sink.addr_64b[6]=0xb2;
+  sink.addr_64b[7]=0x68;
 
-	for (i=0;i<MAXNUMNEIGHBORS;i++) {
-	   if (neighbors_vars.neighbors[i].used == TRUE) {
+
+	for (i=from;i<to;i++) {
+    if (packetfunctions_sameAddress(&sink, &neighbors_vars.neighbors[i].addr_64b)) {
+      continue;
+    }
+
+    if (neighbors_vars.neighbors[i].used == TRUE) {
 		    debugNeighborEntry_t temp;
 		    temp.neighborEntry=neighbors_vars.neighbors[i];
 		    openserial_printStatus(STATUS_EB,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
 		    neighbors_vars.neighbors[i].totalEBReceived = 0;
-	   }
+        neighbors_vars.neighbors[i].numTx = 0;
+        neighbors_vars.neighbors[i].numTxACK  = 0;
+
+
+	   } else {
+      break;
+     }
 	}
 }
 
