@@ -10,7 +10,7 @@
 //=========================== variables =======================================
 
 schedule_vars_t schedule_vars;
-uint8_t schedule_index = 19;
+uint8_t schedule_index = 5;
 
 
 //=========================== prototypes ======================================
@@ -38,6 +38,7 @@ void schedule_init() {
    }
    schedule_vars.backoffExponent = MINBE-1;
    schedule_vars.maxActiveSlots = MAXACTIVESLOTS;
+   schedule_vars.backoff = openrandom_get16b()%(1<<MAXBE);
    
    start_slotOffset = SCHEDULE_MINIMAL_6TISCH_SLOTOFFSET;
    if (idmanager_getIsDAGroot()==TRUE) {
@@ -790,7 +791,7 @@ void schedule_resetBackoff() {
    // reset backoffExponent
    schedule_vars.backoffExponent = MINBE-1;
    // reset backoff
-   schedule_vars.backoff         = 0;
+   schedule_vars.backoff = openrandom_get16b()%(1<<MAXBE);
    
    ENABLE_INTERRUPTS();
 }
@@ -839,7 +840,7 @@ void schedule_indicateTx(asn_t* asnTimestamp, bool succesfullTx) {
          // reset backoffExponent
          schedule_vars.backoffExponent = MINBE-1;
          // reset backoff
-         schedule_vars.backoff         = 0;
+         schedule_vars.backoff = openrandom_get16b()%(1<<MAXBE);
       } else {
          // increase the backoffExponent
          if (schedule_vars.backoffExponent<MAXBE) {

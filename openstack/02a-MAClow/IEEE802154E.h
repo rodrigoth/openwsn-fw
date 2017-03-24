@@ -22,8 +22,8 @@ static const uint8_t chTemplate_default[] = {
 
 //=========================== define ==========================================
 
-#define SYNCHRONIZING_CHANNEL       16 // channel the mote listens on to synchronize
-#define TXRETRIES                    3 // number of MAC retries before declaring failed
+#define SYNCHRONIZING_CHANNEL       13 // channel the mote listens on to synchronize
+#define TXRETRIES                    5 // number of MAC retries before declaring failed
 #define TX_POWER                    31 // 1=-25dBm, 31=0dBm (max value)
 #define RESYNCHRONIZATIONGUARD       5 // in 32kHz ticks. min distance to the end of the slot to successfully synchronize
 #define US_PER_TICK                 30 // number of us per 32kHz clock tick
@@ -87,7 +87,6 @@ static const uint8_t chTemplate_default[] = {
 #define IEEE802154E_MLME_IE_GROUPID                        0x01
 #define IEEE802154E_ACK_NACK_TIMECORRECTION_ELEMENTID      0x1E
 
-#define IEEE802154E_NB_TOTAL                   			   10
 
 /**
 When a packet is received, it is written inside the OpenQueueEntry_t->packet

@@ -2,6 +2,7 @@
 #include "topology.h"
 #include "idmanager.h"
 
+#define FORCETOPOLOGY 1
 //=========================== defines =========================================
 
 
@@ -54,30 +55,30 @@ topology.
 bool topology_isAcceptablePacket(ieee802154_header_iht* ieee802514_header) {
 #ifdef FORCETOPOLOGY
    bool returnVal;
-   
    returnVal=FALSE;
-   switch (idmanager_getMyID(ADDR_64B)->addr_64b[7]) {
-      case 0x86:
-         if (ieee802514_header->src.addr_64b[7]==0x88 || ieee802514_header->src.addr_64b[7] == 0x87) {
-            returnVal=TRUE;
-         }
-         break;
-      case 0x66:
-         if (
-               ieee802514_header->src.addr_64b[7]==0xdf ||
-               ieee802514_header->src.addr_64b[7]==0x4f
-            ) {
-            returnVal=TRUE;
-         }
-         break;
-      case 0x4f:
-         if (
-               ieee802514_header->src.addr_64b[7]==0x66
-            ) {
-            returnVal=TRUE;
-         }
-         break;   
+   
+   open_addr_t node_229;
+   node_229.type = ADDR_64B;
+   node_229.addr_64b[0]=0x05;
+   node_229.addr_64b[1]=0x43;
+   node_229.addr_64b[2]=0x32;
+   node_229.addr_64b[3]=0xff;
+   node_229.addr_64b[4]=0x03;
+   node_229.addr_64b[5]=0xd7;
+   node_229.addr_64b[6]=0xb0;
+   node_229.addr_64b[7]=0x68;
+
+   open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
+   if (packetfunctions_sameAddress(my_address,&node_229)) {
+	   returnVal = TRUE;
+   } else {
+	   if(ieee802514_header->src.addr_64b[6] == 0xb0 && ieee802514_header->src.addr_64b[7] == 0x68) {
+	   	   returnVal = TRUE;
+	   }
    }
+
+
+
    return returnVal;
 #else
    return TRUE;

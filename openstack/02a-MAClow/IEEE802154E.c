@@ -938,15 +938,16 @@ port_INLINE void activity_ti1ORri1() {
             }*/
             if (cellType==CELLTYPE_TXRX) {
                 ieee154e_vars.dataToSend = openqueue_macGetEBPacket();
-                couldSendEB=TRUE;
+                if(ieee154e_vars.dataToSend != NULL) {
+                	couldSendEB=TRUE;
+                } else {
+                	if(neighbor.type == ADDR_ANYCAST) {
+                		ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
+                	}
+                }
+            } else {
+            	ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
             }
-           
-            if ((ieee154e_vars.dataToSend==NULL)) {
-                  ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
-                  couldSendEB=FALSE;
-            }
-
-
          }
          if (ieee154e_vars.dataToSend==NULL) {
             if (cellType==CELLTYPE_TX) {

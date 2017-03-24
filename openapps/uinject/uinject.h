@@ -12,7 +12,7 @@
 
 //=========================== define ==========================================
 
-#define UINJECT_PERIOD_MS 1000
+#define UINJECT_PERIOD_MS 500
 #define UINJECT_EB_PERIOD_MS 610000
 
 //=========================== typedef =========================================
@@ -26,7 +26,7 @@ typedef struct {
    opentimer_id_t       ebTimer; 
    opentimer_id_t       ebTimer2;
    opentimer_id_t       ebTimer3;
-   opentimer_id_t       ebTimer4;   
+   opentimer_id_t       ebTimer4;
 } uinject_vars_t;
 
 //=========================== prototypes ======================================

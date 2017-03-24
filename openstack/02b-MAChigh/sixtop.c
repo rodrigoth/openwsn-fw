@@ -23,7 +23,7 @@
 // in seconds: sixtop maintaince is called every 30 seconds
 #define MAINTENANCE_PERIOD        30
 // in miliseconds: the real EBPERIOD will be randomized chosen between {EBPERIOD-EBPERIOD_RANDOM_RANG, EBPERIOD+EBPERIOD_RANDOM_RANG}
-#define EBPERIOD_RANDOM_RANG     500
+#define EBPERIOD_RANDOM_RANG     1000
 
 //=========================== variables =======================================
 
@@ -713,7 +713,7 @@ port_INLINE void sixtop_sendEB() {
       // I'm not sync'ed or I did not acquire a DAGrank
       
       // delete packets genereted by this module (EB and KA) from openqueue
-      openqueue_removeAllCreatedBy(COMPONENT_SIXTOP);
+      //openqueue_removeAllCreatedBy(COMPONENT_SIXTOP);
       
       // I'm not busy sending an EB or KA
       sixtop_vars.busySendingEB = FALSE;
@@ -723,6 +723,7 @@ port_INLINE void sixtop_sendEB() {
       return;
    }
    
+   opentimers_setPeriod(sixtop_vars.ebSendingTimerId,TIME_MS,(sixtop_vars.ebPeriod-EBPERIOD_RANDOM_RANG+(openrandom_get16b()%(2*EBPERIOD_RANDOM_RANG))));
    if (sixtop_vars.busySendingEB==TRUE) {
       // don't continue if I'm still sending a previous EB
       return;
@@ -789,7 +790,7 @@ port_INLINE void sixtop_sendKA() {
       // I'm not sync'ed
       
       // delete packets genereted by this module (EB and KA) from openqueue
-      openqueue_removeAllCreatedBy(COMPONENT_SIXTOP);
+      //openqueue_removeAllCreatedBy(COMPONENT_SIXTOP);
       
       // I'm not busy sending an EB or KA
       sixtop_vars.busySendingEB = FALSE;
