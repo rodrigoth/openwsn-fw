@@ -68,9 +68,9 @@ void schedule_init() {
    node_229.addr_64b[2]=0x32;
    node_229.addr_64b[3]=0xff;
    node_229.addr_64b[4]=0x03;
-   node_229.addr_64b[5]=0xd7;
-   node_229.addr_64b[6]=0xb0;
-   node_229.addr_64b[7]=0x68;
+   node_229.addr_64b[5]=0xd6;
+   node_229.addr_64b[6]=0x97;
+   node_229.addr_64b[7]=0x88;
 
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
    

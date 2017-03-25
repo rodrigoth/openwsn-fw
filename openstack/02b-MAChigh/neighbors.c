@@ -544,9 +544,9 @@ bool debugPrint_neighbors() {
    node_229.addr_64b[2]=0x32;
    node_229.addr_64b[3]=0xff;
    node_229.addr_64b[4]=0x03;
-   node_229.addr_64b[5]=0xd7;
-   node_229.addr_64b[6]=0xb0;
-   node_229.addr_64b[7]=0x68;
+   node_229.addr_64b[5]=0xd6;
+   node_229.addr_64b[6]=0x97;
+   node_229.addr_64b[7]=0x88;
 
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
 
@@ -579,24 +579,24 @@ void registerNewNeighbor(open_addr_t* address,
    if (isNeighbor(address)==FALSE) {
      open_addr_t node_229,sink;
      node_229.type = ADDR_64B;
-     node_229.addr_64b[0]=0x05;
-     node_229.addr_64b[1]=0x43;
-     node_229.addr_64b[2]=0x32;
-     node_229.addr_64b[3]=0xff;
-     node_229.addr_64b[4]=0x03;
-     node_229.addr_64b[5]=0xd7;
-     node_229.addr_64b[6]=0xb0;
-     node_229.addr_64b[7]=0x68;
+      node_229.addr_64b[0]=0x05;
+   node_229.addr_64b[1]=0x43;
+   node_229.addr_64b[2]=0x32;
+   node_229.addr_64b[3]=0xff;
+   node_229.addr_64b[4]=0x03;
+   node_229.addr_64b[5]=0xd6;
+   node_229.addr_64b[6]=0x97;
+   node_229.addr_64b[7]=0x88;
 
      sink.type = ADDR_64B;
      sink.addr_64b[0]=0x05;
-     sink.addr_64b[1]=0x43;
-     sink.addr_64b[2]=0x32;
-     sink.addr_64b[3]=0xff;
-     sink.addr_64b[4]=0x03;
-     sink.addr_64b[5]=0xde;
-     sink.addr_64b[6]=0xb2;
-     sink.addr_64b[7]=0x68;
+    sink.addr_64b[1]=0x43;
+    sink.addr_64b[2]=0x32;
+    sink.addr_64b[3]=0xff;
+    sink.addr_64b[4]=0x03;
+    sink.addr_64b[5]=0xd6;
+    sink.addr_64b[6]=0x98;
+    sink.addr_64b[7]=0x90;
 
      open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
 
@@ -681,9 +681,10 @@ void neighbors_pushEbSerial(uint8_t from, uint8_t to) {
   sink.addr_64b[2]=0x32;
   sink.addr_64b[3]=0xff;
   sink.addr_64b[4]=0x03;
-  sink.addr_64b[5]=0xde;
-  sink.addr_64b[6]=0xb2;
-  sink.addr_64b[7]=0x68;
+  sink.addr_64b[5]=0xd6;
+  sink.addr_64b[6]=0x98;
+  sink.addr_64b[7]=0x90;
+
 
 
 	for (i=from;i<to;i++) {
@@ -742,9 +743,9 @@ uint8_t * get_neighbors_vars(uint8_t order) {
   sink.addr_64b[2]=0x32;
   sink.addr_64b[3]=0xff;
   sink.addr_64b[4]=0x03;
-  sink.addr_64b[5]=0xde;
-  sink.addr_64b[6]=0xb2;
-  sink.addr_64b[7]=0x68;
+  sink.addr_64b[5]=0xd6;
+  sink.addr_64b[6]=0x98;
+  sink.addr_64b[7]=0x90;
 
   memset(ipAddr_node, 0x00, sizeof(ipAddr_node));
   
