@@ -38,6 +38,9 @@ static const uint8_t infoStackName[] = "OpenWSN ";
 
 #define MAXNUMNEIGHBORS 12
 
+static const uint8_t addr_64b_node[] = {0x05, 0x43, 0x32, 0xff, 0x03, 0xd6, 0x97, 0x88};// M-54 Strasbourg
+static const uint8_t addr_64b_sink[] = {0x05, 0x43, 0x32, 0xff, 0x03, 0xd6, 0x98, 0x90}; // M-53 Strasbourg
+
 enum {
    E_SUCCESS                           = 0,
    E_FAIL                              = 1,

@@ -6,10 +6,14 @@
 #include "openserial.h"
 #include "IEEE802154E.h"
 
+
+#define DEBUG_ONLY_MONITORED_NODE
+
 //=========================== variables =======================================
 
 static neighbors_vars_t neighbors_vars;
 uint8_t ipAddr_node[16] =   {0x00};
+open_addr_t node,sink;
 
 
 //=========================== prototypes ======================================
@@ -23,8 +27,7 @@ void registerNewNeighbor(
      );
 bool isNeighbor(open_addr_t* neighbor);
 void removeNeighbor(uint8_t neighborIndex);
-bool isThisRowMatching(
-        open_addr_t* address,
+bool isThisRowMatching(open_addr_t* address,
         uint8_t      rowNumber
      );
 
@@ -39,6 +42,13 @@ void neighbors_init() {
    memset(&neighbors_vars,0,sizeof(neighbors_vars_t));
    // The .used fields get reset to FALSE by this memset.
    
+   memset(&node,0,sizeof(open_addr_t));
+   memset(&sink,0,sizeof(open_addr_t));
+
+   sink.type = ADDR_64B;
+   node.type = ADDR_64B;
+   memcpy(&(sink.addr_64b),&addr_64b_sink,8);
+   memcpy(&(node.addr_64b),&addr_64b_node,8);
 }
 
 //===== getters
@@ -537,23 +547,12 @@ bool debugPrint_neighbors() {
    temp.row=neighbors_vars.debugRow;
    temp.neighborEntry=neighbors_vars.neighbors[neighbors_vars.debugRow];
    
-   open_addr_t node_229;
-   node_229.type = ADDR_64B;
-   node_229.addr_64b[0]=0x05;
-   node_229.addr_64b[1]=0x43;
-   node_229.addr_64b[2]=0x32;
-   node_229.addr_64b[3]=0xff;
-   node_229.addr_64b[4]=0x03;
-   node_229.addr_64b[5]=0xd6;
-   node_229.addr_64b[6]=0x97;
-   node_229.addr_64b[7]=0x88;
-
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
 
-
-   if (packetfunctions_sameAddress(my_address,&node_229)) {
+   if (packetfunctions_sameAddress(my_address,&node)) {
       openserial_printStatus(STATUS_NEIGHBORS,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
-  }
+   }
+
    return TRUE;
 }
 
@@ -577,30 +576,9 @@ void registerNewNeighbor(open_addr_t* address,
 
    // add this neighbor
    if (isNeighbor(address)==FALSE) {
-     open_addr_t node_229,sink;
-     node_229.type = ADDR_64B;
-      node_229.addr_64b[0]=0x05;
-   node_229.addr_64b[1]=0x43;
-   node_229.addr_64b[2]=0x32;
-   node_229.addr_64b[3]=0xff;
-   node_229.addr_64b[4]=0x03;
-   node_229.addr_64b[5]=0xd6;
-   node_229.addr_64b[6]=0x97;
-   node_229.addr_64b[7]=0x88;
-
-     sink.type = ADDR_64B;
-     sink.addr_64b[0]=0x05;
-    sink.addr_64b[1]=0x43;
-    sink.addr_64b[2]=0x32;
-    sink.addr_64b[3]=0xff;
-    sink.addr_64b[4]=0x03;
-    sink.addr_64b[5]=0xd6;
-    sink.addr_64b[6]=0x98;
-    sink.addr_64b[7]=0x90;
-
      open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
 
-     if (packetfunctions_sameAddress(my_address,&node_229) && !packetfunctions_sameAddress(address,&sink)) {
+     if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(address,&sink)) {
         schedule_addActiveSlot(100,CELLTYPE_TX,FALSE,7,address);
      }
 
@@ -674,36 +652,20 @@ void removeNeighbor(uint8_t neighborIndex) {
 
 void neighbors_pushEbSerial(uint8_t from, uint8_t to) {
 	uint8_t i;
-  open_addr_t sink;
-  sink.type = ADDR_64B;
-  sink.addr_64b[0]=0x05;
-  sink.addr_64b[1]=0x43;
-  sink.addr_64b[2]=0x32;
-  sink.addr_64b[3]=0xff;
-  sink.addr_64b[4]=0x03;
-  sink.addr_64b[5]=0xd6;
-  sink.addr_64b[6]=0x98;
-  sink.addr_64b[7]=0x90;
-
-
 
 	for (i=from;i<to;i++) {
-    if (packetfunctions_sameAddress(&sink, &neighbors_vars.neighbors[i].addr_64b)) {
-      continue;
-    }
-
-    if (neighbors_vars.neighbors[i].used == TRUE) {
-		    debugNeighborEntry_t temp;
-		    temp.neighborEntry=neighbors_vars.neighbors[i];
-		    openserial_printStatus(STATUS_EB,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
-		    neighbors_vars.neighbors[i].totalEBReceived = 0;
-        neighbors_vars.neighbors[i].numTx = 0;
-        neighbors_vars.neighbors[i].numTxACK  = 0;
-
-
-	   } else {
-      break;
-     }
+		if (!packetfunctions_sameAddress(&sink, &neighbors_vars.neighbors[i].addr_64b)) {
+			if (neighbors_vars.neighbors[i].used == TRUE) {
+				debugNeighborEntry_t temp;
+				temp.neighborEntry=neighbors_vars.neighbors[i];
+				openserial_printStatus(STATUS_EB,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
+				neighbors_vars.neighbors[i].totalEBReceived = 0;
+				neighbors_vars.neighbors[i].numTx = 0;
+				neighbors_vars.neighbors[i].numTxACK  = 0;
+			} else {
+			  return;
+			}
+		}
 	}
 }
 
@@ -733,20 +695,8 @@ bool isThisRowMatching(open_addr_t* address, uint8_t rowNumber) {
 }
 
 
-uint8_t * get_neighbors_vars(uint8_t order) {
+uint8_t * get_neighbor_128b_address(uint8_t order) {
   uint8_t prefix[8] = {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-  open_addr_t sink;
-
-  sink.type = ADDR_64B;
-  sink.addr_64b[0]=0x05;
-  sink.addr_64b[1]=0x43;
-  sink.addr_64b[2]=0x32;
-  sink.addr_64b[3]=0xff;
-  sink.addr_64b[4]=0x03;
-  sink.addr_64b[5]=0xd6;
-  sink.addr_64b[6]=0x98;
-  sink.addr_64b[7]=0x90;
-
   memset(ipAddr_node, 0x00, sizeof(ipAddr_node));
   
   if (!packetfunctions_sameAddress(&sink, &neighbors_vars.neighbors[order].addr_64b) && neighbors_vars.neighbors[order].used == TRUE) {

@@ -10,13 +10,15 @@
 #include "idmanager.h"
 #include "neighbors.h"
 
+
+
 //=========================== variables =======================================
 
 uinject_vars_t uinject_vars;
-
+open_addr_t node;
 uint8_t order = 0;
 uint8_t from = 0;
-uint8_t to = 3;
+uint8_t to = EB_PUSH_SERIAL_RANGE;
 
 //=========================== prototypes ======================================
 
@@ -31,31 +33,17 @@ void uinject_init() {
    
    // clear local variables
    memset(&uinject_vars,0,sizeof(uinject_vars_t));
+   memset(&node,0,sizeof(open_addr_t));
+
+   node.type = ADDR_64B;
+   memcpy(&(node.addr_64b),&addr_64b_node,8);
      
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-   open_addr_t node_229;
-   node_229.type = ADDR_64B;
-   node_229.addr_64b[0]=0x05;
-   node_229.addr_64b[1]=0x43;
-   node_229.addr_64b[2]=0x32;
-   node_229.addr_64b[3]=0xff;
-   node_229.addr_64b[4]=0x03;
-   node_229.addr_64b[5]=0xd6;
-   node_229.addr_64b[6]=0x97;
-   node_229.addr_64b[7]=0x88;
 
-   
-   if (packetfunctions_sameAddress(my_address,&node_229)) {	
+   if (packetfunctions_sameAddress(my_address,&node)) {
        uinject_vars.period = UINJECT_PERIOD_MS;   
        uinject_vars.timerId = opentimers_start(uinject_vars.period,TIMER_PERIODIC,TIME_MS,uinject_timer_cb);
-
-
-    
-
-       uinject_vars.ebTimer = opentimers_start(UINJECT_EB_PERIOD_MS,TIMER_PERIODIC,TIME_MS,uinject_timer_eb);
-       uinject_vars.ebTimer2 = opentimers_start(UINJECT_EB_PERIOD_MS+1000,TIMER_PERIODIC,TIME_MS,uinject_timer_eb);
-       uinject_vars.ebTimer3 = opentimers_start(UINJECT_EB_PERIOD_MS+2000,TIMER_PERIODIC,TIME_MS,uinject_timer_eb);
-       uinject_vars.ebTimer4 = opentimers_start(UINJECT_EB_PERIOD_MS+3000,TIMER_PERIODIC,TIME_MS,uinject_timer_eb);
+       uinject_vars.timer_eb_id = opentimers_start(UINJECT_EB_PERIOD_MS,TIMER_PERIODIC,TIME_MS,uinject_timer_eb);
    }
 }
 
@@ -85,19 +73,19 @@ void uinject_timer_eb(opentimer_id_t id){
 
 
 void uinject_task_eb() {
-   // don't run if not synch
    if (ieee154e_isSynch() == FALSE) return;  
    
    neighbors_pushEbSerial(from,to);
-   from = from + 3;
-   to = to + 3;
+   from = from + EB_PUSH_SERIAL_RANGE;
+   to = to + EB_PUSH_SERIAL_RANGE;
 
-   if(to >= MAXNUMNEIGHBORS+3) {
+   if(to >= MAXNUMNEIGHBORS+EB_PUSH_SERIAL_RANGE) {
       from = 0;
-      to = 3;
+      to = EB_PUSH_SERIAL_RANGE;
+      opentimers_setPeriod(uinject_vars.timer_eb_id,TIME_MS,UINJECT_EB_PERIOD_MS);
+   } else {
+	   opentimers_setPeriod(uinject_vars.timer_eb_id,TIME_MS,1000);
    }
-   
-
 }
 
 
@@ -108,7 +96,7 @@ void uinject_task_cb() {
    if (ieee154e_isSynch() == FALSE) return;
    
    uint8_t* ip_128;
-   ip_128 = get_neighbors_vars(order);
+   ip_128 = get_neighbor_128b_address(order);
    if(ip_128 != NULL) {
          pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
 
@@ -138,23 +126,4 @@ void uinject_task_cb() {
    if (order == MAXNUMNEIGHBORS) {
       order = 0;
    }
-
-   
-
-   /*if (order == 1) {
-       memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_231,16);
-   }
-
-   if (order == 2) {
-       memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_237,16);
-   }
-
-   if (order == 3) {
-       memcpy(&pkt->l3_destinationAdd.addr_128b[0],ipAddr_node_247,16);
-       order = 0;
-   }
-    
-   order++;*/
-   
-   
 }

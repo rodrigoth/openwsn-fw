@@ -7,7 +7,7 @@
 
 
 //=========================== variables =======================================
-
+open_addr_t node;
 //=========================== prototypes ======================================
 
 //=========================== public ==========================================
@@ -57,27 +57,17 @@ bool topology_isAcceptablePacket(ieee802154_header_iht* ieee802514_header) {
    bool returnVal;
    returnVal=FALSE;
    
-   open_addr_t node_229;
-   node_229.type = ADDR_64B;
-   node_229.addr_64b[0]=0x05;
-   node_229.addr_64b[1]=0x43;
-   node_229.addr_64b[2]=0x32;
-   node_229.addr_64b[3]=0xff;
-   node_229.addr_64b[4]=0x03;
-   node_229.addr_64b[5]=0xd6;
-   node_229.addr_64b[6]=0x97;
-   node_229.addr_64b[7]=0x88;
-
+   node.type = ADDR_64B;
+   memcpy(&(node.addr_64b),&addr_64b_node,8);
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-   if (packetfunctions_sameAddress(my_address,&node_229)) {
+
+   if (packetfunctions_sameAddress(my_address,&node)) {
 	   returnVal = TRUE;
    } else {
-	   if(ieee802514_header->src.addr_64b[6] == 0x97 && ieee802514_header->src.addr_64b[7] == 0x88) {
+	   if(ieee802514_header->src.addr_64b[6] == addr_64b_node[6] && ieee802514_header->src.addr_64b[7] == addr_64b_node[7]) {
 	   	   returnVal = TRUE;
 	   }
    }
-
-
 
    return returnVal;
 #else
