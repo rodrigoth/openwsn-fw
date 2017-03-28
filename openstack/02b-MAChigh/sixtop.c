@@ -708,6 +708,8 @@ port_INLINE void sixtop_sendEB() {
    uint8_t len;
    
    len = 0;
+   opentimers_setPeriod(sixtop_vars.ebSendingTimerId,TIME_MS,(sixtop_vars.ebPeriod-EBPERIOD_RANDOM_RANG+(openrandom_get16b()%(2*EBPERIOD_RANDOM_RANG))));
+
    
    if ((ieee154e_isSynch()==FALSE) || (icmpv6rpl_getMyDAGrank()==DEFAULTDAGRANK)){
       // I'm not sync'ed or I did not acquire a DAGrank
@@ -723,7 +725,6 @@ port_INLINE void sixtop_sendEB() {
       return;
    }
    
-   opentimers_setPeriod(sixtop_vars.ebSendingTimerId,TIME_MS,(sixtop_vars.ebPeriod-EBPERIOD_RANDOM_RANG+(openrandom_get16b()%(2*EBPERIOD_RANDOM_RANG))));
    if (sixtop_vars.busySendingEB==TRUE) {
       // don't continue if I'm still sending a previous EB
       return;
