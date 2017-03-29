@@ -171,9 +171,8 @@ enum {
    COMPONENT_RRT                       = 0x25,
    COMPONENT_SECURITY                  = 0x26,
    COMPONENT_USERIALBRIDGE             = 0x27,
-   COMPONENT_CEXAMPLE2				   = 0x28,
-   COMPONENT_CEXAMPLE3				   = 0x29,
-   COMPONENT_CEXAMPLE4				   = 0x30,
+   //REPORT
+   COMPONENT_REPORT				       = 0x28,
 };
 
 /**
@@ -253,6 +252,9 @@ enum {
    ERR_SIXTOP_COUNT                    = 0x3d, // there are {0} cells to request mote
    ERR_SIXTOP_LIST                     = 0x3e, // the cells reserved to request mote contains slot {0} and slot {1}
    ERR_SCHEDULE_ADDDUPLICATESLOT       = 0x3f, // the slot {0} to be added is already in schedule
+   //REPORT
+   ERR_REPORT_NO_ENTRY				   = 0x4a, // no entry available
+   ERR_REPORT_ENTRY_ADDED			   = 0x4b, // Neighbor {0}{1} added
 };
 
 //=========================== typedef =========================================

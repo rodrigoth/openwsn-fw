@@ -37,6 +37,9 @@
 #include "opencoap.h"
 //===== applications
 #include "openapps.h"
+//===== report
+#include "report.h"
+
 
 //=========================== variables =======================================
 
@@ -82,6 +85,9 @@ void openstack_init(void) {
    //===== applications
    openapps_init();
    
+   //===== report
+   report_init();
+
    openserial_printInfo(
       COMPONENT_OPENWSN,ERR_BOOTED,
       (errorparameter_t)0,
