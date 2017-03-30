@@ -16,12 +16,14 @@
 #include "sixtop.h"
 #include "adaptive_sync.h"
 #include "processIE.h"
+#include "report.h"
 
 //=========================== variables =======================================
 
 ieee154e_vars_t             ieee154e_vars;
 ieee154e_stats_t            ieee154e_stats;
 ieee154e_dbg_t              ieee154e_dbg;
+
 //=========================== prototypes ======================================
 
 // SYNCHRONIZING
@@ -1308,6 +1310,8 @@ port_INLINE void activity_tie5() {
     ieee154e_vars.dataToSend->l2_retriesLeft--;
    
     if (ieee154e_vars.dataToSend->l2_retriesLeft==0) {
+    	//indicate to report that transmission fails
+    	report_indicateTxAck(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),ieee154e_vars.dataToSend->l2_numTxAttempts,0,ieee154e_vars.freq);
         // indicate tx fail if no more retries left
         notif_sendDone(ieee154e_vars.dataToSend,E_FAIL);
     } else {
@@ -1464,6 +1468,9 @@ port_INLINE void activity_ti9(PORT_RADIOTIMER_WIDTH capturedTime) {
             synchronizeAck(ieee802514_header.timeCorrection);
         }
       
+        //report statistics
+        report_indicateTxAck(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),ieee154e_vars.dataToSend->l2_numTxAttempts,1,ieee154e_vars.freq);
+
         // inform schedule of successful transmission
         schedule_indicateTx(&ieee154e_vars.asn,TRUE);
       
@@ -1772,7 +1779,8 @@ port_INLINE void activity_ri5(PORT_RADIOTIMER_WIDTH capturedTime) {
          }
 
          if(ieee154e_vars.dataReceived->l2_frameType == IEEE154_TYPE_BEACON) {
-			neighbors_updateEBStats(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop));
+			//neighbors_updateEBStats(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop));
+        	 report_indicateEB(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop),ieee154e_vars.freq);
          }
 
          // indicate reception to upper layer (no ACK asked)

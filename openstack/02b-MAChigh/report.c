@@ -43,18 +43,36 @@ owerror_t report_addNeighbor(open_addr_t *neighbor) {
 	return E_SUCCESS;
 }
 
-//TODO
 owerror_t report_indicateTxAck(open_addr_t *neighbor, uint8_t tx, uint8_t ack, uint8_t channel) {
 	reportEntry_t *entry;
 	entry = &(report_vars.reportBuf[0]);
+	uint8_t channelIndex = channel - CHANNEL_OFFSET;
 
 	while(entry != NULL) {
-		openserial_printInfo(COMPONENT_REPORT,ERR_REPORT_ENTRY_ADDED,entry->neighbor.addr_64b[6],entry->neighbor.addr_64b[7]);
+		if(memcmp(&(entry->neighbor.addr_64b[0]),&(neighbor->addr_64b[0]),8) == 0) {
+			entry->tx[channelIndex] = entry->tx[channelIndex] + tx;
+			entry->ack[channelIndex] = entry->ack[channelIndex] + ack;
+			return E_SUCCESS;
+		}
 		entry = entry->next;
 	}
-	return E_SUCCESS;
+	return E_FAIL;
 }
 
+owerror_t report_indicateEB(open_addr_t *neighbor, uint8_t channel) {
+	reportEntry_t *entry;
+		entry = &(report_vars.reportBuf[0]);
+		uint8_t channelIndex = channel - CHANNEL_OFFSET;
+
+		while(entry != NULL) {
+			if(memcmp(&(entry->neighbor.addr_64b[0]),&(neighbor->addr_64b[0]),8) == 0) {
+				entry->eb_receptions[channelIndex] = entry->eb_receptions[channelIndex]+1;
+				return E_SUCCESS;
+			}
+			entry = entry->next;
+		}
+		return E_FAIL;
+}
 
 //=========================== private ==========================================
 reportEntry_t * report_getFirstAvailablePosition() {

@@ -2,6 +2,7 @@
 
 //=========================== definition =====================================
 #define CHANNELS 16
+#define CHANNEL_OFFSET 11
 
 //=========================== typedef =========================================
 typedef struct {
@@ -26,4 +27,5 @@ typedef struct {
 void report_init(void);
 owerror_t report_addNeighbor(open_addr_t *neighbor);
 owerror_t report_indicateTxAck(open_addr_t *neighbor, uint8_t tx, uint8_t ack, uint8_t channel);
+owerror_t report_indicateEB(open_addr_t *neighbor, uint8_t channel);
 
