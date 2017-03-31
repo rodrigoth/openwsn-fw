@@ -9,6 +9,7 @@
 #include "IEEE802154E.h"
 #include "idmanager.h"
 #include "neighbors.h"
+#include "report.h"
 
 
 
@@ -75,7 +76,7 @@ void uinject_timer_eb(opentimer_id_t id){
 void uinject_task_eb() {
    if (ieee154e_isSynch() == FALSE) return;  
    
-   neighbors_pushEbSerial(from,to);
+   report_pushReportSerial(from,to);
    from = from + EB_PUSH_SERIAL_RANGE;
    to = to + EB_PUSH_SERIAL_RANGE;
 

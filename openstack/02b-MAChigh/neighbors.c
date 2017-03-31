@@ -649,36 +649,6 @@ void removeNeighbor(uint8_t neighborIndex) {
    neighbors_vars.neighbors[neighborIndex].totalEBReceived           = 0;
 }
 
-//eb
-
-void neighbors_pushEbSerial(uint8_t from, uint8_t to) {
-	uint8_t i;
-
-	for (i=from;i<to;i++) {
-		if (!packetfunctions_sameAddress(&sink, &neighbors_vars.neighbors[i].addr_64b)) {
-			if (neighbors_vars.neighbors[i].used == TRUE) {
-				debugNeighborEntry_t temp;
-				temp.neighborEntry=neighbors_vars.neighbors[i];
-				openserial_printStatus(STATUS_EB,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
-				neighbors_vars.neighbors[i].totalEBReceived = 0;
-				neighbors_vars.neighbors[i].numTx = 0;
-				neighbors_vars.neighbors[i].numTxACK  = 0;
-			} else {
-			  return;
-			}
-		}
-	}
-}
-
-void neighbors_updateEBStats(open_addr_t *neighbor) {
-	uint8_t i;
-
-	for (i=0;i<MAXNUMNEIGHBORS;i++) {
-	   if (packetfunctions_sameAddress(neighbor, &neighbors_vars.neighbors[i].addr_64b)) {
-		  neighbors_vars.neighbors[i].totalEBReceived++;
-	   }
-	}
-}
 
 //=========================== helpers =========================================
 

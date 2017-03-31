@@ -14,6 +14,16 @@ typedef struct {
 	bool used;
 }reportEntry_t;
 
+
+BEGIN_PACK
+typedef struct {
+	uint8_t neighbor[8];
+	uint8_t eb_receptions[CHANNELS];
+	uint8_t ack[CHANNELS];
+	uint8_t tx[CHANNELS];
+} debug_reportEntry_t;
+END_PACK
+
 //=========================== variables =======================================
 
 typedef struct {
@@ -25,7 +35,9 @@ typedef struct {
 
 // admin
 void report_init(void);
+
 owerror_t report_addNeighbor(open_addr_t *neighbor);
 owerror_t report_indicateTxAck(open_addr_t *neighbor, uint8_t tx, uint8_t ack, uint8_t channel);
 owerror_t report_indicateEB(open_addr_t *neighbor, uint8_t channel);
 
+void report_pushReportSerial(uint8_t from, uint8_t to);

@@ -13,7 +13,7 @@
 //=========================== define ==========================================
 
 #define UINJECT_PERIOD_MS 500
-#define UINJECT_EB_PERIOD_MS 610000
+#define UINJECT_EB_PERIOD_MS 30000 //610000
 #define EB_PUSH_SERIAL_RANGE 3
 
 //=========================== typedef =========================================

@@ -61,19 +61,47 @@ owerror_t report_indicateTxAck(open_addr_t *neighbor, uint8_t tx, uint8_t ack, u
 
 owerror_t report_indicateEB(open_addr_t *neighbor, uint8_t channel) {
 	reportEntry_t *entry;
-		entry = &(report_vars.reportBuf[0]);
-		uint8_t channelIndex = channel - CHANNEL_OFFSET;
+	entry = &(report_vars.reportBuf[0]);
+	uint8_t channelIndex = channel - CHANNEL_OFFSET;
 
-		while(entry != NULL) {
-			if(memcmp(&(entry->neighbor.addr_64b[0]),&(neighbor->addr_64b[0]),8) == 0) {
-				entry->eb_receptions[channelIndex] = entry->eb_receptions[channelIndex]+1;
-				return E_SUCCESS;
-			}
-			entry = entry->next;
+	while(entry != NULL) {
+		if(memcmp(&(entry->neighbor.addr_64b[0]),&(neighbor->addr_64b[0]),8) == 0) {
+			entry->eb_receptions[channelIndex] = entry->eb_receptions[channelIndex]+1;
+			return E_SUCCESS;
 		}
-		return E_FAIL;
+		entry = entry->next;
+	}
+	return E_FAIL;
 }
 
+//fill the report only to the monitored node
+void report_pushReportSerial(uint8_t from, uint8_t to) {
+	debug_reportEntry_t debug_reportEntry;
+	reportEntry_t *entry;
+
+	uint8_t i;
+	for (i = from; i < to; i++) {
+		entry = &(report_vars.reportBuf[i]);
+
+		if(entry->used == FALSE) return;
+
+		memset(&(debug_reportEntry.ack[0]),0,sizeof(uint8_t)*CHANNELS);
+		memset(&(debug_reportEntry.eb_receptions[0]),0,sizeof(uint8_t)*CHANNELS);
+		memset(&(debug_reportEntry.tx[0]),0,sizeof(uint8_t)*CHANNELS);
+		memset(&(debug_reportEntry.neighbor[0]), 0x00, 8);
+
+		memcpy(&(debug_reportEntry.neighbor[0]),&(entry->neighbor.addr_64b[0]),8);
+		memcpy(&(debug_reportEntry.ack[0]),&(entry->ack[0]),sizeof(uint8_t)*CHANNELS);
+		memcpy(&(debug_reportEntry.tx[0]),&(entry->tx[0]),sizeof(uint8_t)*CHANNELS);
+		memcpy(&(debug_reportEntry.eb_receptions[0]),&(entry->eb_receptions[0]),sizeof(uint8_t)*CHANNELS);
+		openserial_printStatus(STATUS_EB,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry_t));
+
+		//reset the statistics for the next observation window
+		memset(&(entry->ack[0]),0,sizeof(uint8_t)*CHANNELS);
+		memset(&(entry->eb_receptions[0]),0,sizeof(uint8_t)*CHANNELS);
+		memset(&(entry->tx[0]),0,sizeof(uint8_t)*CHANNELS);
+	}
+}
 //=========================== private ==========================================
 reportEntry_t * report_getFirstAvailablePosition() {
 	reportEntry_t *entry;
@@ -117,20 +145,11 @@ void report_resetEntry(reportEntry_t* entry) {
 	entry->used = FALSE;
 	entry->next = NULL;
 
-	memset(&(entry->ack[0]),0,sizeof(uint8_t)*MAXNUMNEIGHBORS);
-	memset(&(entry->eb_receptions[0]),0,sizeof(uint8_t)*MAXNUMNEIGHBORS);
-	memset(&(entry->tx[0]),0,sizeof(uint8_t)*MAXNUMNEIGHBORS);
+	memset(&(entry->ack[0]),0,sizeof(uint8_t)*CHANNELS);
+	memset(&(entry->eb_receptions[0]),0,sizeof(uint8_t)*CHANNELS);
+	memset(&(entry->tx[0]),0,sizeof(uint8_t)*CHANNELS);
 
 	entry->neighbor.type = ADDR_NONE;
 	memset(&(entry->neighbor.addr_64b[0]), 0x00, 8);
 }
 
-uint8_t report_getNeighborIndex(open_addr_t *address) {
-	uint8_t i;
-	reportEntry_t *entry;
-
-	for(i = 0; i < MAXNUMNEIGHBORS; i++) {
-
-	}
-
-}

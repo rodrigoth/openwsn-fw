@@ -93,10 +93,6 @@ void          neighbors_removeOld(void);
 // debug
 bool          debugPrint_neighbors(void);
 
-//eb
-void 		  neighbors_pushEbSerial(uint8_t from, uint8_t to);
-void 		  neighbors_updateEBStats(open_addr_t *neighbor);
-
 uint8_t* get_neighbor_128b_address(uint8_t index);
 
 /**
