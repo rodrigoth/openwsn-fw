@@ -17,7 +17,8 @@ typedef struct {
 
 BEGIN_PACK
 typedef struct {
-	uint8_t neighbor[8];
+	open_addr_t neighbor;
+	asn_t asn;
 	uint8_t eb_receptions[CHANNELS];
 	uint8_t ack[CHANNELS];
 	uint8_t tx[CHANNELS];
@@ -40,4 +41,4 @@ owerror_t report_addNeighbor(open_addr_t *neighbor);
 owerror_t report_indicateTxAck(open_addr_t *neighbor, uint8_t tx, uint8_t ack, uint8_t channel);
 owerror_t report_indicateEB(open_addr_t *neighbor, uint8_t channel);
 
-void report_pushReportSerial(uint8_t from, uint8_t to);
+void report_pushReportSerial(uint8_t from, uint8_t to,asn_t asn);

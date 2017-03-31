@@ -75,7 +75,7 @@ owerror_t report_indicateEB(open_addr_t *neighbor, uint8_t channel) {
 }
 
 //fill the report only to the monitored node
-void report_pushReportSerial(uint8_t from, uint8_t to) {
+void report_pushReportSerial(uint8_t from, uint8_t to,asn_t asn) {
 	debug_reportEntry_t debug_reportEntry;
 	reportEntry_t *entry;
 
@@ -88,12 +88,20 @@ void report_pushReportSerial(uint8_t from, uint8_t to) {
 		memset(&(debug_reportEntry.ack[0]),0,sizeof(uint8_t)*CHANNELS);
 		memset(&(debug_reportEntry.eb_receptions[0]),0,sizeof(uint8_t)*CHANNELS);
 		memset(&(debug_reportEntry.tx[0]),0,sizeof(uint8_t)*CHANNELS);
-		memset(&(debug_reportEntry.neighbor[0]), 0x00, 8);
+		memset(&(debug_reportEntry.neighbor.addr_64b[0]), 0x00, 8);
+		debug_reportEntry.asn.bytes0and1 = 0;
+		debug_reportEntry.asn.bytes2and3 = 0;
+		debug_reportEntry.asn.byte4      = 0;
 
-		memcpy(&(debug_reportEntry.neighbor[0]),&(entry->neighbor.addr_64b[0]),8);
+
+		memcpy(&(debug_reportEntry.neighbor.addr_64b[0]),&(entry->neighbor.addr_64b[0]),8);
 		memcpy(&(debug_reportEntry.ack[0]),&(entry->ack[0]),sizeof(uint8_t)*CHANNELS);
 		memcpy(&(debug_reportEntry.tx[0]),&(entry->tx[0]),sizeof(uint8_t)*CHANNELS);
 		memcpy(&(debug_reportEntry.eb_receptions[0]),&(entry->eb_receptions[0]),sizeof(uint8_t)*CHANNELS);
+		debug_reportEntry.asn.bytes0and1 = asn.bytes0and1;
+        debug_reportEntry.asn.bytes2and3 = asn.bytes2and3;
+        debug_reportEntry.asn.byte4      = asn.byte4;
+
 		openserial_printStatus(STATUS_EB,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry_t));
 
 		//reset the statistics for the next observation window

@@ -75,8 +75,16 @@ void uinject_timer_eb(opentimer_id_t id){
 
 void uinject_task_eb() {
    if (ieee154e_isSynch() == FALSE) return;  
-   
-   report_pushReportSerial(from,to);
+
+   uint8_t asnArray[5];
+   asn_t asn;
+
+   ieee154e_getAsn(asnArray);
+   asn.bytes0and1 = ((uint16_t)asnArray[1] << 8) | asnArray[0];
+   asn.bytes2and3 = ((uint16_t)asnArray[3] << 8) | asnArray[2];
+   asn.byte4 = asnArray[4];
+
+   report_pushReportSerial(from,to,asn);
    from = from + EB_PUSH_SERIAL_RANGE;
    to = to + EB_PUSH_SERIAL_RANGE;
 
