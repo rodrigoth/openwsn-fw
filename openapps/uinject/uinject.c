@@ -18,15 +18,11 @@
 uinject_vars_t uinject_vars;
 open_addr_t node;
 uint8_t order = 0;
-uint8_t from = 0;
-uint8_t to = EB_PUSH_SERIAL_RANGE;
 
 //=========================== prototypes ======================================
 
 void uinject_timer_cb(opentimer_id_t id);
-void uinject_timer_eb(opentimer_id_t id);
 void uinject_task_cb(void);
-void uinject_task_eb(void);
 
 //=========================== public ==========================================
 
@@ -44,7 +40,6 @@ void uinject_init() {
    if (packetfunctions_sameAddress(my_address,&node)) {
        uinject_vars.period = UINJECT_PERIOD_MS;   
        uinject_vars.timerId = opentimers_start(uinject_vars.period,TIMER_PERIODIC,TIME_MS,uinject_timer_cb);
-       uinject_vars.timer_eb_id = opentimers_start(UINJECT_EB_PERIOD_MS,TIMER_PERIODIC,TIME_MS,uinject_timer_eb);
    }
 }
 
@@ -63,38 +58,8 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
    task to scheduler with CoAP priority, and let scheduler take care of it.
 */
 void uinject_timer_cb(opentimer_id_t id){
-   
+
    scheduler_push_task(uinject_task_cb,TASKPRIO_COAP);
-}
-
-void uinject_timer_eb(opentimer_id_t id){
-   
-   scheduler_push_task(uinject_task_eb,TASKPRIO_COAP);
-}
-
-
-void uinject_task_eb() {
-   if (ieee154e_isSynch() == FALSE) return;  
-
-   uint8_t asnArray[5];
-   asn_t asn;
-
-   ieee154e_getAsn(asnArray);
-   asn.bytes0and1 = ((uint16_t)asnArray[1] << 8) | asnArray[0];
-   asn.bytes2and3 = ((uint16_t)asnArray[3] << 8) | asnArray[2];
-   asn.byte4 = asnArray[4];
-
-   report_pushReportSerial(from,to,asn);
-   from = from + EB_PUSH_SERIAL_RANGE;
-   to = to + EB_PUSH_SERIAL_RANGE;
-
-   if(to >= MAXNUMNEIGHBORS+EB_PUSH_SERIAL_RANGE) {
-      from = 0;
-      to = EB_PUSH_SERIAL_RANGE;
-      opentimers_setPeriod(uinject_vars.timer_eb_id,TIME_MS,UINJECT_EB_PERIOD_MS);
-   } else {
-	   opentimers_setPeriod(uinject_vars.timer_eb_id,TIME_MS,1000);
-   }
 }
 
 

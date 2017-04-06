@@ -5,7 +5,6 @@
 #include "idmanager.h"
 #include "openserial.h"
 #include "IEEE802154E.h"
-#include "report.h"
 
 #define DEBUG_ONLY_MONITORED_NODE
 
@@ -580,7 +579,6 @@ void registerNewNeighbor(open_addr_t* address,
 
      if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(address,&sink)) {
         schedule_addActiveSlot(100,CELLTYPE_TX,FALSE,7,address);
-        report_addNeighbor(address);
      }
 
       i=0;

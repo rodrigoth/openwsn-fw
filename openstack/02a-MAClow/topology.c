@@ -1,8 +1,6 @@
 #include "opendefs.h"
 #include "topology.h"
 #include "idmanager.h"
-
-#define FORCETOPOLOGY 1
 //=========================== defines =========================================
 
 

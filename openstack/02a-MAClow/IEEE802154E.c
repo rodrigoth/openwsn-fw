@@ -1317,7 +1317,7 @@ port_INLINE void activity_tie5() {
     if (ieee154e_vars.dataToSend->l2_retriesLeft==0) {
     	//indicate to report that transmission fails
     	open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-    	if (packetfunctions_sameAddress(my_address,&node)) {
+    	if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),&sink)) {
     		report_indicateTxAck(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),ieee154e_vars.dataToSend->l2_numTxAttempts,0,ieee154e_vars.freq);
     	}
 
@@ -1479,7 +1479,7 @@ port_INLINE void activity_ti9(PORT_RADIOTIMER_WIDTH capturedTime) {
       
         //report statistics for the monitored node only
         open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-		if (packetfunctions_sameAddress(my_address,&node)) {
+        if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),&sink)) {
 			report_indicateTxAck(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),ieee154e_vars.dataToSend->l2_numTxAttempts,1,ieee154e_vars.freq);
 		}
 
@@ -2524,6 +2524,10 @@ void endSlot() {
       ieee154e_vars.dataToSend->l2_retriesLeft--;
       
       if (ieee154e_vars.dataToSend->l2_retriesLeft==0) {
+    	  open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
+    	  	  if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),&sink)) {
+    	  		  report_indicateTxAck(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),ieee154e_vars.dataToSend->l2_numTxAttempts,0,ieee154e_vars.freq);
+    	  	  }
          // indicate tx fail if no more retries left
          notif_sendDone(ieee154e_vars.dataToSend,E_FAIL);
       } else {

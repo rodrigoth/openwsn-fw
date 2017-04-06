@@ -13,8 +13,6 @@
 //=========================== define ==========================================
 
 #define UINJECT_PERIOD_MS 500
-#define UINJECT_EB_PERIOD_MS 610000
-#define EB_PUSH_SERIAL_RANGE 3
 
 //=========================== typedef =========================================
 
@@ -24,7 +22,6 @@ typedef struct {
    opentimer_id_t       timerId;  ///< periodic timer which triggers transmission
    uint16_t             counter;  ///< incrementing counter which is written into the packet
    uint16_t              period;  ///< uinject packet sending period>
-   opentimer_id_t       timer_eb_id;
 } uinject_vars_t;
 
 //=========================== prototypes ======================================
