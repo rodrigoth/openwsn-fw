@@ -376,8 +376,9 @@ void openserial_startOutput() {
 
 
     DISABLE_INTERRUPTS();
+
     openserial_vars.mode=MODE_OUTPUT;
-    if (openserial_vars.outputBufFilled) {
+    if (openserial_vars.outputBufFilled[bufindex]) {
 #ifdef FASTSIM
     	 uart_writeCircularBuffer_FASTSIM(openserial_vars.outputBuf[bufindex],&openserial_vars.outputBufIdxR[bufindex],&openserial_vars.outputBufIdxW[bufindex]);
 #else
