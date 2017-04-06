@@ -35,6 +35,8 @@
 */
 #define SERIAL_INPUT_BUFFER_SIZE  200
 
+#define  OPENSERIAL_OUTPUT_NBBUFFERS   10
+
 /// Modes of the openserial module.
 enum {
    MODE_OFF    = 0, ///< The module is off, no serial activity.
@@ -110,11 +112,14 @@ typedef struct {
     uint8_t             inputBufFill;
     uint8_t             inputBuf[SERIAL_INPUT_BUFFER_SIZE];
     // output
-    bool                outputBufFilled;
-    uint16_t            outputCrc;
-    uint8_t             outputBufIdxW;
-    uint8_t             outputBufIdxR;
-    uint8_t             outputBuf[SERIAL_OUTPUT_BUFFER_SIZE];
+
+    uint8_t    			outputCurrentR;   //current buffer id to read and push to serial
+	uint8_t    			outputCurrentW;   //current buffer id to write our data
+    bool       			outputBufFilled[OPENSERIAL_OUTPUT_NBBUFFERS];
+    uint16_t   			outputCrc[OPENSERIAL_OUTPUT_NBBUFFERS];
+    uint8_t    			outputBufIdxW[OPENSERIAL_OUTPUT_NBBUFFERS];
+    uint8_t    			outputBufIdxR[OPENSERIAL_OUTPUT_NBBUFFERS];
+    uint8_t    			outputBuf[OPENSERIAL_OUTPUT_NBBUFFERS][SERIAL_OUTPUT_BUFFER_SIZE];
 } openserial_vars_t;
 
 // admin

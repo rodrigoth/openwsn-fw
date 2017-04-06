@@ -260,6 +260,8 @@ enum {
    //REPORT
    ERR_REPORT_NO_ENTRY				   = 0x4a, // no entry available
    ERR_REPORT_ENTRY_ADDED			   = 0x4b, // Neighbor {0}{1} added
+   ERR_OPENSERIAL_BUFFER_OVERFLOW      = 0x4c, // output buffer overflow in openserial (available space {0}, towrite {1})
+
 };
 
 //=========================== typedef =========================================
