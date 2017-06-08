@@ -88,8 +88,10 @@ typedef struct {
    opentimer_id_t       ebSendingTimerId;        // EB sending timer id
    opentimer_id_t       maintenanceTimerId;
    opentimer_id_t       timeoutTimerId;          // TimeOut timer id
+   opentimer_id_t       ebJitterTimerId;
    uint16_t             kaPeriod;                // period of sending KA
    uint16_t             ebPeriod;                // period of sending EB
+   uint16_t             maxJitterPeriod;
    six2six_state_t      six2six_state;
    uint8_t              commandID;
    six2six_handler_t    handler;
