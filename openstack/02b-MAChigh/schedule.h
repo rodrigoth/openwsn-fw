@@ -17,7 +17,7 @@
 
 The superframe repears over time and can be arbitrarly long.
 */
-#define SLOTFRAME_LENGTH    15 //should be 101
+#define SLOTFRAME_LENGTH    17 //should be 101
 
 //draft-ietf-6tisch-minimal-06
 #define SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS                      1
@@ -39,7 +39,7 @@ The superframe repears over time and can be arbitrarly long.
   for seiral port to tranmit data to dagroot. 
 */
 
-#define NUMSLOTSOFF          11
+#define NUMSLOTSOFF          13
 
 /**
 \brief Maximum number of active slots in a superframe.
@@ -74,7 +74,7 @@ See MINBE for an explanation of backoff.
 */
 #define PDR_THRESHOLD      80 // 80 means 80%
 #define MIN_NUMTX_FOR_PDR  50 // don't calculate PDR when numTx is lower than this value 
-#define NUMBER_OF_NODES    10
+#define NUMBER_OF_NODES    11
 
 //=========================== typedef =========================================
 

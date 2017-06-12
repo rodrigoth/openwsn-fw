@@ -10,8 +10,8 @@
 //=========================== variables =======================================
 
 schedule_vars_t schedule_vars;
-uint8_t schedule_index = 5;
-open_addr_t node;
+uint8_t schedule_index = 4;
+open_addr_t node,sink;
 
 //=========================== prototypes ======================================
 
@@ -40,7 +40,12 @@ void schedule_init() {
    schedule_vars.maxActiveSlots = MAXACTIVESLOTS;
    //schedule_vars.backoff = openrandom_get16b()%(1<<MAXBE);
    
+   memset(&node,0,sizeof(open_addr_t));
+   memset(&sink,0,sizeof(open_addr_t));
+
+   sink.type = ADDR_64B;
    node.type = ADDR_64B;
+   memcpy(&(sink.addr_64b),&addr_64b_sink,8);
    memcpy(&(node.addr_64b),&addr_64b_node,8);
 
    start_slotOffset = SCHEDULE_MINIMAL_6TISCH_SLOTOFFSET;
@@ -63,11 +68,20 @@ void schedule_init() {
 
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
    
+   /*if (packetfunctions_sameAddress(my_address,&sink)) {
+   	    schedule_addActiveSlot(4,CELLTYPE_RX,FALSE,7,&node);
+   } */
+   
+
+
+
    if (!packetfunctions_sameAddress(my_address,&node)) {
 	  uint8_t i = 0;
       for(i = 0; i<NUMBER_OF_NODES; i++) {
          schedule_addActiveSlot(schedule_index++,CELLTYPE_RX,FALSE,7,&node);
       }
+   } else {
+       //schedule_addActiveSlot(4,CELLTYPE_TX,FALSE,7,&sink);
    }
 }
 
@@ -102,6 +116,8 @@ void schedule_startDAGroot() {
          &temp_neighbor                      // neighbor
       );
    }
+
+   //schedule_addActiveSlot(4,CELLTYPE_RX,FALSE,7,&node);
 }
 
 /**

@@ -577,7 +577,7 @@ void registerNewNeighbor(open_addr_t* address,
    if (isNeighbor(address)==FALSE) {
      open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
 
-     if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(address,&sink)) {
+    if (packetfunctions_sameAddress(my_address,&node)){// && !packetfunctions_sameAddress(address,&sink)) {
         schedule_addActiveSlot(100,CELLTYPE_TX,FALSE,7,address);
      }
 
@@ -668,7 +668,8 @@ uint8_t * get_neighbor_128b_address(uint8_t order) {
   uint8_t prefix[8] = {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
   memset(ipAddr_node, 0x00, sizeof(ipAddr_node));
   
-  if (!packetfunctions_sameAddress(&sink, &neighbors_vars.neighbors[order].addr_64b) && neighbors_vars.neighbors[order].used == TRUE) {
+  //if (!packetfunctions_sameAddress(&sink, &neighbors_vars.neighbors[order].addr_64b) && neighbors_vars.neighbors[order].used == TRUE) {
+   if ( neighbors_vars.neighbors[order].used == TRUE) {
         memcpy(&(ipAddr_node[0]),&(prefix[0]),8);
         memcpy(&(ipAddr_node[8]),&neighbors_vars.neighbors[order].addr_64b.addr_64b[0],8);
         return ipAddr_node;
