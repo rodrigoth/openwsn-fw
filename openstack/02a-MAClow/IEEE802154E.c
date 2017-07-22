@@ -970,6 +970,10 @@ port_INLINE void activity_ti1ORri1() {
             // change owner
             ieee154e_vars.dataToSend->owner = COMPONENT_IEEE802154E;
             if (couldSendEB==TRUE) {        // I will be sending an EB
+                /*opensbderial_printInfo(COMPONENT_IEEE802154E,ERR_SYNCHRONIZED,
+                            (errorparameter_t)ieee154e_vars.slotOffset,
+                            (errorparameter_t)0);*/
+
                
                //copy synch IE  -- should be Little endian???
                // fill in the ASN field of the EB
@@ -1798,7 +1802,7 @@ port_INLINE void activity_ri5(PORT_RADIOTIMER_WIDTH capturedTime) {
          if(ieee154e_vars.dataReceived->l2_frameType == IEEE154_TYPE_BEACON) {
 			 open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
 			 if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop),&sink) ) {
-				 report_indicateEB(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop),ieee154e_vars.freq);
+				 report_indicateEB(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop),ieee154e_vars.freq,1);
 			 }
          }
 
@@ -1989,7 +1993,7 @@ port_INLINE void activity_ri9(PORT_RADIOTIMER_WIDTH capturedTime) {
    // clear local variable
    ieee154e_vars.ackToSend = NULL;
    
-   // synchronize to the received packet
+   // synchronize to the received packete
    if (idmanager_getIsDAGroot()==FALSE && icmpv6rpl_isPreferredParent(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop))) {
       synchronizePacket(ieee154e_vars.syncCapturedTime);
    }
@@ -2576,4 +2580,8 @@ void endSlot() {
 
 bool ieee154e_isSynch(){
    return ieee154e_vars.isSync;
+}
+
+uint8_t ieee154e_getLastFreq() {
+	return ieee154e_vars.freq;
 }

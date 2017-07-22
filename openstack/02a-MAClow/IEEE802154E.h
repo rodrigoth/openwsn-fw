@@ -296,6 +296,8 @@ void               ieee154e_endOfFrame(PORT_RADIOTIMER_WIDTH capturedTime);
 bool               debugPrint_asn(void);
 bool               debugPrint_isSync(void);
 bool               debugPrint_macStats(void);
+
+uint8_t 			   ieee154e_getLastFreq(void);
 /**
 
 

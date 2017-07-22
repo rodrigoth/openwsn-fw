@@ -10,10 +10,12 @@
 #include "idmanager.h"
 #include "opentimers.h"
 #include "IEEE802154E.h"
+#include "report.h"
 
 //=========================== variables =======================================
 
 icmpv6rpl_vars_t             icmpv6rpl_vars;
+open_addr_t 				node,sink;
 
 //=========================== prototypes ======================================
 
@@ -36,6 +38,11 @@ void icmpv6rpl_init() {
    uint32_t        dioPeriod;
    uint32_t        daoPeriod;
    
+   sink.type = ADDR_64B;
+   node.type = ADDR_64B;
+   memcpy(&(sink.addr_64b),&addr_64b_sink,8);
+   memcpy(&(node.addr_64b),&addr_64b_node,8);
+
    // retrieve my prefix and EUI64
    memcpy(&dodagid[0],idmanager_getMyID(ADDR_PREFIX)->prefix,8); // prefix
    memcpy(&dodagid[8],idmanager_getMyID(ADDR_64B)->addr_64b,8);  // eui64
@@ -463,6 +470,12 @@ void icmpv6rpl_indicateRxDIO(OpenQueueEntry_t* msg) {
    dagrank_t        neighborRank;
    open_addr_t      NeighborAddress;
   
+   open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
+   if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(&(msg->l2_nextORpreviousHop),&sink) ) {
+	   report_indicateEB(&(msg->l2_nextORpreviousHop),ieee154e_getLastFreq(),0);
+   }
+
+
    // take ownership over the packet
    msg->owner = COMPONENT_NEIGHBORS;
    

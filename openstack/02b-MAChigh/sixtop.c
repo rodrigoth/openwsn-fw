@@ -23,7 +23,7 @@
 // in seconds: sixtop maintaince is called every 30 seconds
 #define MAINTENANCE_PERIOD        30
 // in miliseconds: the real EBPERIOD will be randomized chosen between {EBPERIOD-EBPERIOD_RANDOM_RANG, EBPERIOD+EBPERIOD_RANDOM_RANG}
-#define EBPERIOD_RANDOM_RANG     1000
+#define EBPERIOD_RANDOM_RANG     7500
 
 //=========================== variables =======================================
 
@@ -41,7 +41,6 @@ owerror_t     sixtop_send_internal(
 void          sixtop_maintenance_timer_cb(opentimer_id_t id);
 void          sixtop_timeout_timer_cb(opentimer_id_t id);
 void          sixtop_sendingEb_timer_cb(opentimer_id_t id);
-void          sixtop_jitterEb_timer_cb(opentimer_id_t id);
 
 //=== EB/KA task
 
@@ -125,12 +124,13 @@ void sixtop_init() {
     sixtop_vars.ebPeriod           = EBPERIOD;
     sixtop_vars.isResponseEnabled  = TRUE;
     sixtop_vars.handler            = SIX_HANDLER_NONE;
-    sixtop_vars.maxJitterPeriod    = openrandom_get16b()%(1<<14);
-    
-    sixtop_vars.ebJitterTimerId = opentimers_start(sixtop_vars.maxJitterPeriod,
-    		 TIMER_PERIODIC,
-		 TIME_MS,
-		 sixtop_jitterEb_timer_cb);
+
+    sixtop_vars.ebSendingTimerId   = opentimers_start(
+          (sixtop_vars.ebPeriod-EBPERIOD_RANDOM_RANG+(openrandom_get16b()%(2*EBPERIOD_RANDOM_RANG))),
+          TIMER_PERIODIC,
+          TIME_MS,
+          sixtop_sendingEb_timer_cb
+    );
     
     sixtop_vars.maintenanceTimerId  = opentimers_start(
         sixtop_vars.periodMaintenance,
@@ -651,17 +651,6 @@ owerror_t sixtop_send_internal(
 void sixtop_sendingEb_timer_cb(opentimer_id_t id){
    scheduler_push_task(timer_sixtop_sendEb_fired,TASKPRIO_SIXTOP);
 }
-
-void sixtop_jitterEb_timer_cb(opentimer_id_t id){
-	sixtop_vars.ebSendingTimerId   = opentimers_start(
-	        (sixtop_vars.ebPeriod-EBPERIOD_RANDOM_RANG+(openrandom_get16b()%(2*EBPERIOD_RANDOM_RANG))),
-	        TIMER_PERIODIC,
-	        TIME_MS,
-	        sixtop_sendingEb_timer_cb
-	    );
-	opentimers_stop(sixtop_vars.ebJitterTimerId);
-}
-
 
 void sixtop_maintenance_timer_cb(opentimer_id_t id) {
    scheduler_push_task(timer_sixtop_management_fired,TASKPRIO_SIXTOP);

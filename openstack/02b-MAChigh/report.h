@@ -8,6 +8,7 @@ typedef struct {
 	open_addr_t neighbor;
 	asn_t asn;
 	uint8_t channel;
+	uint8_t iseb;
 } debug_reportEntryEB_t;
 END_PACK
 
@@ -30,6 +31,6 @@ END_PACK
 // admin
 void report_init(void);
 void report_indicateTxAck(open_addr_t *neighbor, uint8_t tx, uint8_t ack, uint8_t channel);
-void report_indicateEB(open_addr_t *neighbor, uint8_t channel);
+void report_indicateEB(open_addr_t *neighbor, uint8_t channel,uint8_t iseb);
 
 

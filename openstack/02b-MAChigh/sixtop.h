@@ -88,7 +88,6 @@ typedef struct {
    opentimer_id_t       ebSendingTimerId;        // EB sending timer id
    opentimer_id_t       maintenanceTimerId;
    opentimer_id_t       timeoutTimerId;          // TimeOut timer id
-   opentimer_id_t       ebJitterTimerId;
    uint16_t             kaPeriod;                // period of sending KA
    uint16_t             ebPeriod;                // period of sending EB
    uint16_t             maxJitterPeriod;
@@ -104,8 +103,8 @@ typedef struct {
 void      sixtop_init(void);
 void      sixtop_setKaPeriod(uint16_t kaPeriod);
 void      sixtop_setEBPeriod(uint8_t ebPeriod);
-bool      sixtop_setHandler(six2six_handler_t handler);
-// scheduling
+bool      sixtop_setHandler(six2six_handler_t scheduling);
+// handler
 void      sixtop_request(uint8_t code, open_addr_t* neighbor, uint8_t numCells);
 void      sixtop_addORremoveCellByInfo(uint8_t code,open_addr_t*  neighbor,cellInfo_ht* cellInfo);
 // from upper layer
