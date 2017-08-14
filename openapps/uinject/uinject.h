@@ -12,7 +12,7 @@
 
 //=========================== define ==========================================
 
-#define UINJECT_PERIOD_MS 500
+#define UINJECT_PERIOD_MS 1000
 
 //=========================== typedef =========================================
 
@@ -22,7 +22,20 @@ typedef struct {
    opentimer_id_t       timerId;  ///< periodic timer which triggers transmission
    uint16_t             counter;  ///< incrementing counter which is written into the packet
    uint16_t              period;  ///< uinject packet sending period>
+   uint32_t             seqnum;  //uniquely identifies this packet
 } uinject_vars_t;
+
+BEGIN_PACK
+typedef struct {
+	open_addr_t node;
+	open_addr_t destination;
+	asn_t asn;
+	asn_t asn_in;
+	uint8_t track;
+	uint8_t is_sent;
+} debug_reportEntryUinject_t;
+END_PACK
+
 
 //=========================== prototypes ======================================
 

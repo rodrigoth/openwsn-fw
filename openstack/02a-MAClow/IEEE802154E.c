@@ -115,7 +115,7 @@ void ieee154e_init() {
    memset(&ieee154e_vars,0,sizeof(ieee154e_vars_t));
    memset(&ieee154e_dbg,0,sizeof(ieee154e_dbg_t));
    
-   ieee154e_vars.singleChannel     = 0; // 0 means channel hopping
+   ieee154e_vars.singleChannel     = 0;//SYNCHRONIZING_CHANNEL; // 0 means channel hopping
    ieee154e_vars.isAckEnabled      = TRUE;
    ieee154e_vars.isSecurityEnabled = FALSE;
    ieee154e_vars.slotDuration      = TsSlotDuration;
@@ -1325,9 +1325,10 @@ port_INLINE void activity_tie5() {
     if (ieee154e_vars.dataToSend->l2_retriesLeft==0) {
     	//indicate to report that transmission fails
     	open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-    	if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),&sink)) {
-    		report_indicateTxAck(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),ieee154e_vars.dataToSend->l2_numTxAttempts,0,ieee154e_vars.freq);
-    	}
+    	//if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),&sink)) {
+      //if (!packetfunctions_sameAddress(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),&sink)) {
+    	report_indicateTxAck(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),ieee154e_vars.dataToSend->l2_numTxAttempts,0,ieee154e_vars.freq);
+    	//}
 
         // indicate tx fail if no more retries left
         notif_sendDone(ieee154e_vars.dataToSend,E_FAIL);
@@ -1486,10 +1487,10 @@ port_INLINE void activity_ti9(PORT_RADIOTIMER_WIDTH capturedTime) {
         }
       
         //report statistics for the monitored node only
-        open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-        if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),&sink)) {
-			report_indicateTxAck(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),ieee154e_vars.dataToSend->l2_numTxAttempts,1,ieee154e_vars.freq);
-		}
+        //open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
+        //if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),&sink)) {
+		   report_indicateTxAck(&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),ieee154e_vars.dataToSend->l2_numTxAttempts,1,ieee154e_vars.freq);
+		//}
 
 
         // inform schedule of successful transmission
@@ -1801,9 +1802,10 @@ port_INLINE void activity_ri5(PORT_RADIOTIMER_WIDTH capturedTime) {
 
          if(ieee154e_vars.dataReceived->l2_frameType == IEEE154_TYPE_BEACON) {
 			 open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-			 if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop),&sink) ) {
-				 report_indicateEB(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop),ieee154e_vars.freq,1);
-			 }
+			 //if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop),&sink) ) {
+		    if (!packetfunctions_sameAddress(my_address,&sink)) {
+            report_indicateEB(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop),ieee154e_vars.freq,1);
+			  }
          }
 
          // indicate reception to upper layer (no ACK asked)

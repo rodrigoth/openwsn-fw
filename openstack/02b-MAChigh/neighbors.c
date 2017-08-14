@@ -577,9 +577,9 @@ void registerNewNeighbor(open_addr_t* address,
    if (isNeighbor(address)==FALSE) {
      open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
 
-    if (packetfunctions_sameAddress(my_address,&node)){// && !packetfunctions_sameAddress(address,&sink)) {
-        schedule_addActiveSlot(100,CELLTYPE_TX,FALSE,7,address);
-     }
+    //if (packetfunctions_sameAddress(my_address,&node)){// && !packetfunctions_sameAddress(address,&sink)) {
+    //    schedule_addActiveSlot(100,CELLTYPE_TX,FALSE,7,address);
+    // }
 
       i=0;
       while(i<MAXNUMNEIGHBORS) {
@@ -667,6 +667,8 @@ bool isThisRowMatching(open_addr_t* address, uint8_t rowNumber) {
 uint8_t * get_neighbor_128b_address(uint8_t order) {
   uint8_t prefix[8] = {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
   memset(ipAddr_node, 0x00, sizeof(ipAddr_node));
+  
+
   
   //if (!packetfunctions_sameAddress(&sink, &neighbors_vars.neighbors[order].addr_64b) && neighbors_vars.neighbors[order].used == TRUE) {
    if ( neighbors_vars.neighbors[order].used == TRUE) {

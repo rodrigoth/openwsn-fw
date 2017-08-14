@@ -41,5 +41,6 @@ void report_indicateEB(open_addr_t *neighbor, uint8_t channel,uint8_t iseb) {
 	debug_reportEntry.asn.byte4 = asnArray[4];
 
 	openserial_printStatus(STATUS_EB,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntryEB_t));
+	
 }
 

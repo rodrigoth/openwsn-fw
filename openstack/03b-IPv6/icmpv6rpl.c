@@ -471,8 +471,9 @@ void icmpv6rpl_indicateRxDIO(OpenQueueEntry_t* msg) {
    open_addr_t      NeighborAddress;
   
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-   if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(&(msg->l2_nextORpreviousHop),&sink) ) {
-	   report_indicateEB(&(msg->l2_nextORpreviousHop),ieee154e_getLastFreq(),0);
+   //if (packetfunctions_sameAddress(my_address,&node) && !packetfunctions_sameAddress(&(msg->l2_nextORpreviousHop),&sink) ) {
+	  if (!packetfunctions_sameAddress(my_address,&sink)) {
+      report_indicateEB(&(msg->l2_nextORpreviousHop),ieee154e_getLastFreq(),0);
    }
 
 
