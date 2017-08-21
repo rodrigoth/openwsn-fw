@@ -548,9 +548,9 @@ bool debugPrint_neighbors() {
    
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
 
-   if (packetfunctions_sameAddress(my_address,&node)) {
-      openserial_printStatus(STATUS_NEIGHBORS,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
-   }
+   //if (packetfunctions_sameAddress(my_address,&node)) {
+   openserial_printStatus(STATUS_NEIGHBORS,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
+   //}
 
    return TRUE;
 }
@@ -577,9 +577,9 @@ void registerNewNeighbor(open_addr_t* address,
    if (isNeighbor(address)==FALSE) {
      open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
 
-    //if (packetfunctions_sameAddress(my_address,&node)){// && !packetfunctions_sameAddress(address,&sink)) {
-    //    schedule_addActiveSlot(100,CELLTYPE_TX,FALSE,7,address);
-    // }
+    if (packetfunctions_sameAddress(my_address,&node)){// && !packetfunctions_sameAddress(address,&sink)) {
+        schedule_addActiveSlot(100,CELLTYPE_TX,FALSE,7,address);
+    }
 
       i=0;
       while(i<MAXNUMNEIGHBORS) {

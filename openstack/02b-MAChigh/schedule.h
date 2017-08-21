@@ -74,7 +74,7 @@ See MINBE for an explanation of backoff.
 */
 #define PDR_THRESHOLD      80 // 80 means 80%
 #define MIN_NUMTX_FOR_PDR  50 // don't calculate PDR when numTx is lower than this value 
-#define NUMBER_OF_NODES    11
+#define NUMBER_OF_NODES    30
 
 //=========================== typedef =========================================
 
