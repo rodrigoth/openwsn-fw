@@ -5,7 +5,7 @@
 
 
 //=========================== variables =======================================
-open_addr_t node,sink;
+open_addr_t node;
 //=========================== prototypes ======================================
 
 //=========================== public ==========================================
@@ -53,35 +53,19 @@ topology.
 bool topology_isAcceptablePacket(ieee802154_header_iht* ieee802514_header) {
 #ifdef FORCETOPOLOGY
    bool returnVal;
-   returnVal=TRUE;
+   returnVal=FALSE;
    
    node.type = ADDR_64B;
    memcpy(&(node.addr_64b),&addr_64b_node,8);
-
-   sink.type = ADDR_64B;
-   memcpy(&(sink.addr_64b),&addr_64b_sink,8);
-   
-
-
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
 
    if (packetfunctions_sameAddress(my_address,&node)) {
-	    if(ieee802514_header->src.addr_64b[6] == addr_64b_sink[6] && ieee802514_header->src.addr_64b[7] == addr_64b_sink[7]) {
-         returnVal = FALSE;
-       }
+     returnVal = TRUE;
    } else {
-      if (packetfunctions_sameAddress(my_address,&sink)) {
-          if(ieee802514_header->src.addr_64b[6] == addr_64b_node[6] && ieee802514_header->src.addr_64b[7] == addr_64b_node[7]) {
-            returnVal = FALSE;
-          }
-      } else {
-        if ( (ieee802514_header->src.addr_64b[6] == addr_64b_node[6] && ieee802514_header->src.addr_64b[7] == addr_64b_node[7]) ||  (ieee802514_header->src.addr_64b[6] == addr_64b_sink[6] && ieee802514_header->src.addr_64b[7] == addr_64b_sink[7]) ) {
-            returnVal = TRUE;
-          } else {
-          returnVal = FALSE;
-        }
+     if(ieee802514_header->src.addr_64b[6] == addr_64b_node[6] && ieee802514_header->src.addr_64b[7] == addr_64b_node[7]) {
+         returnVal = TRUE;
      }
-  }
+   }
 
    return returnVal;
 #else

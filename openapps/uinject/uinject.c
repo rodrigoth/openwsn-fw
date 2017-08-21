@@ -24,7 +24,7 @@ void uinject_timer_cb(opentimer_id_t id);
 void uinject_task_cb(void);
 uint8_t order = 0;
 
-uint32_t seqnuns[10] = {0};
+uint32_t seqnuns[27] = {0};
 
 //=========================== public ==========================================
 
@@ -56,7 +56,7 @@ void uinject_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
 }
 
 void uinject_receive(OpenQueueEntry_t* pkt) {
-  OpenQueueEntry_t* new_pkt;
+  /*OpenQueueEntry_t* new_pkt;
 
   new_pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
 
@@ -88,7 +88,7 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 
   if ((openudp_send(new_pkt))==E_FAIL) {
       openqueue_freePacketBuffer(new_pkt);
-  }
+  }*/
   openqueue_freePacketBuffer(pkt); 
 }
 
