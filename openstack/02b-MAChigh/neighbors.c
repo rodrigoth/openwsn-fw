@@ -548,9 +548,9 @@ bool debugPrint_neighbors() {
    
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
 
-   if (packetfunctions_sameAddress(my_address,&node)) {
-      openserial_printStatus(STATUS_NEIGHBORS,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
-   }
+   
+  openserial_printStatus(STATUS_NEIGHBORS,(uint8_t*)&temp,sizeof(debugNeighborEntry_t));
+   
 
    return TRUE;
 }
@@ -610,7 +610,11 @@ void registerNewNeighbor(open_addr_t* address,
       }
       if (i==MAXNUMNEIGHBORS) {
          openserial_printError(COMPONENT_NEIGHBORS,ERR_NEIGHBORS_FULL,
-                               (errorparameter_t)MAXNUMNEIGHBORS,
+                               (errorparameter_t)address->addr_64b[6],
+                               (errorparameter_t)0);
+
+         openserial_printError(COMPONENT_NEIGHBORS,ERR_NEIGHBORS_FULL,
+                               (errorparameter_t)address->addr_64b[7],
                                (errorparameter_t)0);
          return;
       }

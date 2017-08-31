@@ -24,7 +24,7 @@ void uinject_timer_cb(opentimer_id_t id);
 void uinject_task_cb(void);
 uint8_t order = 0;
 
-uint32_t seqnuns[10] = {0};
+uint32_t seqnuns[20] = {0};
 
 //=========================== public ==========================================
 
