@@ -5,10 +5,12 @@
 #include "idmanager.h"
 #include "openserial.h"
 #include "IEEE802154E.h"
+#include "ranking.h"
 
 //=========================== variables =======================================
 
 static neighbors_vars_t neighbors_vars;
+open_addr_t  node;
 
 //=========================== prototypes ======================================
 
@@ -26,6 +28,7 @@ bool isThisRowMatching(
         open_addr_t* address,
         uint8_t      rowNumber
      );
+bool isValueInArray(uint8_t val, uint8_t *arr, uint8_t size);
 
 //=========================== public ==========================================
 
@@ -33,6 +36,10 @@ bool isThisRowMatching(
 \brief Initializes this module.
 */
 void neighbors_init() {
+
+   memset(&node,0,sizeof(open_addr_t));
+   node.type = ADDR_64B;
+   memcpy(&(node.addr_64b),&addr_64b_node,8);
    
    // clear module variables
    memset(&neighbors_vars,0,sizeof(neighbors_vars_t));
@@ -143,6 +150,16 @@ uint8_t neighbors_getSequenceNumber(open_addr_t* address){
     }
     return neighbors_vars.neighbors[i].sequenceNumber;
 
+}
+
+void  neighbors_getAllBroadcastReception(uint8_t* recepetions,uint8_t* indexes){
+  uint8_t i;
+  for(i = 0; i < MAXNUMNEIGHBORS; i++) {
+    if (neighbors_vars.neighbors[i].used == TRUE) {
+      recepetions[i] = neighbors_vars.neighbors[i].broadcastReceivedCounter;
+      indexes[i] = i;
+    }
+  }
 }
 
 //===== interrogators
@@ -289,6 +306,12 @@ bool neighbors_reachedMaxTransmission(uint8_t index){
     
     return returnVal;
 }
+
+
+bool neighbors_isPreferredParent(uint8_t index) {
+    return neighbors_vars.neighbors[index].parentPreference;
+}
+
 
 //===== updating neighbor information
 
@@ -463,6 +486,28 @@ void neighbors_resetGeneration(open_addr_t* address){
     }
 }
 
+
+void  neighbors_indicateBroadcastReception(open_addr_t* address) {
+   uint8_t i;
+    for (i=0;i<MAXNUMNEIGHBORS;i++){
+        if (packetfunctions_sameAddress(address, &neighbors_vars.neighbors[i].addr_64b)){
+            neighbors_vars.neighbors[i].broadcastReceivedCounter++;
+            break;
+        }
+    }
+}
+
+
+void  neighbors_resetBroadcastReception() {
+    uint8_t i;
+    for (i=0;i<MAXNUMNEIGHBORS;i++){
+        neighbors_vars.neighbors[i].broadcastReceivedCounter = 0;
+    }
+}
+
+
+
+
 //===== write addresses
 
 /**
@@ -505,8 +550,11 @@ void neighbors_setNeighborNoResource(open_addr_t* address){
    }
 }
 
-void neighbors_setPreferredParent(uint8_t index, bool isPreferred){
-    neighbors_vars.neighbors[index].parentPreference = isPreferred;
+void neighbors_setPreferredParent(uint8_t index, bool isPreferred, bool ranking){
+     open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
+     if ( (packetfunctions_sameAddress(my_address,&node) && ranking) || (!packetfunctions_sameAddress(my_address,&node)) ) {
+        neighbors_vars.neighbors[index].parentPreference = isPreferred;
+     }    
 }
 
 //===== managing routing info
@@ -696,26 +744,35 @@ void registerNewNeighbor(open_addr_t* address,
       while(i<MAXNUMNEIGHBORS) {
          if (neighbors_vars.neighbors[i].used==FALSE) {
             // add this neighbor
-            neighbors_vars.neighbors[i].used                   = TRUE;
-            neighbors_vars.neighbors[i].insecure               = insecure;
+            neighbors_vars.neighbors[i].used                      = TRUE;
+            neighbors_vars.neighbors[i].insecure                  = insecure;
             // neighbors_vars.neighbors[i].stableNeighbor         = FALSE;
             // Note: all new neighbors are consider stable
-            neighbors_vars.neighbors[i].stableNeighbor         = TRUE;
-            neighbors_vars.neighbors[i].switchStabilityCounter = 0;
+            neighbors_vars.neighbors[i].stableNeighbor            = TRUE;
+            neighbors_vars.neighbors[i].switchStabilityCounter    = 0;
             memcpy(&neighbors_vars.neighbors[i].addr_64b,address,sizeof(open_addr_t));
-            neighbors_vars.neighbors[i].DAGrank                = DEFAULTDAGRANK;
+            neighbors_vars.neighbors[i].DAGrank                   = DEFAULTDAGRANK;
             // since we don't have a DAG rank at this point, no need to call for routing table update
-            neighbors_vars.neighbors[i].rssi                   = rssi;
-            neighbors_vars.neighbors[i].numRx                  = 1;
-            neighbors_vars.neighbors[i].numTx                  = 0;
-            neighbors_vars.neighbors[i].numTxACK               = 0;
+            neighbors_vars.neighbors[i].rssi                      = rssi;
+            neighbors_vars.neighbors[i].numRx                     = 1;
+            neighbors_vars.neighbors[i].numTx                     = 0;
+            neighbors_vars.neighbors[i].numTxACK                  = 0;
+            neighbors_vars.neighbors[i].broadcastReceivedCounter  = 0;
             memcpy(&neighbors_vars.neighbors[i].asn,asnTimestamp,sizeof(asn_t));
             //update jp
             if (joinPrioPresent==TRUE){
                neighbors_vars.neighbors[i].joinPrio=joinPrio;
             }
+
+             open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
+             if (packetfunctions_sameAddress(my_address,&node)) {
+                ranking_startPeriodRanking();  
+             } 
             
             break;
+
+
+
          }
          i++;
       }
@@ -770,4 +827,13 @@ bool isThisRowMatching(open_addr_t* address, uint8_t rowNumber) {
                                (errorparameter_t)3);
          return FALSE;
    }
+}
+
+bool isValueInArray(uint8_t val, uint8_t *arr, uint8_t size) {
+    uint8_t i;
+    for (i=0; i < size; i++) {
+        if (arr[i] == val)
+            return TRUE;
+    }
+    return FALSE;
 }

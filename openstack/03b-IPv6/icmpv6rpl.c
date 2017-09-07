@@ -10,10 +10,13 @@
 #include "idmanager.h"
 #include "opentimers.h"
 #include "IEEE802154E.h"
+#include "openreport.h"
 
 //=========================== variables =======================================
 
-icmpv6rpl_vars_t             icmpv6rpl_vars;
+icmpv6rpl_vars_t     icmpv6rpl_vars;
+open_addr_t          node;
+
 
 //=========================== prototypes ======================================
 
@@ -33,6 +36,10 @@ void sendDAO(void);
 */
 void icmpv6rpl_init() {
    uint8_t         dodagid[16];
+
+
+   node.type = ADDR_64B;
+   memcpy(&(node.addr_64b),&addr_64b_node,8);
    
    // retrieve my prefix and EUI64
    memcpy(&dodagid[0],idmanager_getMyID(ADDR_PREFIX)->prefix,8); // prefix
@@ -293,7 +300,8 @@ void icmpv6rpl_receive(OpenQueueEntry_t* msg) {
 */
 bool icmpv6rpl_getPreferredParentIndex(uint8_t* indexptr) {
    *indexptr = icmpv6rpl_vars.ParentIndex;
-   return icmpv6rpl_vars.haveParent;
+    return icmpv6rpl_vars.haveParent;
+   
 }
 
 /**
@@ -380,6 +388,8 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
             return;
         }
     }
+
+
     // prep for loop, remember state before neighbor table scanning
     prevParentIndex      = icmpv6rpl_vars.ParentIndex;
     prevHadParent        = icmpv6rpl_vars.haveParent;
@@ -420,10 +430,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
             tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
             if (tentativeDAGrank > 65535) {tentativeDAGrank = 65535;}
             // if not low enough to justify switch, pass (i.e. hysterisis)
-            if (
-                (previousDAGrank<tentativeDAGrank) ||
-                (previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)
-            ) {
+            if ((previousDAGrank<tentativeDAGrank) || (previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
                   continue;
             }
             // remember that we have at least one valid candidate parent
@@ -438,12 +445,14 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
     }
    
    if (foundBetterParent) {
+      openreport_indicateParentSwitch();
+
       icmpv6rpl_vars.haveParent=TRUE;
       if (!prevHadParent) {
          // in case preParent is killed before calling this function, clear the preferredParent flag
-         neighbors_setPreferredParent(prevParentIndex, FALSE);
+         neighbors_setPreferredParent(prevParentIndex, FALSE,FALSE);
          // set neighbors as preferred parent
-         neighbors_setPreferredParent(icmpv6rpl_vars.ParentIndex, TRUE);
+         neighbors_setPreferredParent(icmpv6rpl_vars.ParentIndex, TRUE,FALSE);
       } else {
          if (icmpv6rpl_vars.ParentIndex==prevParentIndex) {
              // report on the rank change if any, not on the deletion/creation of parent
@@ -453,9 +462,9 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
              }
          } else {
              // clear neighbors preferredParent flag
-             neighbors_setPreferredParent(prevParentIndex, FALSE);
+             neighbors_setPreferredParent(prevParentIndex, FALSE,FALSE);
              // set neighbors as preferred parent
-             neighbors_setPreferredParent(icmpv6rpl_vars.ParentIndex, TRUE);
+             neighbors_setPreferredParent(icmpv6rpl_vars.ParentIndex, TRUE,FALSE);
          }
       }
    } else {
@@ -488,6 +497,10 @@ void icmpv6rpl_indicateRxDIO(OpenQueueEntry_t* msg) {
    open_addr_t      myPrefix;
    uint8_t*         current;
    uint8_t          optionsLen;
+
+
+   neighbors_indicateBroadcastReception(&(msg->l2_nextORpreviousHop));
+
    // take ownership over the packet
    msg->owner = COMPONENT_NEIGHBORS;
    

@@ -18,6 +18,7 @@ sources_c = [
     os.path.join('02b-MAChigh','sf0.c'),
     os.path.join('02b-MAChigh','schedule.c'),
     os.path.join('02b-MAChigh','sixtop.c'),
+    os.path.join('02b-MAChigh','ranking.c'),
     #=== 03a-IPHC
     os.path.join('03a-IPHC','iphc.c'),
     os.path.join('03a-IPHC','openbridge.c'),
@@ -33,6 +34,7 @@ sources_c = [
     os.path.join('cross-layers','openqueue.c'),
     os.path.join('cross-layers','openrandom.c'),
     os.path.join('cross-layers','packetfunctions.c'),
+    os.path.join('cross-layers','openreport.c'),
 ]
 sources_h = [
     'openstack.h',
@@ -62,6 +64,7 @@ sources_h = [
     os.path.join('cross-layers','openqueue.h'),
     os.path.join('cross-layers','openrandom.h'),
     os.path.join('cross-layers','packetfunctions.h'),
+    os.path.join('cross-layers','openreport.h'),
     #=== apps
     os.path.join('#','openapps','userialbridge','userialbridge.h'),
 ]

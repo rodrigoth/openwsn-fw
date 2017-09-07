@@ -41,6 +41,16 @@ static const uint8_t infoStackName[] = "OpenWSN ";
 // maximum celllist length
 #define CELLLIST_MAX_LEN 3
 
+
+
+
+
+static const uint8_t addr_64b_node[] = {0x05, 0x43, 0x32, 0xff, 0x03, 0xd7, 0x86, 0x62}; // A-205 Grenoble;
+static const uint8_t addr_64b_sink[] = {0x05, 0x43, 0x32, 0xff, 0x03, 0xd8, 0xb5, 0x58}; // A-225 Grenoble
+
+
+
+
 enum {
    E_SUCCESS                           = 0,
    E_FAIL                              = 1,
@@ -113,6 +123,7 @@ enum {
    STATUS_KAPERIOD                     = 10,
    STATUS_JOINED                       = 11,
    STATUS_MAX                          = 12,
+   STATUS_PARENTSWITCH                 = 13,
 };
 
 //component identifiers
@@ -177,6 +188,8 @@ enum {
    COMPONENT_UMONITOR                  = 0x2a,
    COMPONENT_CJOIN                     = 0x2b,
    COMPONENT_OPENOSCOAP                = 0x2c,
+   //RANKING
+   COMPONENT_RANKING                   = 0x2d,
 };
 
 /**
@@ -259,7 +272,7 @@ enum {
    ERR_UNSUPPORTED_FORMAT              = 0x40, // the received packet format is not supported {code location {0}}
    ERR_UNSUPPORTED_METADATA            = 0x41, // the metadata type is not suppored
    //l3
-   ERR_6LORH_DEADLINE_EXPIRED	       = 0x42, // the received packet has expired
+   ERR_6LORH_DEADLINE_EXPIRED	         = 0x42, // the received packet has expired
    ERR_6LORH_DEADLINE_DROPPED          = 0x43, // packet expiry time reached, dropped
    // join and OSCOAP
    ERR_JOINED                          = 0x44, // node joined
@@ -268,6 +281,17 @@ enum {
    ERR_REPLAY_FAILED                   = 0x47, // OSCOAP replay protection failed
    ERR_DECRYPTION_FAILED               = 0x48, // OSCOAP decryption and tag verification failed
    ERR_ABORT_JOIN_PROCESS              = 0x49, // Aborted join process {code location {0}}
+
+
+   //ranking
+   ERR_RANKING_EMPTY                   = 0x50, // Ranking array is empty
+   ERR_PARENT_NOT_CHANGED              = 0x51, // Parent not changed
+   ERR_NO_PARENT_FOUND                 = 0x52, // No parent found 
+   ERR_FIRST_PARENT                    = 0x53, // First parent index {0}
+   ERR_SORT                            = 0x54, // First parent index {0} second parent {1}
+   ERR_ARRAY_NOT_EMPTY                 = 0x55, // Array not empty
+   ERR_PARENT_CHANGED                  = 0x56, // Parent changed
+
 };
 
 //=========================== typedef =========================================
@@ -387,6 +411,7 @@ typedef struct {
    bool             f6PNORES;
    uint8_t          generation;
    uint8_t          sequenceNumber;
+   uint8_t          broadcastReceivedCounter;
 } neighborRow_t;
 END_PACK
 

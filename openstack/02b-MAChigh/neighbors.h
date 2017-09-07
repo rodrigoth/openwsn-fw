@@ -49,6 +49,7 @@ typedef struct {
    neighborRow_t        neighbors[MAXNUMNEIGHBORS];
    dagrank_t            myDAGrank;
    uint8_t              debugRow;
+   open_addr_t          topRankedNeighbors[MAXPREFERENCE];
 } neighbors_vars_t;
 
 //=========================== prototypes ======================================
@@ -64,10 +65,12 @@ open_addr_t*  neighbors_getJoinProxy(void);
 bool          neighbors_getNeighborNoResource(uint8_t index);
 uint8_t       neighbors_getGeneration(open_addr_t* address);
 uint8_t       neighbors_getSequenceNumber(open_addr_t* address);
+void          neighbors_getAllBroadcastReception(uint8_t* recepetions,uint8_t* indexes);
+
 // setters
 void          neighbors_setNeighborRank(uint8_t index, dagrank_t rank);
 void          neighbors_setNeighborNoResource(open_addr_t* address);
-void          neighbors_setPreferredParent(uint8_t index, bool isPreferred);
+void          neighbors_setPreferredParent(uint8_t index, bool isPreferred,bool ranking);
 // interrogators
 bool          neighbors_isStableNeighbor(open_addr_t* address);
 bool          neighbors_isStableNeighborByIndex(uint8_t index);
@@ -75,6 +78,7 @@ bool          neighbors_isInsecureNeighbor(open_addr_t* address);
 bool          neighbors_isNeighborWithLowerDAGrank(uint8_t index);
 bool          neighbors_isNeighborWithHigherDAGrank(uint8_t index);
 bool          neighbors_reachedMaxTransmission(uint8_t index);
+bool          neighbors_isPreferredParent(uint8_t index);
 
 // updating neighbor information
 void          neighbors_indicateRx(
@@ -94,6 +98,10 @@ void          neighbors_indicateTx(
 void          neighbors_updateSequenceNumber(open_addr_t* address);
 void          neighbors_updateGeneration(open_addr_t* address);
 void          neighbors_resetGeneration(open_addr_t* address);
+void          neighbors_indicateBroadcastReception(open_addr_t* address);
+void          neighbors_resetBroadcastReception(void);
+
+
 
 // get addresses
 bool          neighbors_getNeighborEui64(open_addr_t* address,uint8_t addr_type,uint8_t index);

@@ -259,7 +259,7 @@ command_line_vars.AddVariables(
     (
         'forcetopology',                                   # key
         '',                                                # help
-        command_line_options['forcetopology'][0],          # default
+        command_line_options['forcetopology'][1],          # default
         validate_option,                                   # validator
         int,                                               # converter
     ),

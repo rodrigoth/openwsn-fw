@@ -7,6 +7,7 @@
 #include "idmanager.h"
 #include "openapps.h"
 #include "openrandom.h"
+#include "ranking.h"
 
 //=========================== definition =====================================
 
@@ -16,6 +17,7 @@
 //=========================== variables =======================================
 
 sf0_vars_t sf0_vars;
+open_addr_t node;
 
 //=========================== prototypes ======================================
 
@@ -28,6 +30,11 @@ void sf0_handleRCError(uint8_t code);
 //=========================== public ==========================================
 
 void sf0_init(void) {
+
+    memset(&node,0,sizeof(open_addr_t));
+    node.type = ADDR_64B;
+    memcpy(&(node.addr_64b),&addr_64b_node,8);
+   
     memset(&sf0_vars,0,sizeof(sf0_vars_t));
     sf0_vars.numAppPacketsPerSlotFrame = 0;
     sixtop_setSFcallback(sf0_getsfid,sf0_getMetadata,sf0_translateMetadata,sf0_handleRCError);
@@ -101,12 +108,20 @@ void sf0_bandwidthEstimate_task(void){
         return;
     }
     
-    // get preferred parent
-    foundNeighbor = icmpv6rpl_getPreferredParentEui64(&neighbor);
+    
+    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
+   if (!packetfunctions_sameAddress(my_address,&node)) {
+        foundNeighbor = icmpv6rpl_getPreferredParentEui64(&neighbor);  
+    } else {
+        foundNeighbor = ranking_getPreferredParentEui64(&neighbor);
+    }
+    
     if (foundNeighbor==FALSE) {
         return;
     }
-    
+
+
+   
     // get bandwidth of outgoing, incoming and self.
     // Here we just calculate the estimated bandwidth for 
     // the application sending on dedicate cells(TX or Rx).

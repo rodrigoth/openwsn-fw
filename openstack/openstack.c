@@ -15,6 +15,7 @@
 #include "openrandom.h"
 #include "opentimers.h"
 #include "opentimers.h"
+#include "openreport.h"
 //-- 02a-TSCH
 #include "adaptive_sync.h"
 #include "IEEE802154E.h"
@@ -23,6 +24,7 @@
 #include "sixtop.h"
 #include "neighbors.h"
 #include "sf0.h"
+#include "ranking.h"
 //-- 03a-IPHC
 #include "openbridge.h"
 #include "iphc.h"
@@ -55,6 +57,7 @@ void openstack_init(void) {
    openqueue_init();
    openrandom_init();
    opentimers_init();
+   openreport_init();
    //-- 02a-TSCH
 //   adaptive_sync_init();
    ieee154e_init();
@@ -63,6 +66,8 @@ void openstack_init(void) {
    sixtop_init();
    neighbors_init();
    sf0_init();
+   ranking_init();
+
    //-- 03a-IPHC
    openbridge_init();
    iphc_init();

@@ -21,6 +21,7 @@
 ieee154e_vars_t    ieee154e_vars;
 ieee154e_stats_t   ieee154e_stats;
 ieee154e_dbg_t     ieee154e_dbg;
+open_addr_t node,sink;
 
 //=========================== prototypes ======================================
 
@@ -109,8 +110,15 @@ void ieee154e_init() {
    // initialize variables
    memset(&ieee154e_vars,0,sizeof(ieee154e_vars_t));
    memset(&ieee154e_dbg,0,sizeof(ieee154e_dbg_t));
+
+   node.type = ADDR_64B;
+   memcpy(&(node.addr_64b),&addr_64b_node,8);
+
+   sink.type = ADDR_64B;
+   memcpy(&(sink.addr_64b),&addr_64b_sink,8);
    
-   ieee154e_vars.singleChannel     = 0; // 0 means channel hopping
+   
+   ieee154e_vars.singleChannel     = 0;//SYNCHRONIZING_CHANNEL; //0; // 0 means channel hopping
    ieee154e_vars.isAckEnabled      = TRUE;
    ieee154e_vars.isSecurityEnabled = FALSE;
    ieee154e_vars.slotDuration      = TsSlotDuration;
@@ -907,12 +915,19 @@ port_INLINE void activity_ti1ORri1() {
          // check whether we can send
          if (schedule_getOkToSend()) {
             schedule_getNeighbor(&neighbor);
-            ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
-            if ((ieee154e_vars.dataToSend==NULL) && (cellType==CELLTYPE_TXRX)) {
-               couldSendEB=TRUE;
-               // look for an EB packet in the queue
-               ieee154e_vars.dataToSend = openqueue_macGetEBPacket();
+            if (cellType==CELLTYPE_TXRX) {
+                ieee154e_vars.dataToSend = openqueue_macGetEBPacket();
+                if(ieee154e_vars.dataToSend != NULL) {
+                  couldSendEB=TRUE;
+                } else {
+                  if(neighbor.type == ADDR_ANYCAST) {
+                     ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
+                  }
+                }
+            } else {
+               ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
             }
+            
          }
          if (ieee154e_vars.dataToSend==NULL) {
             if (cellType==CELLTYPE_TX) {
@@ -1904,6 +1919,16 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
                 IEEE802154_security_isConfigured() == FALSE) {
             synchronizePacket(ieee154e_vars.syncCapturedTime);
             }
+            
+
+            if(ieee154e_vars.dataReceived->l2_frameType == IEEE154_TYPE_BEACON) {
+               open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
+               if (!packetfunctions_sameAddress(my_address,&sink)) {
+                   neighbors_indicateBroadcastReception(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop));
+               }
+            }
+
+
             // indicate reception to upper layer (no ACK asked)
             notif_receive(ieee154e_vars.dataReceived);
             // reset local variable

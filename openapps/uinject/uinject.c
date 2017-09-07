@@ -6,6 +6,7 @@
 #include "scheduler.h"
 #include "IEEE802154E.h"
 #include "idmanager.h"
+#include "ranking.h"
 
 //=========================== variables =======================================
 
@@ -86,6 +87,12 @@ void uinject_task_cb() {
       opentimers_destroy(uinject_vars.timerId);
       return;
    }
+
+
+  // /if (!ranking_getHaveParent()) {return;}
+
+
+
    
    // if you get here, send a packet
    

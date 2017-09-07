@@ -583,6 +583,10 @@ void schedule_advanceSlot() {
    
    INTERRUPT_DECLARATION();
    DISABLE_INTERRUPTS();  
+  
+  if (schedule_vars.currentScheduleEntry->slotOffset >= ((scheduleEntry_t*)schedule_vars.currentScheduleEntry->next)->slotOffset) {
+       sf0_notifyNewSlotframe();
+   }   
    schedule_vars.currentScheduleEntry = schedule_vars.currentScheduleEntry->next;
    
    ENABLE_INTERRUPTS();
