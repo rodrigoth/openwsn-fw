@@ -131,7 +131,7 @@ command_line_options = {
     'fastsim':          ['1','0'],
     'simhost':          ['amd64-linux','x86-linux','amd64-windows','x86-windows'],
     'simhostpy':        [''],                               # No reasonable default
-    'panid':            [''],
+    'panid':            ['5'],
     'dagroot':          ['0','1'],
     'forcetopology':    ['0','1'],
     'debug':            ['0','1'],
@@ -259,7 +259,7 @@ command_line_vars.AddVariables(
     (
         'forcetopology',                                   # key
         '',                                                # help
-        command_line_options['forcetopology'][1],          # default
+        command_line_options['forcetopology'][0],          # default
         validate_option,                                   # validator
         int,                                               # converter
     ),

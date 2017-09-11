@@ -5,12 +5,10 @@
 #include "idmanager.h"
 #include "openserial.h"
 #include "IEEE802154E.h"
-#include "ranking.h"
 
 //=========================== variables =======================================
 
 static neighbors_vars_t neighbors_vars;
-open_addr_t  node;
 
 //=========================== prototypes ======================================
 
@@ -28,7 +26,7 @@ bool isThisRowMatching(
         open_addr_t* address,
         uint8_t      rowNumber
      );
-bool isValueInArray(uint8_t val, uint8_t *arr, uint8_t size);
+uint8_t neighbors_transformLinkMetric(uint8_t broadcastRecepetion);
 
 //=========================== public ==========================================
 
@@ -36,10 +34,6 @@ bool isValueInArray(uint8_t val, uint8_t *arr, uint8_t size);
 \brief Initializes this module.
 */
 void neighbors_init() {
-
-   memset(&node,0,sizeof(open_addr_t));
-   node.type = ADDR_64B;
-   memcpy(&(node.addr_64b),&addr_64b_node,8);
    
    // clear module variables
    memset(&neighbors_vars,0,sizeof(neighbors_vars_t));
@@ -550,11 +544,8 @@ void neighbors_setNeighborNoResource(open_addr_t* address){
    }
 }
 
-void neighbors_setPreferredParent(uint8_t index, bool isPreferred, bool ranking){
-     open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-     if ( (packetfunctions_sameAddress(my_address,&node) && ranking) || (!packetfunctions_sameAddress(my_address,&node)) ) {
-        neighbors_vars.neighbors[index].parentPreference = isPreferred;
-     }    
+void neighbors_setPreferredParent(uint8_t index, bool isPreferred){
+     neighbors_vars.neighbors[index].parentPreference = isPreferred;    
 }
 
 //===== managing routing info
@@ -568,8 +559,18 @@ This really belongs to icmpv6rpl but it would require a much more complex interf
 uint16_t neighbors_getLinkMetric(uint8_t index) {
     uint16_t  rankIncrease;
     uint32_t  rankIncreaseIntermediary; // stores intermediary results of rankIncrease calculation
+    uint8_t   broadcastRecepetion;
 
-    // we assume that this neighbor has already been checked for being in use         
+    if (neighbors_vars.neighbors[index].broadcastReceivedCounter==0) {
+        rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
+    } else {
+        broadcastRecepetion = neighbors_transformLinkMetric(neighbors_vars.neighbors[index].broadcastReceivedCounter);
+        rankIncrease = 3*broadcastRecepetion*MINHOPRANKINCREASE;
+    }
+    return rankIncrease;
+
+
+    /*// we assume that this neighbor has already been checked for being in use         
     // calculate link cost to this neighbor
     if (neighbors_vars.neighbors[index].numTxACK==0) {
         if (neighbors_vars.neighbors[index].numTx<=DEFAULTLINKCOST){
@@ -591,7 +592,15 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
             rankIncrease = (uint16_t)(rankIncreaseIntermediary >> 10);
         }
     }
-    return rankIncrease;
+    return rankIncrease;*/
+}
+
+uint8_t neighbors_transformLinkMetric(uint8_t broadcastRecepetion) {
+    if (broadcastRecepetion <= 5) {
+        return LARGESTLINKCOST;
+    } 
+
+    return MAXBROADCASTRECEPETION/broadcastRecepetion;
 }
 
 //===== maintenance
@@ -612,7 +621,7 @@ void  neighbors_removeOld() {
                 if (haveParent && (i==j)) { // this is our preferred parent, carefully!
                     icmpv6rpl_killPreferredParent();
                     removeNeighbor(i);
-                    icmpv6rpl_updateMyDAGrankAndParentSelection();
+                    //icmpv6rpl_updateMyDAGrankAndParentSelection();
                 } else {
                     removeNeighbor(i);
                 }
@@ -693,7 +702,7 @@ void  neighbors_removeOld() {
                 haveParent = icmpv6rpl_getPreferredParentIndex(&j);
                 if (haveParent && (i==j)) { // this is our preferred parent, carefully!
                     icmpv6rpl_killPreferredParent();
-                    icmpv6rpl_updateMyDAGrankAndParentSelection();
+                    //icmpv6rpl_updateMyDAGrankAndParentSelection();
                 }
                 if (neighbors_vars.neighbors[i].f6PNORES == FALSE){
                     removeNeighbor(i);
@@ -764,11 +773,6 @@ void registerNewNeighbor(open_addr_t* address,
                neighbors_vars.neighbors[i].joinPrio=joinPrio;
             }
 
-             open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-             if (packetfunctions_sameAddress(my_address,&node)) {
-                ranking_startPeriodRanking();  
-             } 
-            
             break;
 
 
@@ -829,11 +833,4 @@ bool isThisRowMatching(open_addr_t* address, uint8_t rowNumber) {
    }
 }
 
-bool isValueInArray(uint8_t val, uint8_t *arr, uint8_t size) {
-    uint8_t i;
-    for (i=0; i < size; i++) {
-        if (arr[i] == val)
-            return TRUE;
-    }
-    return FALSE;
-}
+

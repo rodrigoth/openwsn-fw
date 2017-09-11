@@ -11,10 +11,8 @@
 #include "openudp.h"
 #include "debugpins.h"
 #include "scheduler.h"
-#include "ranking.h"
 
 //=========================== variables =======================================
-open_addr_t node;
 //=========================== prototypes ======================================
 
 void      forwarding_getNextHop(
@@ -58,9 +56,6 @@ void forwarding_createDeadlineOption(
 \brief Initialize this module.
 */
 void forwarding_init() {
-    memset(&node,0,sizeof(open_addr_t));
-    node.type = ADDR_64B;
-    memcpy(&(node.addr_64b),&addr_64b_node,8);
 }
 
 /**
@@ -457,14 +452,8 @@ void forwarding_getNextHop(open_addr_t* destination128b, open_addr_t* addressToW
       // IP destination is 1-hop neighbor, send directly
       packetfunctions_ip128bToMac64b(destination128b,&temp_prefix64btoWrite,addressToWrite64b);
    } else {
-      open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-      if (!packetfunctions_sameAddress(my_address,&node)) {
-        icmpv6rpl_getPreferredParentEui64(addressToWrite64b);
-    } else {
-        ranking_getPreferredParentEui64(addressToWrite64b);
-    }
-      
-   }
+      icmpv6rpl_getPreferredParentEui64(addressToWrite64b);
+   }  
 }
 
 /**

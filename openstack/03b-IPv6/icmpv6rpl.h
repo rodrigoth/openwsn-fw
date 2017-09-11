@@ -12,7 +12,7 @@
 
 //=========================== define ==========================================
 
-#define TIMER_DIO_TIMEOUT         10  // seconds
+#define TIMER_DIO_TIMEOUT         11  // seconds
 #define TIMER_DAO_TIMEOUT         60  // seconds
 
 // Non-Storing Mode of Operation (1)
@@ -60,6 +60,12 @@
 // max number of parents and children to send in DAO
 //section 8.2.1 pag 67 RFC6550 -- using a subset
 #define MAX_TARGET_PARENTS        0x01
+
+
+#define RANKING_FIRST_OBSERVATION_PERIOD        15000
+#define RANKING_OBSERVATION_WINDOW_PERIOD_MS    240000 // default 4 minutes
+#define RANKING_PARENT_SWITCH_THRESHOLD         80 // 80% the difference shoud be > 20% to switch the preferent parent
+
 
 enum{
   OPTION_ROUTE_INFORMATION_TYPE   = 0x03,
@@ -204,6 +210,8 @@ typedef struct {
    icmpv6rpl_pio_t*          incomingPio;             //pio structure incoming
    icmpv6rpl_config_ht*      incomingConf;            //configuration incoming
    bool                      daoSent;
+   opentimers_id_t           timerId;                 ///< periodic timer which triggers transmission
+   bool                      timerStarted;
 } icmpv6rpl_vars_t;
 
 

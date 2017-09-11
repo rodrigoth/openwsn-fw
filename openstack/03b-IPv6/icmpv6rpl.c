@@ -15,8 +15,6 @@
 //=========================== variables =======================================
 
 icmpv6rpl_vars_t     icmpv6rpl_vars;
-open_addr_t          node;
-
 
 //=========================== prototypes ======================================
 
@@ -29,6 +27,11 @@ void icmpv6rpl_timer_DAO_cb(opentimers_id_t id);
 void icmpv6rpl_timer_DAO_task(void);
 void sendDAO(void);
 
+void ranking_timer_cb(opentimers_id_t id);
+void ranking_task_cb(void);
+void sort_arrays(uint8_t* receptions, uint8_t* indexes) ;
+uint8_t getLastParentBroadcastReception(uint8_t* receptions, uint8_t* indexes, uint8_t prevParentIndex);
+
 //=========================== public ==========================================
 
 /**
@@ -36,10 +39,6 @@ void sendDAO(void);
 */
 void icmpv6rpl_init() {
    uint8_t         dodagid[16];
-
-
-   node.type = ADDR_64B;
-   memcpy(&(node.addr_64b),&addr_64b_node,8);
    
    // retrieve my prefix and EUI64
    memcpy(&dodagid[0],idmanager_getMyID(ADDR_PREFIX)->prefix,8); // prefix
@@ -47,6 +46,8 @@ void icmpv6rpl_init() {
    
    //===== reset local variables
    memset(&icmpv6rpl_vars,0,sizeof(icmpv6rpl_vars_t));
+
+   icmpv6rpl_vars.dioTimerCounter = openrandom_get16b()%(1<<5);
    
    //=== routing
    icmpv6rpl_vars.haveParent=FALSE;
@@ -336,7 +337,7 @@ bool icmpv6rpl_isPreferredParent(open_addr_t* address) {
    //compare parent address to the one presented.
    switch (address->type) {
       case ADDR_64B:
-         neighbors_getNeighborEui64(&temp,ADDR_64B,icmpv6rpl_vars.ParentIndex);
+         neighbors_getNeighborEui64(&temp,ADDR_64B,icmpv6rpl_vars.ParentIndex);          
          return packetfunctions_sameAddress(address,&temp);
       default:
          openserial_printCritical(COMPONENT_NEIGHBORS,ERR_WRONG_ADDR_TYPE,
@@ -379,6 +380,8 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
     uint16_t  rankIncrease;
     dagrank_t neighborRank;
     uint32_t  tentativeDAGrank;
+    open_addr_t temp;
+
    
     // if I'm a DAGroot, my DAGrank is always MINHOPRANKINCREASE
     if ((idmanager_getIsDAGroot())==TRUE) {
@@ -396,12 +399,16 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
     prevRankIncrease     = icmpv6rpl_vars.rankIncrease;
     // update my rank to current parent first
     if (icmpv6rpl_vars.haveParent==TRUE){
-        if (neighbors_reachedMaxTransmission(icmpv6rpl_vars.ParentIndex)==FALSE){
+        //if (neighbors_reachedMaxTransmission(icmpv6rpl_vars.ParentIndex)==FALSE){
             // I havn't enough transmission to my parent, don't update.
-            return;
-        }
+        //    return;
+        //}
+
+
         rankIncrease     = neighbors_getLinkMetric(icmpv6rpl_vars.ParentIndex);
         neighborRank     = neighbors_getNeighborRank(icmpv6rpl_vars.ParentIndex);
+
+
         tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
         if (tentativeDAGrank>65535) {
             icmpv6rpl_vars.myDAGrank = 65535;
@@ -412,25 +419,79 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
     previousDAGrank      = icmpv6rpl_vars.myDAGrank;
     foundBetterParent    = FALSE;
     icmpv6rpl_vars.haveParent = FALSE;
+
+
+    uint8_t broadcastReceptions[MAXNUMNEIGHBORS];
+    uint8_t neighborsIndexes[MAXNUMNEIGHBORS];
+
+    memset(&broadcastReceptions[0],0,sizeof(uint8_t)*MAXNUMNEIGHBORS);
+    memset(&neighborsIndexes[0],0,sizeof(uint8_t)*MAXNUMNEIGHBORS);
+
+
+    neighbors_getAllBroadcastReception(&broadcastReceptions[0],&neighborsIndexes[0]);
+    sort_arrays(&broadcastReceptions[0],&neighborsIndexes[0]);
+
+
+    for(i = 0; i < 4; i++) {
+        openserial_printError(COMPONENT_RANKING,ERR_SORT, (errorparameter_t)broadcastReceptions[i],(errorparameter_t)neighborsIndexes[i]);  
+    }
+
+
+
+   /* uint8_t topRankedNodeIndex = neighborsIndexes[0];
+
+    if (icmpv6rpl_vars.haveParent==TRUE && topRankedNodeIndex == icmpv6rpl_vars.ParentIndex) {
+        openserial_printError(COMPONENT_RANKING,ERR_PARENT_NOT_CHANGED, (errorparameter_t)0,(errorparameter_t)0);
+    } else {
+        uint8_t lastParentBroadCastRecepetion = getLastParentBroadcastReception(&broadcastReceptions[0], &neighborsIndexes[0], icmpv6rpl_vars.ParentIndex);
+        uint8_t diffRecepetion = (uint16_t)(100*lastParentBroadCastRecepetion)/broadcastReceptions[0];
+        openserial_printError(COMPONENT_RANKING,ERR_SORT, (errorparameter_t)99,diffRecepetion);  
+
+        
+        if (icmpv6rpl_vars.haveParent==FALSE || diffRecepetion < RANKING_PARENT_SWITCH_THRESHOLD) {
+            foundBetterParent=TRUE; 
+
+            // get link cost to this neighbor
+            rankIncrease=neighbors_getLinkMetric(topRankedNodeIndex);
+            
+
+            // get this neighbor's advertized rank
+            neighborRank=neighbors_getNeighborRank(topRankedNodeIndex);
+
+            tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
+
+
+            icmpv6rpl_vars.myDAGrank    = (uint16_t)tentativeDAGrank;
+            icmpv6rpl_vars.ParentIndex  = topRankedNodeIndex;
+            icmpv6rpl_vars.rankIncrease = rankIncrease;
+        } else {
+              openserial_printError(COMPONENT_RANKING,ERR_PARENT_NOT_CHANGED, (errorparameter_t)0,(errorparameter_t)0);
+        }
+    
+    }*/
     
     // loop through neighbor table, update myDAGrank
     for (i=0;i<MAXNUMNEIGHBORS;i++) {
         if (neighbors_isStableNeighborByIndex(i)) { // in use and link is stable
             // neighbor marked as NORES can't be parent
-            if (neighbors_getNeighborNoResource(i)==TRUE) {
-                continue;
-            }
+            //if (neighbors_getNeighborNoResource(i)==TRUE) {
+            //    continue;
+            //}
             // get link cost to this neighbor
             rankIncrease=neighbors_getLinkMetric(i);
+            
+
             // get this neighbor's advertized rank
             neighborRank=neighbors_getNeighborRank(i);
+
+
             // if this neighbor has unknown/infinite rank, pass on it
             if (neighborRank==DEFAULTDAGRANK) continue;
             // compute tentative cost of full path to root through this neighbor
             tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
             if (tentativeDAGrank > 65535) {tentativeDAGrank = 65535;}
             // if not low enough to justify switch, pass (i.e. hysterisis)
-            if ((previousDAGrank<tentativeDAGrank) || (previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
+            if (previousDAGrank<=tentativeDAGrank) { //|| (previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
                   continue;
             }
             // remember that we have at least one valid candidate parent
@@ -450,9 +511,9 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
       icmpv6rpl_vars.haveParent=TRUE;
       if (!prevHadParent) {
          // in case preParent is killed before calling this function, clear the preferredParent flag
-         neighbors_setPreferredParent(prevParentIndex, FALSE,FALSE);
+         neighbors_setPreferredParent(prevParentIndex, FALSE);
          // set neighbors as preferred parent
-         neighbors_setPreferredParent(icmpv6rpl_vars.ParentIndex, TRUE,FALSE);
+         neighbors_setPreferredParent(icmpv6rpl_vars.ParentIndex, TRUE);
       } else {
          if (icmpv6rpl_vars.ParentIndex==prevParentIndex) {
              // report on the rank change if any, not on the deletion/creation of parent
@@ -462,9 +523,9 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
              }
          } else {
              // clear neighbors preferredParent flag
-             neighbors_setPreferredParent(prevParentIndex, FALSE,FALSE);
+             neighbors_setPreferredParent(prevParentIndex, FALSE);
              // set neighbors as preferred parent
-             neighbors_setPreferredParent(icmpv6rpl_vars.ParentIndex, TRUE,FALSE);
+             neighbors_setPreferredParent(icmpv6rpl_vars.ParentIndex, TRUE);
          }
       }
    } else {
@@ -475,7 +536,32 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
       icmpv6rpl_vars.rankIncrease= prevRankIncrease;
       // no change to report on
    }
+
+  neighbors_resetBroadcastReception();
 }
+
+
+void sort_arrays(uint8_t* receptions, uint8_t* indexes) {
+  uint8_t i, j;    
+  uint8_t current_nb,current_broadcast_count;
+
+    for (i = 0; i < MAXNUMNEIGHBORS; i++) {
+        for (j = i +1; j < MAXNUMNEIGHBORS; j++ ) {
+            if (receptions[i] < receptions[j]) {
+                current_broadcast_count = receptions[i];
+                current_nb = indexes[i];
+
+                receptions[i] = receptions[j];
+                receptions[j] = current_broadcast_count;
+
+                indexes[i] = indexes[j];
+                indexes[j] = current_nb;
+            }
+        }
+    }
+}
+
+
 
 /**
 \brief Indicate I just received a RPL DIO from a neighbor.
@@ -500,6 +586,17 @@ void icmpv6rpl_indicateRxDIO(OpenQueueEntry_t* msg) {
 
 
    neighbors_indicateBroadcastReception(&(msg->l2_nextORpreviousHop));
+
+
+   if(icmpv6rpl_vars.timerStarted == FALSE) {
+      icmpv6rpl_vars.timerId = opentimers_create();
+      if(icmpv6rpl_vars.timerId != TOO_MANY_TIMERS_ERROR) {
+          opentimers_setPriority(icmpv6rpl_vars.timerId,0);
+          opentimers_scheduleIn(icmpv6rpl_vars.timerId,RANKING_FIRST_OBSERVATION_PERIOD,TIME_MS,TIMER_ONESHOT,ranking_timer_cb);
+          icmpv6rpl_vars.timerStarted = TRUE;  
+          
+      } 
+   } 
 
    // take ownership over the packet
    msg->owner = COMPONENT_NEIGHBORS;
@@ -579,7 +676,7 @@ void icmpv6rpl_indicateRxDIO(OpenQueueEntry_t* msg) {
                neighbors_setNeighborRank(i,icmpv6rpl_vars.incomingDio->rank);
             }
             // since changes were made to neighbors DAG rank, run the routing algorithm again
-            icmpv6rpl_updateMyDAGrankAndParentSelection(); 
+            //icmpv6rpl_updateMyDAGrankAndParentSelection(); 
             break; // there should be only one matching entry, no need to loop further
          }
       }
@@ -628,6 +725,7 @@ void icmpv6rpl_timer_DIO_task() {
     case 0:
         // called every TIMER_DIO_TIMEOUT seconds
         sendDIO();
+        icmpv6rpl_vars.dioTimerCounter = openrandom_get16b()%(1<<5);
         break;
     default:
         break;
@@ -971,3 +1069,24 @@ bool icmpv6rpl_daoSent(void) {
     return icmpv6rpl_vars.daoSent;
 }
 
+void ranking_timer_cb(opentimers_id_t id){
+    scheduler_push_task(ranking_task_cb,TASKPRIO_SF0);  
+}
+
+void ranking_task_cb() {
+  icmpv6rpl_updateMyDAGrankAndParentSelection();
+  opentimers_scheduleIn(icmpv6rpl_vars.timerId,RANKING_OBSERVATION_WINDOW_PERIOD_MS,TIME_MS,TIMER_ONESHOT,ranking_timer_cb);
+}
+
+uint8_t getLastParentBroadcastReception(uint8_t* receptions, uint8_t* indexes, uint8_t prevParentIndex) {
+    uint8_t i;
+    uint8_t prevIndex = 0;
+    for(i = 0; i < MAXNUMNEIGHBORS; i++) {
+        if (indexes[i] == prevParentIndex) {
+            prevIndex = i;
+            break;
+        }
+    }
+
+    return receptions[prevIndex];
+}

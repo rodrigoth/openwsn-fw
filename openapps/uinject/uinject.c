@@ -99,6 +99,7 @@ void uinject_task_cb() {
    // get a free packet buffer
    pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
    if (pkt==NULL) {
+      openqueue_removeAllCreatedBy(COMPONENT_UINJECT);
       openserial_printError(
          COMPONENT_UINJECT,
          ERR_NO_FREE_PACKET_BUFFER,

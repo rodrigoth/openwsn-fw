@@ -24,7 +24,7 @@
 #include "sixtop.h"
 #include "neighbors.h"
 #include "sf0.h"
-#include "ranking.h"
+//#include "ranking.h"
 //-- 03a-IPHC
 #include "openbridge.h"
 #include "iphc.h"
@@ -66,7 +66,7 @@ void openstack_init(void) {
    sixtop_init();
    neighbors_init();
    sf0_init();
-   ranking_init();
+   //ranking_init();
 
    //-- 03a-IPHC
    openbridge_init();

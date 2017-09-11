@@ -18,7 +18,7 @@ sources_c = [
     os.path.join('02b-MAChigh','sf0.c'),
     os.path.join('02b-MAChigh','schedule.c'),
     os.path.join('02b-MAChigh','sixtop.c'),
-    os.path.join('02b-MAChigh','ranking.c'),
+    #os.path.join('02b-MAChigh','ranking.c'),
     #=== 03a-IPHC
     os.path.join('03a-IPHC','iphc.c'),
     os.path.join('03a-IPHC','openbridge.c'),

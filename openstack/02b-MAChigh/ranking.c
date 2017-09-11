@@ -4,6 +4,7 @@
 #include "openserial.h"
 #include "IEEE802154E.h"
 #include "opendefs.h"
+#include "openreport.h"
 //=========================== variables =======================================
 
 ranking_vars_t ranking_vars;
@@ -22,11 +23,11 @@ void ranking_init() {
 
 
 void ranking_startPeriodRanking() {
-    if (ranking_vars.timeStarted == FALSE) {
+    /*if (ranking_vars.timeStarted == FALSE) {
 		ranking_vars.timerId = opentimers_create();
 		opentimers_scheduleIn(ranking_vars.timerId,RANKING_FIRST_OBSERVATION_PERIOD,TIME_MS,TIMER_PERIODIC,ranking_timer_cb);
 		ranking_vars.timeStarted = TRUE;
-	}
+	}*/
 }
 
 
@@ -74,7 +75,8 @@ void ranking_task_cb() {
  			neighbors_setPreferredParent(neighborsIndexes[0], TRUE,TRUE);
  			ranking_vars.lastParentIndex = neighborsIndexes[0];
  			ranking_vars.parentIndex = neighborsIndexes[0];
- 			openserial_printError(COMPONENT_RANKING,ERR_PARENT_CHANGED, (errorparameter_t)0,(errorparameter_t)0);	
+ 			//openserial_printError(COMPONENT_RANKING,ERR_PARENT_CHANGED, (errorparameter_t)0,(errorparameter_t)0);	
+ 			openreport_indicateParentSwitch();
 
  		} else {
  			openserial_printError(COMPONENT_RANKING,ERR_PARENT_NOT_CHANGED, (errorparameter_t)0,(errorparameter_t)0);	

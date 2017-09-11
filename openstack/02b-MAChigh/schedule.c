@@ -11,10 +11,12 @@
 //=========================== variables =======================================
 
 schedule_vars_t schedule_vars;
+uint8_t shared_slots[] = {0,20,40,60,80};
 
 //=========================== prototypes ======================================
 
 void schedule_resetEntry(scheduleEntry_t* pScheduleEntry);
+bool is_value_in_array(uint8_t val, uint8_t *arr, uint8_t size);
 
 //=========================== public ==========================================
 
@@ -54,6 +56,14 @@ void schedule_init() {
          0,                                     // channel offset
          &temp_neighbor                         // neighbor
       );
+   }
+
+
+   uint8_t i;
+   memset(&temp_neighbor,0,sizeof(temp_neighbor));
+   temp_neighbor.type             = ADDR_ANYCAST;
+   for(i = 1; i < sizeof(shared_slots); i++) {
+      schedule_addActiveSlot(shared_slots[i],CELLTYPE_TXRX,TRUE,SCHEDULE_MINIMAL_6TISCH_CHANNELOFFSET,&temp_neighbor);
    }
 }
 
@@ -885,4 +895,13 @@ void schedule_resetEntry(scheduleEntry_t* e) {
    e->lastUsedAsn.bytes2and3 = 0;
    e->lastUsedAsn.byte4      = 0;
    e->next                   = NULL;
+}
+
+bool is_value_in_array(uint8_t val, uint8_t *arr, uint8_t size){
+    uint8_t i;
+    for (i=0; i < size; i++) {
+        if (arr[i] == val)
+            return TRUE;
+    }
+    return FALSE;
 }

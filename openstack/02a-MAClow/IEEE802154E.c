@@ -21,7 +21,6 @@
 ieee154e_vars_t    ieee154e_vars;
 ieee154e_stats_t   ieee154e_stats;
 ieee154e_dbg_t     ieee154e_dbg;
-open_addr_t node,sink;
 
 //=========================== prototypes ======================================
 
@@ -111,11 +110,6 @@ void ieee154e_init() {
    memset(&ieee154e_vars,0,sizeof(ieee154e_vars_t));
    memset(&ieee154e_dbg,0,sizeof(ieee154e_dbg_t));
 
-   node.type = ADDR_64B;
-   memcpy(&(node.addr_64b),&addr_64b_node,8);
-
-   sink.type = ADDR_64B;
-   memcpy(&(sink.addr_64b),&addr_64b_sink,8);
    
    
    ieee154e_vars.singleChannel     = 0;//SYNCHRONIZING_CHANNEL; //0; // 0 means channel hopping
@@ -1922,10 +1916,7 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
             
 
             if(ieee154e_vars.dataReceived->l2_frameType == IEEE154_TYPE_BEACON) {
-               open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
-               if (!packetfunctions_sameAddress(my_address,&sink)) {
-                   neighbors_indicateBroadcastReception(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop));
-               }
+               neighbors_indicateBroadcastReception(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop));
             }
 
 

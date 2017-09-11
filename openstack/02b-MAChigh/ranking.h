@@ -7,7 +7,7 @@
 
 
 //=========================== define ==========================================
-#define RANKING_OBSERVATION_WINDOW_PERIOD_MS 40000 // default 4 minutes
+#define RANKING_OBSERVATION_WINDOW_PERIOD_MS 240000 // default 4 minutes
 #define RANKING_FIRST_OBSERVATION_PERIOD 15000
 
 //=========================== typedef =========================================
@@ -29,5 +29,6 @@ typedef struct {
 void ranking_init(void);
 void ranking_startPeriodRanking(void);
 bool ranking_getPreferredParentEui64(open_addr_t* addressToWrite);
+
 
 #endif

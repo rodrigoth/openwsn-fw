@@ -18,6 +18,7 @@
 #define SWITCHSTABILITYTHRESHOLD  3
 #define DEFAULTLINKCOST           4
 #define LARGESTLINKCOST           8
+#define MAXBROADCASTRECEPETION    40 //4 minutes EB + DIO            
 
 #define MAXDAGRANK                0xffff
 #define DEFAULTDAGRANK            MAXDAGRANK
@@ -70,7 +71,7 @@ void          neighbors_getAllBroadcastReception(uint8_t* recepetions,uint8_t* i
 // setters
 void          neighbors_setNeighborRank(uint8_t index, dagrank_t rank);
 void          neighbors_setNeighborNoResource(open_addr_t* address);
-void          neighbors_setPreferredParent(uint8_t index, bool isPreferred,bool ranking);
+void          neighbors_setPreferredParent(uint8_t index, bool isPreferred);
 // interrogators
 bool          neighbors_isStableNeighbor(open_addr_t* address);
 bool          neighbors_isStableNeighborByIndex(uint8_t index);

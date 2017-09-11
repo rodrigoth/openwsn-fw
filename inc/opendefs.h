@@ -36,17 +36,12 @@ static const uint8_t infoStackName[] = "OpenWSN ";
 #define LENGTH_ADDR64b   8
 #define LENGTH_ADDR128b  16
 
-#define MAXNUMNEIGHBORS  10
+#define MAXNUMNEIGHBORS  19
 
 // maximum celllist length
 #define CELLLIST_MAX_LEN 3
 
 
-
-
-
-static const uint8_t addr_64b_node[] = {0x05, 0x43, 0x32, 0xff, 0x03, 0xd7, 0x86, 0x62}; // A-205 Grenoble;
-static const uint8_t addr_64b_sink[] = {0x05, 0x43, 0x32, 0xff, 0x03, 0xd8, 0xb5, 0x58}; // A-225 Grenoble
 
 
 

@@ -29,7 +29,7 @@
 #define TIMERTHRESHOLD 10
 
 /// Maximum number of timers that can run concurrently
-#define MAX_NUM_TIMERS             10
+#define MAX_NUM_TIMERS             15
 #define MAX_TICKS_IN_SINGLE_CLOCK  (uint32_t)(((PORT_TIMER_WIDTH)0xFFFFFFFF)>>1)
 //#define MAX_TICKS_IN_SINGLE_CLOCK  0x7FFF
 #define TOO_MANY_TIMERS_ERROR      255
