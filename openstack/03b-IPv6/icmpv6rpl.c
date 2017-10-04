@@ -47,7 +47,7 @@ void icmpv6rpl_init() {
    //===== reset local variables
    memset(&icmpv6rpl_vars,0,sizeof(icmpv6rpl_vars_t));
 
-   icmpv6rpl_vars.dioTimerCounter = openrandom_get16b()%(1<<5);
+   //icmpv6rpl_vars.dioTimerCounter = openrandom_get16b()%(1<<5);
    
    //=== routing
    icmpv6rpl_vars.haveParent=FALSE;
@@ -417,11 +417,13 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
         }
     }
     previousDAGrank      = icmpv6rpl_vars.myDAGrank;
+    //openserial_printError(COMPONENT_RANKING,ERR_SORT, 0,previousDAGrank);  
+
     foundBetterParent    = FALSE;
     icmpv6rpl_vars.haveParent = FALSE;
 
 
-    uint8_t broadcastReceptions[MAXNUMNEIGHBORS];
+    /*uint8_t broadcastReceptions[MAXNUMNEIGHBORS];
     uint8_t neighborsIndexes[MAXNUMNEIGHBORS];
 
     memset(&broadcastReceptions[0],0,sizeof(uint8_t)*MAXNUMNEIGHBORS);
@@ -434,7 +436,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
 
     for(i = 0; i < 4; i++) {
         openserial_printError(COMPONENT_RANKING,ERR_SORT, (errorparameter_t)broadcastReceptions[i],(errorparameter_t)neighborsIndexes[i]);  
-    }
+    }*/
 
 
 
@@ -484,6 +486,8 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
             // get this neighbor's advertized rank
             neighborRank=neighbors_getNeighborRank(i);
 
+            //openserial_printError(COMPONENT_RANKING,ERR_SORT, rankIncrease,neighborRank);  
+
 
             // if this neighbor has unknown/infinite rank, pass on it
             if (neighborRank==DEFAULTDAGRANK) continue;
@@ -491,7 +495,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
             tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
             if (tentativeDAGrank > 65535) {tentativeDAGrank = 65535;}
             // if not low enough to justify switch, pass (i.e. hysterisis)
-            if (previousDAGrank<=tentativeDAGrank) { //|| (previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
+            if ((previousDAGrank<=tentativeDAGrank) || (previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
                   continue;
             }
             // remember that we have at least one valid candidate parent
@@ -588,7 +592,7 @@ void icmpv6rpl_indicateRxDIO(OpenQueueEntry_t* msg) {
    neighbors_indicateBroadcastReception(&(msg->l2_nextORpreviousHop));
 
 
-   if(icmpv6rpl_vars.timerStarted == FALSE) {
+   /*if(icmpv6rpl_vars.timerStarted == FALSE) {
       icmpv6rpl_vars.timerId = opentimers_create();
       if(icmpv6rpl_vars.timerId != TOO_MANY_TIMERS_ERROR) {
           opentimers_setPriority(icmpv6rpl_vars.timerId,0);
@@ -596,7 +600,7 @@ void icmpv6rpl_indicateRxDIO(OpenQueueEntry_t* msg) {
           icmpv6rpl_vars.timerStarted = TRUE;  
           
       } 
-   } 
+   } */
 
    // take ownership over the packet
    msg->owner = COMPONENT_NEIGHBORS;
@@ -676,7 +680,7 @@ void icmpv6rpl_indicateRxDIO(OpenQueueEntry_t* msg) {
                neighbors_setNeighborRank(i,icmpv6rpl_vars.incomingDio->rank);
             }
             // since changes were made to neighbors DAG rank, run the routing algorithm again
-            //icmpv6rpl_updateMyDAGrankAndParentSelection(); 
+            icmpv6rpl_updateMyDAGrankAndParentSelection(); 
             break; // there should be only one matching entry, no need to loop further
          }
       }
@@ -725,7 +729,7 @@ void icmpv6rpl_timer_DIO_task() {
     case 0:
         // called every TIMER_DIO_TIMEOUT seconds
         sendDIO();
-        icmpv6rpl_vars.dioTimerCounter = openrandom_get16b()%(1<<5);
+        //icmpv6rpl_vars.dioTimerCounter = openrandom_get16b()%(1<<5);
         break;
     default:
         break;
@@ -1070,12 +1074,12 @@ bool icmpv6rpl_daoSent(void) {
 }
 
 void ranking_timer_cb(opentimers_id_t id){
-    scheduler_push_task(ranking_task_cb,TASKPRIO_SF0);  
+    //scheduler_push_task(ranking_task_cb,TASKPRIO_SF0);  
 }
 
 void ranking_task_cb() {
-  icmpv6rpl_updateMyDAGrankAndParentSelection();
-  opentimers_scheduleIn(icmpv6rpl_vars.timerId,RANKING_OBSERVATION_WINDOW_PERIOD_MS,TIME_MS,TIMER_ONESHOT,ranking_timer_cb);
+  //icmpv6rpl_updateMyDAGrankAndParentSelection();
+  //opentimers_scheduleIn(icmpv6rpl_vars.timerId,RANKING_OBSERVATION_WINDOW_PERIOD_MS,TIME_MS,TIMER_ONESHOT,ranking_timer_cb);
 }
 
 uint8_t getLastParentBroadcastReception(uint8_t* receptions, uint8_t* indexes, uint8_t prevParentIndex) {

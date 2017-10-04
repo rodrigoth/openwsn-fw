@@ -11,7 +11,7 @@
 //=========================== variables =======================================
 
 schedule_vars_t schedule_vars;
-uint8_t shared_slots[] = {0,20,40,60,80};
+//uint8_t shared_slots[] = {0,20,40,60,80};
 
 //=========================== prototypes ======================================
 
@@ -59,12 +59,12 @@ void schedule_init() {
    }
 
 
-   uint8_t i;
+   /*uint8_t i;
    memset(&temp_neighbor,0,sizeof(temp_neighbor));
    temp_neighbor.type             = ADDR_ANYCAST;
    for(i = 1; i < sizeof(shared_slots); i++) {
       schedule_addActiveSlot(shared_slots[i],CELLTYPE_TXRX,TRUE,SCHEDULE_MINIMAL_6TISCH_CHANNELOFFSET,&temp_neighbor);
-   }
+   }*/
 }
 
 /**

@@ -561,16 +561,16 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
     uint32_t  rankIncreaseIntermediary; // stores intermediary results of rankIncrease calculation
     uint8_t   broadcastRecepetion;
 
-    if (neighbors_vars.neighbors[index].broadcastReceivedCounter==0) {
+    /*if (neighbors_vars.neighbors[index].broadcastReceivedCounter==0) {
         rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
     } else {
         broadcastRecepetion = neighbors_transformLinkMetric(neighbors_vars.neighbors[index].broadcastReceivedCounter);
         rankIncrease = 3*broadcastRecepetion*MINHOPRANKINCREASE;
     }
-    return rankIncrease;
+    return rankIncrease;*/
 
 
-    /*// we assume that this neighbor has already been checked for being in use         
+    // we assume that this neighbor has already been checked for being in use         
     // calculate link cost to this neighbor
     if (neighbors_vars.neighbors[index].numTxACK==0) {
         if (neighbors_vars.neighbors[index].numTx<=DEFAULTLINKCOST){
@@ -592,7 +592,7 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
             rankIncrease = (uint16_t)(rankIncreaseIntermediary >> 10);
         }
     }
-    return rankIncrease;*/
+    return rankIncrease;
 }
 
 uint8_t neighbors_transformLinkMetric(uint8_t broadcastRecepetion) {
@@ -621,7 +621,7 @@ void  neighbors_removeOld() {
                 if (haveParent && (i==j)) { // this is our preferred parent, carefully!
                     icmpv6rpl_killPreferredParent();
                     removeNeighbor(i);
-                    //icmpv6rpl_updateMyDAGrankAndParentSelection();
+                    icmpv6rpl_updateMyDAGrankAndParentSelection();
                 } else {
                     removeNeighbor(i);
                 }

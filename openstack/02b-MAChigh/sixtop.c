@@ -110,7 +110,7 @@ void sixtop_init() {
     sixtop_vars.isResponseEnabled  = TRUE;
     sixtop_vars.six2six_state      = SIX_STATE_IDLE;
 
-    sixtop_vars.ebCounter          = openrandom_get16b()%(1<<5);
+    //sixtop_vars.ebCounter          = openrandom_get16b()%(1<<5);
     
     sixtop_vars.ebSendingTimerId   = opentimers_create();
     opentimers_scheduleIn(
@@ -637,7 +637,7 @@ void timer_sixtop_sendEb_fired(){
     case 0:
         // called every EBPERIOD seconds
         sixtop_sendEB();
-        sixtop_vars.ebCounter          = openrandom_get16b()%(1<<5);
+        //sixtop_vars.ebCounter          = openrandom_get16b()%(1<<5);
         break;
     default:
         break;
@@ -659,7 +659,7 @@ void timer_sixtop_management_fired(void) {
     switch (sixtop_vars.mgtTaskCounter) {
     case 0:
         // called every MAINTENANCE_PERIOD seconds
-        //neighbors_removeOld();
+        neighbors_removeOld();
         break;
     default:
         // called every second, except once every MAINTENANCE_PERIOD seconds

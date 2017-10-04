@@ -52,14 +52,19 @@ topology.
 */
 bool topology_isAcceptablePacket(ieee802154_header_iht* ieee802514_header) {
 #ifdef FORCETOPOLOGY
+
+   memset(&node,0,sizeof(open_addr_t));
+   memset(&sink,0,sizeof(open_addr_t));
+
+   sink.type = ADDR_64B;
+   node.type = ADDR_64B;
+   memcpy(&(sink.addr_64b),&addr_64b_sink,8);
+   memcpy(&(node.addr_64b),&addr_64b_node,8);
+
+
    bool returnVal;
    returnVal=TRUE;
    
-   node.type = ADDR_64B;
-   memcpy(&(node.addr_64b),&addr_64b_node,8);
-
-   sink.type = ADDR_64B;
-   memcpy(&(sink.addr_64b),&addr_64b_sink,8);
    
 
 
@@ -74,13 +79,13 @@ bool topology_isAcceptablePacket(ieee802154_header_iht* ieee802514_header) {
           if(ieee802514_header->src.addr_64b[6] == addr_64b_node[6] && ieee802514_header->src.addr_64b[7] == addr_64b_node[7]) {
             returnVal = FALSE;
           }
-      } /*else {
+      } else {
         if ( (ieee802514_header->src.addr_64b[6] == addr_64b_node[6] && ieee802514_header->src.addr_64b[7] == addr_64b_node[7]) ||  (ieee802514_header->src.addr_64b[6] == addr_64b_sink[6] && ieee802514_header->src.addr_64b[7] == addr_64b_sink[7]) ) {
             returnVal = TRUE;
           } else {
           returnVal = FALSE;
         }
-     }*/
+     }
   }
 
    return returnVal;
