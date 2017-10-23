@@ -7,9 +7,16 @@
 BEGIN_PACK
 typedef struct {
 	asn_t asn;
-} debug_reportEntryParentSwitch_t;
+	open_addr_t newParent;
+} debug_reportParentChangeEntry_t;
 END_PACK
 
+BEGIN_PACK
+typedef struct {
+	asn_t asn;
+	uint8_t code;
+} debug_report6pRequestEntry_t;
+END_PACK
 
 
 //=========================== variables =======================================
@@ -20,7 +27,8 @@ END_PACK
 
 // admin
 void openreport_init(void);
-void openreport_indicateParentSwitch();
+void openreport_indicateParentSwitch(open_addr_t *newParent);
+void openreport_indicate6pRequest(uint8_t code);
 
 
 

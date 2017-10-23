@@ -10,6 +10,7 @@
 #include "idmanager.h"
 #include "opentimers.h"
 #include "IEEE802154E.h"
+#include "openreport.h"
 
 //=========================== variables =======================================
 
@@ -435,6 +436,9 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
              neighbors_setPreferredParent(icmpv6rpl_vars.ParentIndex, TRUE);
          }
       }
+      open_addr_t addr;
+      icmpv6rpl_getPreferredParentEui64(&addr);
+      openreport_indicateParentSwitch(&addr);
    } else {
       // restore routing table as we found it on entry
       icmpv6rpl_vars.myDAGrank   = previousDAGrank;

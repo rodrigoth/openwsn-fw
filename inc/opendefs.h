@@ -108,6 +108,8 @@ enum {
    STATUS_NEIGHBORS                    =  9,
    STATUS_KAPERIOD                     = 10,
    STATUS_MAX                          = 11,
+   STATUS_PARENTSWITCH                 = 13,
+   STATUS_6PREQUEST                    = 14, 
 };
 
 //component identifiers

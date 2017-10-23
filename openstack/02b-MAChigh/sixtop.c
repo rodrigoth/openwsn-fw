@@ -17,6 +17,7 @@
 #include "IEEE802154_security.h"
 #include "idmanager.h"
 #include "schedule.h"
+#include "openreport.h"
 
 //=========================== define ==========================================
 
@@ -277,6 +278,9 @@ void sixtop_request(uint8_t code, open_addr_t* neighbor, uint8_t numCells){
    
     // send packet
     sixtop_send(pkt);
+
+    openreport_indicate6pRequest(code);
+
     
     //update states
     switch(code){
