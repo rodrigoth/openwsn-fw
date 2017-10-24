@@ -13,7 +13,7 @@
 
 //=========================== define ==========================================
 
-#define QUEUELENGTH  10
+#define QUEUELENGTH  20
 
 //=========================== typedef =========================================
 
@@ -45,6 +45,8 @@ OpenQueueEntry_t*  openqueue_sixtopGetReceivedPacket(void);
 // called by IEEE80215E
 OpenQueueEntry_t*  openqueue_macGetDataPacket(open_addr_t* toNeighbor);
 OpenQueueEntry_t*  openqueue_macGetEBPacket(void);
+OpenQueueEntry_t*  openqueue_macGetDioPacket(void);
+OpenQueueEntry_t*  openqueue_macGet6pPacket(void);
 
 /**
 \}

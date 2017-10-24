@@ -11,6 +11,7 @@
 #include "opentimers.h"
 #include "IEEE802154E.h"
 #include "openreport.h"
+#include "schedule.h"
 
 //=========================== variables =======================================
 
@@ -694,6 +695,9 @@ void sendDAO() {
    if (icmpv6rpl_vars.busySendingDAO==TRUE) {
       return;
    }
+
+   uint8_t slots = schedule_getNumOfSlotsByType(CELLTYPE_TX);
+   if(slots == 0) return;
    
    // if you get here, you start construct DAO
    

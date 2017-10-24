@@ -81,8 +81,8 @@ void uinject_task_cb() {
       return;
    }
 
-   //uint8_t slots = schedule_getNumOfSlotsByType(CELLTYPE_TX);
-   //if(slots == 0) return;
+   uint8_t slots = schedule_getNumOfSlotsByType(CELLTYPE_TX);
+   if(slots == 0) return;
 
    //don't run if I dont have slots to my preferred parent
    /*icmpv6rpl_getPreferredParentEui64(&neighbor);
