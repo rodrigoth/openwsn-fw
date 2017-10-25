@@ -81,6 +81,8 @@ void uinject_task_cb() {
       return;
    }
 
+   seqnum++;
+
    uint8_t slots = schedule_getNumOfSlotsByType(CELLTYPE_TX);
    if(slots == 0) return;
 
@@ -111,8 +113,8 @@ void uinject_task_cb() {
    pkt->l3_destinationAdd.type        = ADDR_128B;
    memcpy(&pkt->l3_destinationAdd.addr_128b[0],uinject_dst_addr,16);
    
-   seqnum++;
    
+
    packetfunctions_reserveHeaderSize(pkt,sizeof(uint32_t));
    pkt->payload[0] = (seqnum & 0xff000000) >> 24;
    pkt->payload[1] = (seqnum & 0x00ff0000) >> 16;

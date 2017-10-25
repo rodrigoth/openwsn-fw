@@ -84,7 +84,7 @@ void icmpv6rpl_init() {
    memcpy(&icmpv6rpl_vars.dioDestination.addr_128b[0],all_routers_multicast,sizeof(all_routers_multicast));
    
    icmpv6rpl_vars.dioPeriod                 = TIMER_DIO_TIMEOUT;
-   dioPeriod                                = icmpv6rpl_vars.dioPeriod - 0x80 + (openrandom_get16b()&0xff);
+   dioPeriod                                = icmpv6rpl_vars.dioPeriod - 2000+(openrandom_get16b()%(2*2000));
    icmpv6rpl_vars.timerIdDIO                = opentimers_start(
                                                 dioPeriod,
                                                 TIMER_PERIODIC,
@@ -535,7 +535,7 @@ void icmpv6rpl_timer_DIO_task() {
    sendDIO();
    
    // arm the DIO timer with this new value
-   dioPeriod = icmpv6rpl_vars.dioPeriod - 0x80 + (openrandom_get16b()&0xff);
+   dioPeriod = icmpv6rpl_vars.dioPeriod - 2000+(openrandom_get16b()%(2*2000));
    opentimers_setPeriod(
       icmpv6rpl_vars.timerIdDIO,
       TIME_MS,
@@ -828,7 +828,7 @@ void icmpv6rpl_setDIOPeriod(uint16_t dioPeriod){
    uint32_t        dioPeriodRandom;
    
    icmpv6rpl_vars.dioPeriod = dioPeriod;
-   dioPeriodRandom = icmpv6rpl_vars.dioPeriod - 0x80 + (openrandom_get16b()&0xff);
+   dioPeriodRandom = icmpv6rpl_vars.dioPeriod - 2000+(openrandom_get16b()%(2*2000));
    opentimers_setPeriod(
        icmpv6rpl_vars.timerIdDIO,
        TIME_MS,

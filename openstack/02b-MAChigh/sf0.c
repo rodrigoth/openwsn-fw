@@ -17,8 +17,6 @@ sf0_vars_t sf0_vars;
 
 //=========================== prototypes ======================================
 
-void sf0_addCell_task(void);
-void sf0_removeCell_task(void);
 void sf0_bandwidthEstimate_task(void);
 
 //=========================== public ==========================================
@@ -28,13 +26,6 @@ void sf0_init(void) {
     sf0_vars.numAppPacketsPerSlotFrame = 0;
 }
 
-void sf0_notif_addedCell(void) {
-   scheduler_push_task(sf0_addCell_task,TASKPRIO_SF0);
-}
-
-void sf0_notif_removedCell(void) {
-   scheduler_push_task(sf0_removeCell_task,TASKPRIO_SF0);
-}
 
 // this function is called once per slotframe. 
 void sf0_notifyNewSlotframe(void) {
@@ -47,49 +38,7 @@ void sf0_setBackoff(uint8_t value){
 
 //=========================== private =========================================
 
-void sf0_addCell_task(void) {
-   open_addr_t          neighbor;
-   bool                 foundNeighbor;
-   
-   // get preferred parent
-   foundNeighbor = icmpv6rpl_getPreferredParentEui64(&neighbor);
-   if (foundNeighbor==FALSE) {
-      return;
-   }
-   
-   if (sixtop_setHandler(SIX_HANDLER_SF0)==FALSE){
-      // one sixtop transcation is happening, only one instance at one time
-      return;
-   }
-   // call sixtop
-   sixtop_request(
-      IANA_6TOP_CMD_ADD,
-      &neighbor,
-      1
-   );
-}
 
-void sf0_removeCell_task(void) {
-   open_addr_t          neighbor;
-   bool                 foundNeighbor;
-   
-   // get preferred parent
-   foundNeighbor = icmpv6rpl_getPreferredParentEui64(&neighbor);
-   if (foundNeighbor==FALSE) {
-      return;
-   }
-   
-   if (sixtop_setHandler(SIX_HANDLER_SF0)==FALSE){
-      // one sixtop transcation is happening, only one instance at one time
-      return;
-   }
-   // call sixtop
-   sixtop_request(
-      IANA_6TOP_CMD_DELETE,
-      &neighbor,
-      1
-   );
-}
 
 void sf0_bandwidthEstimate_task(void){
     open_addr_t    neighbor;

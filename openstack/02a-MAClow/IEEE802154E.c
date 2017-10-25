@@ -862,7 +862,7 @@ port_INLINE void activity_ti1ORri1() {
             // update the statistics
             ieee154e_stats.numDeSync++;
 
-            //sixtop_init();
+            sixtop_init();
             openqueue_init();
                
             // abort

@@ -24,7 +24,7 @@
 // in seconds: sixtop maintaince is called every 30 seconds
 #define MAINTENANCE_PERIOD        30
 // in miliseconds: the real EBPERIOD will be randomized chosen between {EBPERIOD-EBPERIOD_RANDOM_RANG, EBPERIOD+EBPERIOD_RANDOM_RANG}
-#define EBPERIOD_RANDOM_RANG     500
+#define EBPERIOD_RANDOM_RANG     2000
 
 //=========================== variables =======================================
 
@@ -125,6 +125,7 @@ void sixtop_init() {
     sixtop_vars.ebPeriod           = EBPERIOD;
     sixtop_vars.isResponseEnabled  = TRUE;
     sixtop_vars.handler            = SIX_HANDLER_NONE;
+    sixtop_vars.six2six_state 	   = SIX_STATE_IDLE;
     
     sixtop_vars.ebSendingTimerId   = opentimers_start(
         (sixtop_vars.ebPeriod-EBPERIOD_RANDOM_RANG+(openrandom_get16b()%(2*EBPERIOD_RANDOM_RANG))),
@@ -184,6 +185,8 @@ void sixtop_request(uint8_t code, open_addr_t* neighbor, uint8_t numCells){
     cellInfo_ht       cellList[SCHEDULEIEMAXNUMCELLS];
    
     memset(cellList,0,sizeof(cellList));
+    openserial_printError(COMPONENT_SIXTOP_RES,ERR_WRONG_ADDR_TYPE,(errorparameter_t)code,(errorparameter_t)neighbor->addr_64b[7]);
+
    
     // filter parameters
     if(sixtop_vars.six2six_state!=SIX_STATE_IDLE){
@@ -237,6 +240,8 @@ void sixtop_request(uint8_t code, open_addr_t* neighbor, uint8_t numCells){
         );
         return;
     }
+
+    openserial_printError(COMPONENT_SIXTOP_RES,ERR_WRONG_ADDR_TYPE,(errorparameter_t)101,(errorparameter_t)100);
    
     // update state
     sixtop_vars.six2six_state  = SIX_STATE_SENDING_REQUEST;
