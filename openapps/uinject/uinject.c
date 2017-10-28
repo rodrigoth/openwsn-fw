@@ -8,6 +8,7 @@
 #include "scheduler.h"
 #include "IEEE802154E.h"
 #include "idmanager.h"
+#include "icmpv6rpl.h"
 
 //=========================== variables =======================================
 
@@ -70,7 +71,7 @@ void uinject_timer_cb(opentimer_id_t id){
 
 void uinject_task_cb() {
     OpenQueueEntry_t*    pkt;
-   uint8_t              asnArray[5];
+    uint8_t              asnArray[5];
    
    // don't run if not synch
    if (ieee154e_isSynch() == FALSE) return;
@@ -83,13 +84,14 @@ void uinject_task_cb() {
 
    seqnum++;
 
-   uint8_t slots = schedule_getNumOfSlotsByType(CELLTYPE_TX);
-   if(slots == 0) return;
+   //uint8_t slots = schedule_getNumOfSlotsByType(CELLTYPE_TX);
+   //if(slots == 0) return;
 
    //don't run if I dont have slots to my preferred parent
-   /*icmpv6rpl_getPreferredParentEui64(&neighbor);
+   open_addr_t neighbor;
+   icmpv6rpl_getPreferredParentEui64(&neighbor);
    uint8_t slots = schedule_getNumberSlotToPreferredParent(&neighbor);
-   if(slots == 0) return;*/
+   if(slots == 0) return;
    
    // if you get here, send a packet
    

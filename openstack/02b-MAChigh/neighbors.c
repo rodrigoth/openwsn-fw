@@ -415,15 +415,15 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 void  neighbors_removeOld() {
     uint8_t    i, j;
     bool       haveParent;
-    uint8_t    neighborIndexWithLowestRank[3];
-    dagrank_t  lowestRank;
+    //uint8_t    neighborIndexWithLowestRank[3];
+    //dagrank_t  lowestRank;
     PORT_TIMER_WIDTH timeSinceHeard;
     
     // remove old neighbor
     for (i=0;i<MAXNUMNEIGHBORS;i++) {
         if (neighbors_vars.neighbors[i].used==1) {
             timeSinceHeard = ieee154e_asnDiff(&neighbors_vars.neighbors[i].asn);
-            if (timeSinceHeard>DESYNCTIMEOUT) {
+            if (timeSinceHeard>DESYNCTIMEOUT*2) {
                 haveParent = icmpv6rpl_getPreferredParentIndex(&j);
                 if (haveParent && (i==j)) { // this is our preferred parent, carefully!
                     icmpv6rpl_killPreferredParent();
@@ -437,7 +437,7 @@ void  neighbors_removeOld() {
     }
     
     // neighbors marked as NO_RES will never removed.
-    
+   /*
     // first round
     lowestRank = MAXDAGRANK;
     for (i=0;i<MAXNUMNEIGHBORS;i++) {
@@ -516,7 +516,7 @@ void  neighbors_removeOld() {
                 }
             }
         }
-    }
+    }*/
 }
 
 //===== debug

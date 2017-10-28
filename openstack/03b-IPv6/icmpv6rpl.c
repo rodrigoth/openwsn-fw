@@ -696,7 +696,11 @@ void sendDAO() {
       return;
    }
 
-   uint8_t slots = schedule_getNumOfSlotsByType(CELLTYPE_TX);
+   //uint8_t slots = schedule_getNumOfSlotsByType(CELLTYPE_TX);
+   //if(slots == 0) return;
+   open_addr_t neighbor;
+   icmpv6rpl_getPreferredParentEui64(&neighbor);
+   uint8_t slots = schedule_getNumberSlotToPreferredParent(&neighbor);
    if(slots == 0) return;
    
    // if you get here, you start construct DAO

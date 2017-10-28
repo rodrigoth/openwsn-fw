@@ -6,6 +6,7 @@
 #include "schedule.h"
 #include "idmanager.h"
 #include "openapps.h"
+#include "processIE.h"
 
 //=========================== definition =====================================
 
@@ -66,7 +67,8 @@ void sf0_bandwidthEstimate_task(void){
     // get bandwidth of outgoing, incoming and self.
     // Here we just calculate the estimated bandwidth for 
     // the application sending on dedicate cells(TX or Rx).
-    bw_outgoing = schedule_getNumOfSlotsByType(CELLTYPE_TX);
+    //bw_outgoing = schedule_getNumOfSlotsByType(CELLTYPE_TX);
+    bw_outgoing = schedule_getNumberSlotToPreferredParent(&neighbor);
     bw_incoming = schedule_getNumOfSlotsByType(CELLTYPE_RX);
     
     // get self required bandwith, you can design your
@@ -86,11 +88,13 @@ void sf0_bandwidthEstimate_task(void){
             // one sixtop transcation is happening, only one instance at one time
             return;
         }
-        sixtop_request(
-            IANA_6TOP_CMD_ADD,
-            &neighbor,
-            bw_incoming+bw_self-bw_outgoing+1
-        );
+
+        uint8_t requiredCells = bw_incoming+bw_self+1-bw_outgoing;
+        if(requiredCells > SCHEDULEIEMAXNUMCELLS) {
+        	requiredCells = SCHEDULEIEMAXNUMCELLS;
+        }
+
+        sixtop_request(IANA_6TOP_CMD_ADD,&neighbor,requiredCells);
     } else {
         // remove cell(s)
         if ( (bw_incoming+bw_self) < (bw_outgoing-SF0THRESHOLD)) {

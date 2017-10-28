@@ -14,7 +14,7 @@ schedule_vars_t schedule_vars;
 //=========================== prototypes ======================================
 
 void schedule_resetEntry(scheduleEntry_t* pScheduleEntry);
-uint8_t shared_slots[] = {0,20,40,60,80};
+uint8_t shared_slots[] = {0,14,28,42,56,70,84};
 
 //=========================== public ==========================================
 
@@ -859,6 +859,25 @@ void schedule_housekeeping(){
     }
    
     ENABLE_INTERRUPTS();
+}
+
+uint8_t schedule_getNumberSlotToPreferredParent(open_addr_t *preferredParent) {
+    uint8_t i;
+    uint8_t counter;
+
+    INTERRUPT_DECLARATION();
+    DISABLE_INTERRUPTS();
+
+    counter = 0;
+    for(i=0;i<MAXACTIVESLOTS;i++) {
+      if(schedule_vars.scheduleBuf[i].type == CELLTYPE_TX &&
+         packetfunctions_sameAddress(preferredParent,&(schedule_vars.scheduleBuf[i].neighbor))==TRUE) {
+         counter++;
+      }
+    }
+
+    ENABLE_INTERRUPTS();
+    return counter;
 }
 
 //=========================== private =========================================
