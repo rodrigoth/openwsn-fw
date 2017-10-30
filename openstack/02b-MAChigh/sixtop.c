@@ -149,6 +149,15 @@ void sixtop_init() {
     );
 }
 
+sixtop_resetState() {
+	sixtop_vars.busySendingKA      = FALSE;
+	sixtop_vars.busySendingEB      = FALSE;
+	sixtop_vars.mgtTaskCounter     = 0;
+	sixtop_vars.isResponseEnabled  = TRUE;
+	sixtop_vars.handler            = SIX_HANDLER_NONE;
+	sixtop_vars.six2six_state 	   = SIX_STATE_IDLE;
+}
+
 void sixtop_setKaPeriod(uint16_t kaPeriod) {
    if(kaPeriod > MAXKAPERIOD) {
       sixtop_vars.kaPeriod = MAXKAPERIOD;
@@ -185,7 +194,7 @@ void sixtop_request(uint8_t code, open_addr_t* neighbor, uint8_t numCells){
     cellInfo_ht       cellList[SCHEDULEIEMAXNUMCELLS];
    
     memset(cellList,0,sizeof(cellList));
-    openserial_printError(COMPONENT_SIXTOP_RES,ERR_WRONG_ADDR_TYPE,(errorparameter_t)code,(errorparameter_t)neighbor->addr_64b[7]);
+    //openserial_printError(COMPONENT_SIXTOP_RES,ERR_WRONG_ADDR_TYPE,(errorparameter_t)code,(errorparameter_t)neighbor->addr_64b[7]);
 
    
     // filter parameters
@@ -241,7 +250,7 @@ void sixtop_request(uint8_t code, open_addr_t* neighbor, uint8_t numCells){
         return;
     }
 
-    openserial_printError(COMPONENT_SIXTOP_RES,ERR_WRONG_ADDR_TYPE,(errorparameter_t)101,(errorparameter_t)100);
+    //openserial_printError(COMPONENT_SIXTOP_RES,ERR_WRONG_ADDR_TYPE,(errorparameter_t)101,(errorparameter_t)100);
    
     // update state
     sixtop_vars.six2six_state  = SIX_STATE_SENDING_REQUEST;
@@ -444,7 +453,11 @@ void task_sixtopNotifSendDone() {
          &msg->l2_asn
       );
    } else {
-      neighbors_indicateTx(
+	   // get creator
+	   // get source
+	   // get dest
+	   // log failed transmission
+	   neighbors_indicateTx(
          &(msg->l2_nextORpreviousHop),
          msg->l2_numTxAttempts,
          FALSE,
@@ -452,6 +465,9 @@ void task_sixtopNotifSendDone() {
       );
    }
    
+
+
+
    // send the packet to where it belongs
    switch (msg->creator) {
       

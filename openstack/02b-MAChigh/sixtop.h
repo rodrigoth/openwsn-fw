@@ -116,6 +116,7 @@ bool      debugPrint_myDAGrank(void);
 bool      debugPrint_kaPeriod(void);
 // control
 void      sixtop_setIsResponseEnabled(bool isEnabled);
+void      sixtop_resetState(void);
 
 /**
 \}

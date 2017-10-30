@@ -113,7 +113,7 @@ void ieee154e_init() {
    memset(&ieee154e_vars,0,sizeof(ieee154e_vars_t));
    memset(&ieee154e_dbg,0,sizeof(ieee154e_dbg_t));
    
-   ieee154e_vars.singleChannel     = 0; // 0 means channel hopping
+   ieee154e_vars.singleChannel     = SYNCHRONIZING_CHANNEL; // 0 means channel hopping
    ieee154e_vars.isAckEnabled      = TRUE;
    ieee154e_vars.isSecurityEnabled = FALSE;
    ieee154e_vars.slotDuration      = TsSlotDuration;
@@ -862,7 +862,7 @@ port_INLINE void activity_ti1ORri1() {
             // update the statistics
             ieee154e_stats.numDeSync++;
 
-            sixtop_init();
+            sixtop_resetState();
             openqueue_init();
                
             // abort
@@ -1310,6 +1310,11 @@ port_INLINE void activity_tie5() {
    
     if (ieee154e_vars.dataToSend->l2_retriesLeft==0) {
         // indicate tx fail if no more retries left
+
+    	if (ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT) {
+    		openreport_indicateTx(NULL,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),0,ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,1,COMPONENT_UINJECT);
+    	}
+
         notif_sendDone(ieee154e_vars.dataToSend,E_FAIL);
     } else {
         // return packet to the virtual COMPONENT_SIXTOP_TO_IEEE802154E component
@@ -1464,7 +1469,11 @@ port_INLINE void activity_ti9(PORT_RADIOTIMER_WIDTH capturedTime) {
         ) {
             synchronizeAck(ieee802514_header.timeCorrection);
         }
-      
+
+        if (ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT) {
+			openreport_indicateTx(NULL,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),1,ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,1,COMPONENT_UINJECT);
+		}
+
         // inform schedule of successful transmission
         schedule_indicateTx(&ieee154e_vars.asn,TRUE);
       

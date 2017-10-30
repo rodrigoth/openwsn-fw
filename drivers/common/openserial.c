@@ -324,7 +324,7 @@ void openserial_startOutput() {
     debugPrintCounter = openserial_vars.debugPrintCounter;
     ENABLE_INTERRUPTS();
     
-    switch (debugPrintCounter) {
+    /*switch (debugPrintCounter) {
         case STATUS_ISSYNC:
             if (debugPrint_isSync()==TRUE) {
                 break;
@@ -373,7 +373,7 @@ void openserial_startOutput() {
             DISABLE_INTERRUPTS();
             openserial_vars.debugPrintCounter=0;
             ENABLE_INTERRUPTS();
-    }
+    }*/
     
     //=== flush TX buffer
     

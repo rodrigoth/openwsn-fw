@@ -44,6 +44,7 @@
 *******************************************************************************/
 void NMIException(void)
 {
+	board_reset();
 }
 
 /*******************************************************************************
@@ -69,9 +70,10 @@ void HardFaultException(void)
 void MemManageException(void)
 {
   /* Go to infinite loop when Memory Manage exception occurs */
-  while (1)
-  {
-  }
+  //while (1)
+  //{
+  //}
+  board_reset();
 }
 
 /*******************************************************************************
@@ -84,9 +86,10 @@ void MemManageException(void)
 void BusFaultException(void)
 {
   /* Go to infinite loop when Bus Fault exception occurs */
-  while (1)
-  {
-  }
+  //while (1)
+  //{
+  //}
+   board_reset();
 }
 
 /*******************************************************************************
@@ -99,9 +102,10 @@ void BusFaultException(void)
 void UsageFaultException(void)
 {
   /* Go to infinite loop when Usage Fault exception occurs */
-  while (1)
-  {
-  }
+  //while (1)
+  //{
+  //}
+  board_reset();
 }
 
 /*******************************************************************************

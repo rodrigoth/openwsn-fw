@@ -110,6 +110,8 @@ enum {
    STATUS_MAX                          = 11,
    STATUS_PARENTSWITCH                 = 13,
    STATUS_6PREQUEST                    = 14, 
+   STATUS_TX		  				   = 15,
+   STATUS_RX						   = 16,
 };
 
 //component identifiers
