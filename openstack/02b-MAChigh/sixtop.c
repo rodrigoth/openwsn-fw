@@ -656,7 +656,7 @@ void timer_sixtop_management_fired(void) {
     switch (sixtop_vars.mgtTaskCounter) {
     case 0:
         // called every MAINTENANCE_PERIOD seconds
-        neighbors_removeOld();
+        //neighbors_removeOld();
         break;
     default:
         // called every second, except once every MAINTENANCE_PERIOD seconds
@@ -1104,10 +1104,10 @@ void sixtop_six2six_notifyReceive(
                 break;
             }
             // generation check
-            if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code != IANA_6TOP_CMD_CLEAR){
+            /*if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code != IANA_6TOP_CMD_CLEAR){
                 returnCode = IANA_6TOP_RC_GEN_ERR;
                 break;
-            }
+            }*/
             // previous 6p transcation check
             if (sixtop_vars.six2six_state != SIX_STATE_IDLE){
                 returnCode = IANA_6TOP_RC_RESET;
