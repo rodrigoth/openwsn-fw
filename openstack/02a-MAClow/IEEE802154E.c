@@ -16,6 +16,7 @@
 #include "sixtop.h"
 #include "adaptive_sync.h"
 #include "processIE.h"
+#include "openreport.h"
 
 //=========================== variables =======================================
 
@@ -1311,9 +1312,16 @@ port_INLINE void activity_tie5() {
     if (ieee154e_vars.dataToSend->l2_retriesLeft==0) {
         // indicate tx fail if no more retries left
 
-    	if (ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT) {
-    		openreport_indicateTx(NULL,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),0,ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,1,COMPONENT_UINJECT);
-    	}
+    	uint8_t packetLengh = ieee154e_vars.dataToSend->length;
+		if ((packetLengh == 64 || packetLengh == 65) &&
+			(ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT || ieee154e_vars.dataToSend->creator == COMPONENT_FORWARDING)) {
+			open_addr_t sender;
+
+
+			memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
+			uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
+			openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),0,ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator);
+		}
 
         notif_sendDone(ieee154e_vars.dataToSend,E_FAIL);
     } else {
@@ -1470,8 +1478,16 @@ port_INLINE void activity_ti9(PORT_RADIOTIMER_WIDTH capturedTime) {
             synchronizeAck(ieee802514_header.timeCorrection);
         }
 
-        if (ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT) {
-			openreport_indicateTx(NULL,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),1,ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,1,COMPONENT_UINJECT);
+        //64 or 65 = expected payload size for uinject packets
+        uint8_t packetLengh = ieee154e_vars.dataToSend->length;
+        if ((packetLengh == 64 || packetLengh == 65) &&
+        	(ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT || ieee154e_vars.dataToSend->creator == COMPONENT_FORWARDING)) {
+        	open_addr_t sender;
+
+
+        	memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
+        	uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
+            openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),1,ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator);
 		}
 
         // inform schedule of successful transmission
@@ -1490,7 +1506,7 @@ port_INLINE void activity_ti9(PORT_RADIOTIMER_WIDTH capturedTime) {
     // clear local variable
     ieee154e_vars.ackReceived = NULL;
    
-    // official end of Tx slot
+    // official end of Tx slotstat
     endSlot();
 }
 

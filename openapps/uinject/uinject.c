@@ -118,31 +118,31 @@ void uinject_task_cb() {
    
 
    packetfunctions_reserveHeaderSize(pkt,sizeof(uint32_t));
-   pkt->payload[0] = (seqnum & 0xff000000) >> 24;
-   pkt->payload[1] = (seqnum & 0x00ff0000) >> 16;
-   pkt->payload[2] = (seqnum & 0x0000ff00) >> 8;
-   pkt->payload[3] = (seqnum & 0x000000ff);
+   pkt->payload[0] = (seqnum & 0xff000000) >> 24; //63
+   pkt->payload[1] = (seqnum & 0x00ff0000) >> 16; //62
+   pkt->payload[2] = (seqnum & 0x0000ff00) >> 8; //61
+   pkt->payload[3] = (seqnum & 0x000000ff); //60
 
    
    packetfunctions_reserveHeaderSize(pkt,sizeof(asn_t));
    ieee154e_getAsn(asnArray);
-   pkt->payload[0] = asnArray[0];
-   pkt->payload[1] = asnArray[1];
-   pkt->payload[2] = asnArray[2];
-   pkt->payload[3] = asnArray[3];
-   pkt->payload[4] = asnArray[4];
+   pkt->payload[0] = asnArray[0]; //59
+   pkt->payload[1] = asnArray[1]; //58
+   pkt->payload[2] = asnArray[2]; //57
+   pkt->payload[3] = asnArray[3]; //56
+   pkt->payload[4] = asnArray[4]; //55
 
 
    open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
    packetfunctions_reserveHeaderSize(pkt,8);
-   pkt->payload[0] = my_address->addr_64b[0];
-   pkt->payload[1] = my_address->addr_64b[1];
-   pkt->payload[2] = my_address->addr_64b[2];
-   pkt->payload[3] = my_address->addr_64b[3];
-   pkt->payload[4] = my_address->addr_64b[4];
-   pkt->payload[5] = my_address->addr_64b[5];
-   pkt->payload[6] = my_address->addr_64b[6];
-   pkt->payload[7] = my_address->addr_64b[7];
+   pkt->payload[0] = my_address->addr_64b[0]; //54
+   pkt->payload[1] = my_address->addr_64b[1]; //53
+   pkt->payload[2] = my_address->addr_64b[2]; //52
+   pkt->payload[3] = my_address->addr_64b[3]; //51
+   pkt->payload[4] = my_address->addr_64b[4]; //50
+   pkt->payload[5] = my_address->addr_64b[5]; //49
+   pkt->payload[6] = my_address->addr_64b[6]; //48
+   pkt->payload[7] = my_address->addr_64b[7]; //47
    
    
    if ((openudp_send(pkt))==E_FAIL) {

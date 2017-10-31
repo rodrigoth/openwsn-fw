@@ -41,7 +41,7 @@ void openreport_indicate6pRequest(uint8_t code) {
     openserial_printStatus(STATUS_6PREQUEST,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }
 
-void openreport_indicateTx(open_addr_t *previousHop, open_addr_t *destination, uint8_t ack, uint8_t tx, uint8_t channel, uint32_t seqnum,uint8_t component) {
+void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_t ack, uint8_t tx, uint8_t channel, uint32_t seqnum,uint8_t component) {
 	uint8_t asnArray[5];
 	debug_reportTxEntry_t debug_reportEntry;
 
@@ -52,10 +52,10 @@ void openreport_indicateTx(open_addr_t *previousHop, open_addr_t *destination, u
 	debug_reportEntry.asn.bytes2and3 = ((uint16_t)asnArray[3] << 8) | asnArray[2];
 	debug_reportEntry.asn.byte4 = asnArray[4];
 
-	if ( previousHop != NULL) {
-		memcpy(&(debug_reportEntry.destination.addr_64b[0]),&(destination->addr_64b[0]),8);
-	}
-	memcpy(&(debug_reportEntry.previousHop.addr_64b[0]),&(previousHop->addr_64b[0]),8);
+	memcpy(&(debug_reportEntry.sender.addr_64b[0]),&(sender->addr_64b[0]),8);
+
+	memcpy(&(debug_reportEntry.destination.addr_64b[0]),&(destination->addr_64b[0]),8);
+
 
 
 	debug_reportEntry.ack = ack;
