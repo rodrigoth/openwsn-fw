@@ -1474,8 +1474,7 @@ bool sixtop_areAvailableCellsToBeScheduled(
    available  = FALSE;
   
    if(bw == 0 || bw>SCHEDULEIEMAXNUMCELLS){
-      // log wrong parameter error TODO
-    
+	   openserial_printError(COMPONENT_SIXTOP_RES,ERR_SIXTOP_NOAVAILABLECELL,(errorparameter_t)2,(errorparameter_t)2);
       available = FALSE;
    } else {
       do {
@@ -1498,6 +1497,7 @@ bool sixtop_areAvailableCellsToBeScheduled(
       } else {
          // local schedule can't statisfy the bandwidth of cell request
          available = FALSE;
+         openserial_printError(COMPONENT_SIXTOP_RES,ERR_SIXTOP_NOAVAILABLECELL,(errorparameter_t)3,(errorparameter_t)3);
       }
    }
    
@@ -1520,8 +1520,8 @@ bool sixtop_areAvailableCellsToBeRemoved(
    available  = FALSE;
   
    if(bw == 0 || bw>SCHEDULEIEMAXNUMCELLS){
-      // log wrong parameter error TODO
-      available = FALSE;
+	   openserial_printError(COMPONENT_SIXTOP_RES,ERR_SIXTOP_NOAVAILABLECELL,(errorparameter_t)0,(errorparameter_t)0);
+	   available = FALSE;
    } else {
       do {
           schedule_getSlotInfo(cellList[i].tsNum,neighbor,&info);
@@ -1544,6 +1544,7 @@ bool sixtop_areAvailableCellsToBeRemoved(
         } else {
             // local schedule can't statisfy the bandwidth of cell request
             available = FALSE;
+            openserial_printError(COMPONENT_SIXTOP_RES,ERR_SIXTOP_NOAVAILABLECELL,(errorparameter_t)1,(errorparameter_t)1);
         }
    }
    
