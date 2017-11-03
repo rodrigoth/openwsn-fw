@@ -251,6 +251,7 @@ enum {
    ERR_SIXTOP_LIST                     = 0x3e, // the cells reserved to request mote contains slot {0} and slot {1}
    ERR_SCHEDULE_ADDDUPLICATESLOT       = 0x3f, // the slot {0} to be added is already in schedule
    ERR_SIXTOP_NOAVAILABLECELL  		   = 0x40, // no available cell, code location {0}
+   ERR_UINJECT_ALIVE  		 		   = 0x41, // uinject trigged
 };
 
 //=========================== typedef =========================================

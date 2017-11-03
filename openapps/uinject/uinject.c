@@ -72,7 +72,8 @@ void uinject_timer_cb(opentimer_id_t id){
 void uinject_task_cb() {
     OpenQueueEntry_t*    pkt;
     uint8_t              asnArray[5];
-   
+
+   openserial_printInfo(COMPONENT_UINJECT,ERR_UINJECT_ALIVE,(errorparameter_t)0,(errorparameter_t)0);
    // don't run if not synch
    if (ieee154e_isSynch() == FALSE) return;
    

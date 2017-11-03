@@ -135,7 +135,7 @@ port_INLINE uint8_t processIE_prependSlotframeLinkIE(OpenQueueEntry_t* pkt){
       pkt->payload[4]   = linkOption;                          // linkOption
       len+=5;
    }*/
-    uint8_t shared_slots[] = {0,14,28,42,56,70,84};
+   uint8_t shared_slots[] = {0,20,40,60,80};
     for(i = 0; i < sizeof(shared_slots); i++) {
         packetfunctions_reserveHeaderSize(pkt,5);
         pkt->payload[0]   = shared_slots[i]        & 0xFF;

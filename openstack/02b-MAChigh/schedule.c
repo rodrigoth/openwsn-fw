@@ -14,7 +14,7 @@ schedule_vars_t schedule_vars;
 //=========================== prototypes ======================================
 
 void schedule_resetEntry(scheduleEntry_t* pScheduleEntry);
-uint8_t shared_slots[] = {0,14,28,42,56,70,84};
+uint8_t shared_slots[] = {0,20,40,60,80};
 
 //=========================== public ==========================================
 

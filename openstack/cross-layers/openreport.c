@@ -27,7 +27,7 @@ void openreport_indicateParentSwitch(open_addr_t *newParent) {
     openserial_printStatus(STATUS_PARENTSWITCH,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }
 
-void openreport_indicate6pRequest(uint8_t code) {
+void openreport_indicate6pRequest(uint8_t code,uint8_t requestedCells) {
 	uint8_t asnArray[5];
 	debug_report6pRequestEntry_t debug_reportEntry;
 
@@ -37,6 +37,7 @@ void openreport_indicate6pRequest(uint8_t code) {
     debug_reportEntry.asn.byte4 = asnArray[4];
 
     debug_reportEntry.code = code;
+    debug_reportEntry.requestedCells = requestedCells;
 
     openserial_printStatus(STATUS_6PREQUEST,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }
