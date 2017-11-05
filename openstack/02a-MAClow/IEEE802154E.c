@@ -114,7 +114,7 @@ void ieee154e_init() {
    memset(&ieee154e_vars,0,sizeof(ieee154e_vars_t));
    memset(&ieee154e_dbg,0,sizeof(ieee154e_dbg_t));
    
-   ieee154e_vars.singleChannel     = 0;//SYNCHRONIZING_CHANNEL; // 0 means channel hopping
+   ieee154e_vars.singleChannel     = 0; // 0 means channel hopping
    ieee154e_vars.isAckEnabled      = TRUE;
    ieee154e_vars.isSecurityEnabled = FALSE;
    ieee154e_vars.slotDuration      = TsSlotDuration;
@@ -562,9 +562,9 @@ port_INLINE void activity_synchronize_endOfFrame(PORT_RADIOTIMER_WIDTH capturedT
       // break if packet too short
       if (ieee154e_vars.dataReceived->length<LENGTH_CRC || ieee154e_vars.dataReceived->length>LENGTH_IEEE154_MAX) {
          // break from the do-while loop and execute abort code below
-          openserial_printError(COMPONENT_IEEE802154E,ERR_INVALIDPACKETFROMRADIO,
+          /*openserial_printError(COMPONENT_IEEE802154E,ERR_INVALIDPACKETFROMRADIO,
                             (errorparameter_t)0,
-                            ieee154e_vars.dataReceived->length);
+                            ieee154e_vars.dataReceived->length);*/
          break;
       }
       
@@ -1316,11 +1316,14 @@ port_INLINE void activity_tie5() {
 		if ((packetLengh == 64 || packetLengh == 65) &&
 			(ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT || ieee154e_vars.dataToSend->creator == COMPONENT_FORWARDING)) {
 			open_addr_t sender;
+			uint8_t asnArray[5];
 
-
+			memcpy(&asnArray,&(ieee154e_vars.dataToSend->payload[packetLengh-9]),5);
 			memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
+
 			uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
-			openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),0,ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator);
+			openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),0,
+					ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray);
 		}
 
         notif_sendDone(ieee154e_vars.dataToSend,E_FAIL);
@@ -1425,9 +1428,9 @@ port_INLINE void activity_ti9(PORT_RADIOTIMER_WIDTH capturedTime) {
         // break if wrong length
         if (ieee154e_vars.ackReceived->length<LENGTH_CRC || ieee154e_vars.ackReceived->length>LENGTH_IEEE154_MAX) {
             // break from the do-while loop and execute the clean-up code below
-            openserial_printError(COMPONENT_IEEE802154E,ERR_INVALIDPACKETFROMRADIO,
+            /*openserial_printError(COMPONENT_IEEE802154E,ERR_INVALIDPACKETFROMRADIO,
                             (errorparameter_t)1,
-                            ieee154e_vars.ackReceived->length);
+                            ieee154e_vars.ackReceived->length);*/
         
             break;
         }
@@ -1480,14 +1483,17 @@ port_INLINE void activity_ti9(PORT_RADIOTIMER_WIDTH capturedTime) {
 
         //64 or 65 = expected payload size for uinject packets
         uint8_t packetLengh = ieee154e_vars.dataToSend->length;
-        if ((packetLengh == 64 || packetLengh == 65) &&
-        	(ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT || ieee154e_vars.dataToSend->creator == COMPONENT_FORWARDING)) {
-        	open_addr_t sender;
+		if ((packetLengh == 64 || packetLengh == 65) &&
+			(ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT || ieee154e_vars.dataToSend->creator == COMPONENT_FORWARDING)) {
+			open_addr_t sender;
+			uint8_t asnArray[5];
 
+			memcpy(&asnArray,&(ieee154e_vars.dataToSend->payload[packetLengh-9]),5);
+			memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
 
-        	memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
-        	uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
-            openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),1,ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator);
+			uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
+			openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),1,
+					ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray);
 		}
 
         // inform schedule of successful transmission
@@ -1656,9 +1662,9 @@ port_INLINE void activity_ri5(PORT_RADIOTIMER_WIDTH capturedTime) {
       // break if wrong length
       if (ieee154e_vars.dataReceived->length<LENGTH_CRC || ieee154e_vars.dataReceived->length>LENGTH_IEEE154_MAX ) {
          // jump to the error code below this do-while loop
-        openserial_printError(COMPONENT_IEEE802154E,ERR_INVALIDPACKETFROMRADIO,
+        /*openserial_printError(COMPONENT_IEEE802154E,ERR_INVALIDPACKETFROMRADIO,
                             (errorparameter_t)2,
-                            ieee154e_vars.dataReceived->length);
+                            ieee154e_vars.dataReceived->length);*/
          break;
       }
       

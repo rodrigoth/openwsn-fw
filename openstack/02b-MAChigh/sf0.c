@@ -83,7 +83,7 @@ void sf0_bandwidthEstimate_task(void){
     //         requiredCells  = bw_incoming + bw_self
     // when scheduledCells<requiredCells, add one or more cell
     
-    if (bw_outgoing <= bw_incoming+bw_self){
+    if (bw_outgoing == 0 || bw_outgoing < bw_incoming+bw_self) {
         if (sixtop_setHandler(SIX_HANDLER_SF0)==FALSE){
             // one sixtop transcation is happening, only one instance at one time
             return;
@@ -96,21 +96,22 @@ void sf0_bandwidthEstimate_task(void){
 
         sixtop_request(IANA_6TOP_CMD_ADD,&neighbor,requiredCells);
     } else {
-        // remove cell(s)
-        if ( (bw_incoming+bw_self) < (bw_outgoing-SF0THRESHOLD)) {
-            if (sixtop_setHandler(SIX_HANDLER_SF0)==FALSE){
-               // one sixtop transcation is happening, only one instance at one time
-               return;
-            }
-            sixtop_request(
-                IANA_6TOP_CMD_DELETE,
-                &neighbor,
-                SF0THRESHOLD
-            );
-        } else {
-            // nothing to do
-        }
-    }
+		// remove cell(s)
+		if ((bw_incoming+bw_self) < (bw_outgoing-SF0THRESHOLD)) {
+			if (sixtop_setHandler(SIX_HANDLER_SF0)==FALSE){
+				// one sixtop transcation is happening, only one instance at one time
+				   return;
+			}
+
+			uint8_t cellsToRemove = bw_outgoing - (bw_incoming+bw_self+1);
+
+			if(cellsToRemove > SCHEDULEIEMAXNUMCELLS ) {
+				cellsToRemove = SCHEDULEIEMAXNUMCELLS;
+			}
+			sixtop_request(IANA_6TOP_CMD_DELETE,&neighbor,cellsToRemove);
+		}
+	}
+
 }
 
 void sf0_appPktPeriod(uint8_t numAppPacketsPerSlotFrame){

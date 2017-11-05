@@ -43,7 +43,7 @@ END_PACK
 void openreport_init(void);
 void openreport_indicateParentSwitch(open_addr_t *newParent);
 void openreport_indicate6pRequest(uint8_t code,uint8_t requestedCells);
-void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_t ack, uint8_t tx, uint8_t channel, uint32_t seqnum,uint8_t component);
+void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_t ack, uint8_t tx, uint8_t channel, uint32_t seqnum,uint8_t component,uint8_t *asn);
 
 
 

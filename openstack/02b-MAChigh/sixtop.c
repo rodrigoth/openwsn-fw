@@ -149,7 +149,7 @@ void sixtop_init() {
     );
 }
 
-sixtop_resetState() {
+void sixtop_resetState() {
 	sixtop_vars.busySendingKA      = FALSE;
 	sixtop_vars.busySendingEB      = FALSE;
 	sixtop_vars.mgtTaskCounter     = 0;
@@ -194,7 +194,6 @@ void sixtop_request(uint8_t code, open_addr_t* neighbor, uint8_t numCells){
     cellInfo_ht       cellList[SCHEDULEIEMAXNUMCELLS];
    
     memset(cellList,0,sizeof(cellList));
-    //openserial_printError(COMPONENT_SIXTOP_RES,ERR_WRONG_ADDR_TYPE,(errorparameter_t)code,(errorparameter_t)neighbor->addr_64b[7]);
 
    
     // filter parameters
@@ -1380,21 +1379,18 @@ bool sixtop_candidateRemoveCellList(
    for(i=0;i<schedule_getFrameLength();i++){
       schedule_getSlotInfo(i,neighbor,&info);
       if(info.link_type == CELLTYPE_TX){
-         cellList[numCandCells].tsNum       = i;
+         cellList[numCandCells].tsNum       = info.slotOffset;
          cellList[numCandCells].choffset    = info.channelOffset;
          cellList[numCandCells].linkoptions = CELLTYPE_TX;
          numCandCells++;
-         if (numCandCells==SCHEDULEIEMAXNUMCELLS){
-            break; // only delete one cell
+
+
+         if (numCandCells==requiredCells){
+            return TRUE;
          }
       }
    }
-   
-   if(numCandCells<requiredCells){
-      return FALSE;
-   }else{
-      return TRUE;
-   }
+   return FALSE;
 }
 
 void sixtop_addCellsByState(
@@ -1504,49 +1500,28 @@ bool sixtop_areAvailableCellsToBeScheduled(
    return available;
 }
 
-bool sixtop_areAvailableCellsToBeRemoved(      
-        uint8_t      frameID, 
-        uint8_t      numOfCells, 
-        cellInfo_ht* cellList,
-        open_addr_t* neighbor
-    ){
+bool sixtop_areAvailableCellsToBeRemoved(uint8_t frameID, uint8_t numOfCells, cellInfo_ht* cellList,open_addr_t* neighbor){
    uint8_t              i;
    uint8_t              bw;
-   bool                 available;
    slotinfo_element_t   info;
    
    i          = 0;
-   bw         = numOfCells;
-   available  = FALSE;
+   bw         = 0;
   
-   if(bw == 0 || bw>SCHEDULEIEMAXNUMCELLS){
+   if(numOfCells == 0 || numOfCells > SCHEDULEIEMAXNUMCELLS){
 	   openserial_printError(COMPONENT_SIXTOP_RES,ERR_SIXTOP_NOAVAILABLECELL,(errorparameter_t)0,(errorparameter_t)0);
-	   available = FALSE;
+	   return FALSE;
    } else {
-      do {
-          schedule_getSlotInfo(cellList[i].tsNum,neighbor,&info);
-          if(info.link_type == CELLTYPE_RX){
-              bw--;
-          } else {
-              cellList[i].linkoptions = CELLTYPE_OFF;
-          }
-          i++;
-        }while(i<SCHEDULEIEMAXNUMCELLS && bw>0);
-      
-        if(bw==0){
-            //the rest link will not be scheduled, mark them as off type
-            while(i<SCHEDULEIEMAXNUMCELLS){
-                cellList[i].linkoptions = CELLTYPE_OFF;
-                i++;
-            }
-            // local schedule can statisfy the bandwidth of cell request. 
-            available = TRUE;
-        } else {
-            // local schedule can't statisfy the bandwidth of cell request
-            available = FALSE;
-            openserial_printError(COMPONENT_SIXTOP_RES,ERR_SIXTOP_NOAVAILABLECELL,(errorparameter_t)1,(errorparameter_t)1);
-        }
+       for(i = 0; i < SCHEDULEIEMAXNUMCELLS; i++) {
+    	   schedule_getSlotInfo(cellList[i].tsNum,neighbor,&info);
+    	   if(info.link_type == CELLTYPE_RX){
+    		   bw++;
+    	   }
+    	   if(bw == numOfCells) {
+    		   return TRUE;
+    	   }
+       }
    }
-   
-   return available;
+   openserial_printError(COMPONENT_SIXTOP_RES,ERR_SIXTOP_NOAVAILABLECELL,(errorparameter_t)1,(errorparameter_t)1);
+   return FALSE;
 }
