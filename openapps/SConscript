@@ -5,10 +5,8 @@ Import('env')
 localEnv      = env.Clone()
 
 #===== retrieve the list of apps to build
-
 defaultApps   = []
-if localEnv['board']=='python':
-    defaultApps  += [
+defaultApps  += [
         'c6t',
         'cinfo',
         'cleds',
@@ -22,7 +20,7 @@ if localEnv['board']=='python':
         'cexample',
         'cstorm',
         'cjoin',
-    ]
+]
 
 # source files that should be included in the build other than
 # those with default application name (application.c)
@@ -49,7 +47,7 @@ additionalHeaderFiles = [
 if localEnv['apps']:
     userApps  = localEnv['apps'].split(',')
 else:
-    userApps  = []
+    userApps  = ['uinject']
 
 # union of default and additional apps (without duplicates)
 apps      = ['opencoap']
@@ -58,7 +56,7 @@ if userApps:
     appsInit  = ['opencoap'] # make sure opencoap is initialized first
     appsInit += sorted(list(set(userApps)))
 else:
-    appsInit = []
+    appsInit = ['uinject']
 
 #===== rule to create a (temporary) openapps_dyn.c file
 

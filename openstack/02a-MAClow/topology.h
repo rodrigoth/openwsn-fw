@@ -12,9 +12,13 @@
 #include "IEEE802154.h"
 
 //=========================== define ==========================================
-
+#define NUMBER_OF_NODES_PER_HOP	9
 //=========================== typedef =========================================
-
+typedef struct {
+   uint8_t hop;
+   uint8_t bytes6[NUMBER_OF_NODES_PER_HOP];
+   uint8_t bytes7[NUMBER_OF_NODES_PER_HOP];
+} topologyEntry_t;
 //=========================== variables =======================================
 
 //=========================== prototypes ======================================
@@ -29,3 +33,4 @@ bool topology_isAcceptablePacket(ieee802154_header_iht* ieee802514_header);
 */
 
 #endif
+

@@ -533,7 +533,7 @@ port_INLINE void activity_synchronize_newSlot() {
         radio_rfOff();
         
         // update record of current channel
-        ieee154e_vars.freq = (openrandom_get16b()&0x0F) + 11;
+        ieee154e_vars.freq = 26;
         
         // configure the radio to listen to the default synchronizing channel
         radio_setFrequency(ieee154e_vars.freq);

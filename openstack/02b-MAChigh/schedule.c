@@ -597,6 +597,12 @@ slotOffset_t schedule_getNextActiveSlotOffset() {
    
    INTERRUPT_DECLARATION();
    DISABLE_INTERRUPTS();
+
+   if (schedule_vars.currentScheduleEntry->slotOffset >= ((scheduleEntry_t*)schedule_vars.currentScheduleEntry->next)->slotOffset
+       ) {
+       // one slotframe has elapsed
+       sf0_notifyNewSlotframe();
+   }   
    
    res = ((scheduleEntry_t*)(schedule_vars.currentScheduleEntry->next))->slotOffset;
    
