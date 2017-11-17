@@ -252,6 +252,8 @@ enum {
    ERR_SCHEDULE_ADDDUPLICATESLOT       = 0x3f, // the slot {0} to be added is already in schedule
    ERR_SIXTOP_NOAVAILABLECELL  		   = 0x40, // no available cell, code location {0}
    ERR_UINJECT_ALIVE  		 		   = 0x41, // uinject trigged
+   ERR_SIXTOP_CELLTOADD				   = 0x42, // requesting cell {0},{1}
+   ERR_SIXTOP_CELLTOREMOVE			   = 0x43, // deleting cell {0},{1}
 };
 
 //=========================== typedef =========================================
