@@ -254,6 +254,8 @@ enum {
    ERR_UINJECT_ALIVE  		 		   = 0x41, // uinject trigged
    ERR_SIXTOP_CELLTOADD				   = 0x42, // requesting cell {0},{1}
    ERR_SIXTOP_CELLTOREMOVE			   = 0x43, // deleting cell {0},{1}
+   ERR_SIXTOP_WRONGCELLTYPE			   = 0x44, // wrong cell type {0}, expecting {1}
+   ERR_SIXTOP_WRONGNEIGHBOR			   = 0x45, // expecting neighbor {0}, found {1}
 };
 
 //=========================== typedef =========================================

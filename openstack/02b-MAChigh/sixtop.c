@@ -225,12 +225,24 @@ void sixtop_request(uint8_t code, open_addr_t* neighbor, uint8_t numCells){
               sixtop_vars.handler = SIX_HANDLER_NONE;
               return;
         }
+        uint8_t i;
+        for(i = 0; i < SCHEDULEIEMAXNUMCELLS; i++) {
+        	if (cellList[i].linkoptions == CELLTYPE_TX) {
+        		openserial_printInfo(COMPONENT_SIXTOP,ERR_SIXTOP_CELLTOADD,(errorparameter_t) cellList[i].tsNum, (errorparameter_t) cellList[i].choffset);
+        	}
+        }
     }
     if (code == IANA_6TOP_CMD_DELETE){
         if (sixtop_candidateRemoveCellList(&frameID,cellList,neighbor,numCells)==FALSE){
               sixtop_vars.handler = SIX_HANDLER_NONE;
               return;
         }
+        uint8_t i;
+        for(i = 0; i < SCHEDULEIEMAXNUMCELLS; i++) {
+			if (cellList[i].linkoptions == CELLTYPE_TX) {
+				openserial_printInfo(COMPONENT_SIXTOP,ERR_SIXTOP_CELLTOREMOVE,(errorparameter_t) cellList[i].tsNum, (errorparameter_t) cellList[i].choffset);
+			}
+		}
     }
     
     // container to be define by SF, currently equals to frameID
@@ -1514,13 +1526,22 @@ bool sixtop_areAvailableCellsToBeRemoved(uint8_t frameID, uint8_t numOfCells, ce
    } else {
        for(i = 0; i < SCHEDULEIEMAXNUMCELLS; i++) {
     	   schedule_getSlotInfo(cellList[i].tsNum,neighbor,&info);
+
     	   if(info.link_type == CELLTYPE_RX){
     		   bw++;
+    	   } else {
+    		   openserial_printError(COMPONENT_SIXTOP,ERR_SIXTOP_WRONGCELLTYPE,info.link_type,CELLTYPE_RX);
     	   }
+
     	   if(bw == numOfCells) {
     		   return TRUE;
     	   }
        }
+   }
+   for(i = 0; i < SCHEDULEIEMAXNUMCELLS; i++) {
+		if (cellList[i].linkoptions == CELLTYPE_TX) {
+   				openserial_printInfo(COMPONENT_SIXTOP,ERR_SIXTOP_CELLTOREMOVE,(errorparameter_t) cellList[i].tsNum, (errorparameter_t) cellList[i].choffset);
+		}
    }
    openserial_printError(COMPONENT_SIXTOP_RES,ERR_SIXTOP_NOAVAILABLECELL,(errorparameter_t)1,(errorparameter_t)1);
    return FALSE;
