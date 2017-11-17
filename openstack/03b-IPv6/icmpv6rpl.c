@@ -93,7 +93,7 @@ void icmpv6rpl_init() {
                                              );
    
    //=== DAO
-   
+
    icmpv6rpl_vars.dao.rplinstanceId         = 0x00;        ///< TODO: put correct value
    icmpv6rpl_vars.dao.K_D_flags             = FLAG_DAO_A   | \
                                               FLAG_DAO_B   | \
@@ -111,7 +111,7 @@ void icmpv6rpl_init() {
       dodagid,
       sizeof(icmpv6rpl_vars.dao.DODAGID)
    );  // can be replaced later
-   
+
    icmpv6rpl_vars.dao_transit.type          = OPTION_TRANSIT_INFORMATION_TYPE;
    // optionLength: to be populated upon TX
    icmpv6rpl_vars.dao_transit.E_flags       = E_DAO_Transit_Info;
@@ -122,7 +122,7 @@ void icmpv6rpl_init() {
                                               PC3_A_DAO_Transit_Info | \
                                               PC3_B_DAO_Transit_Info | \
                                               PC4_A_DAO_Transit_Info | \
-                                              PC4_B_DAO_Transit_Info;  
+                                              PC4_B_DAO_Transit_Info;
    icmpv6rpl_vars.dao_transit.PathSequence  = 0x00; // to be incremented at each TX
    icmpv6rpl_vars.dao_transit.PathLifetime  = 0xAA;
    //target information
@@ -130,7 +130,7 @@ void icmpv6rpl_init() {
    icmpv6rpl_vars.dao_target.optionLength  = 0;
    icmpv6rpl_vars.dao_target.flags  = 0;
    icmpv6rpl_vars.dao_target.prefixLength = 0;
-   
+
    icmpv6rpl_vars.daoPeriod                 = TIMER_DAO_TIMEOUT;
    daoPeriod                                = icmpv6rpl_vars.daoPeriod - 0x80 + (openrandom_get16b()&0xff);
    icmpv6rpl_vars.timerIdDAO                = opentimers_start(
@@ -139,7 +139,7 @@ void icmpv6rpl_init() {
                                                 TIME_MS,
                                                 icmpv6rpl_timer_DAO_cb
                                              );
-   
+
 }
 
 void  icmpv6rpl_writeDODAGid(uint8_t* dodagid) {
@@ -643,18 +643,18 @@ void icmpv6rpl_timer_DAO_cb(opentimer_id_t id) {
 \note This function is executed in task context, called by the scheduler.
 */
 void icmpv6rpl_timer_DAO_task() {
-   uint32_t        daoPeriod;
+   ///uint32_t        daoPeriod;
    
    // send DAO
-   sendDAO();
+   //sendDAO();
    
    // arm the DAO timer with this new value
-   daoPeriod = icmpv6rpl_vars.daoPeriod - 0x80 + (openrandom_get16b()&0xff);
+   /*daoPeriod = icmpv6rpl_vars.daoPeriod - 0x80 + (openrandom_get16b()&0xff);
    opentimers_setPeriod(
       icmpv6rpl_vars.timerIdDAO,
       TIME_MS,
       daoPeriod
-   );
+   );*/
 }
 
 /**
