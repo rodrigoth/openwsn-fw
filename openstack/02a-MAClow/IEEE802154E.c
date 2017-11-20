@@ -533,7 +533,7 @@ port_INLINE void activity_synchronize_newSlot() {
         radio_rfOff();
         
         // update record of current channel
-        ieee154e_vars.freq = 26;
+        ieee154e_vars.freq = (openrandom_get16b()&0x0F) + 11;
         
         // configure the radio to listen to the default synchronizing channel
         radio_setFrequency(ieee154e_vars.freq);
@@ -673,6 +673,7 @@ port_INLINE void activity_synchronize_endOfFrame(PORT_TIMER_WIDTH capturedTime) 
       }
       
       // parse the IEEE802.15.4 header (synchronize, end of frame)
+
       ieee802154_retrieveHeader(ieee154e_vars.dataReceived,&ieee802514_header);
       
       // break if invalid IEEE802.15.4 header
@@ -691,23 +692,23 @@ port_INLINE void activity_synchronize_endOfFrame(PORT_TIMER_WIDTH capturedTime) 
             break;
       }
 
+
       if (ieee154e_vars.dataReceived->l2_securityLevel != IEEE154_ASH_SLF_TYPE_NOSEC) {
          // If we are not synced, we need to parse IEs and retrieve the ASN
          // before authenticating the beacon, because nonce is created from the ASN
          if (!ieee154e_vars.isSync && ieee802514_header.frameType == IEEE154_TYPE_BEACON) {
             if (!isValidJoin(ieee154e_vars.dataReceived, &ieee802514_header)) {
-               break;
+            	break;
             }
          }
          else { // discard other frames as we cannot decrypt without being synced
-            break;
+        	 break;
          }
       }
 
       // toss the IEEE802.15.4 header -- this does not include IEs as they are processed
       // next.
       packetfunctions_tossHeader(ieee154e_vars.dataReceived,ieee802514_header.headerLength);
-     
       // process IEs
       lenIE = 0;
       if (
@@ -767,6 +768,7 @@ port_INLINE void activity_synchronize_endOfFrame(PORT_TIMER_WIDTH capturedTime) 
 
 port_INLINE bool ieee154e_processIEs(OpenQueueEntry_t* pkt, uint16_t* lenIE) {
     uint8_t i;
+
     if (isValidEbFormat(pkt,lenIE)==TRUE){
         // at this point, ASN and frame length are known
         // the current slotoffset can be inferred
@@ -830,6 +832,8 @@ port_INLINE void activity_ti1ORri1() {
             
             // update the statistics
             ieee154e_stats.numDeSync++;
+            openqueue_init();
+            sixtop_setDefaultState();
                
             // abort
             endSlot();
@@ -1757,10 +1761,10 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
       
         // break if invalid IEEE802.15.4 header
         if (ieee802514_header.valid==FALSE) {
+
             // break from the do-while loop and execute the clean-up code below
             break;
         }
-
         // store header details in packet buffer
         ieee154e_vars.dataReceived->l2_frameType      = ieee802514_header.frameType;
         ieee154e_vars.dataReceived->l2_dsn            = ieee802514_header.dsn;
@@ -2430,7 +2434,7 @@ bool isValidEbFormat(OpenQueueEntry_t* pkt, uint16_t* lenIE){
                 slotframelink_ie_checkPass = TRUE;
                 break;
             default:
-                // unsupported IE type, skip the ie
+
                 break;
             }
         }

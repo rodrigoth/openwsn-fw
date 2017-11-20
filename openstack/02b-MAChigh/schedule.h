@@ -39,7 +39,7 @@ The superframe reappears over time and can be arbitrarily long.
   for serial port to transmit data to dagroot.
 */
 
-#define NUMSLOTSOFF          90
+#define NUMSLOTSOFF          92
 
 /**
 \brief Maximum number of active slots in a superframe.

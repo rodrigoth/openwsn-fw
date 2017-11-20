@@ -80,8 +80,10 @@ void icmpv6rpl_init() {
    icmpv6rpl_vars.dioDestination.type = ADDR_128B;
    memcpy(&icmpv6rpl_vars.dioDestination.addr_128b[0],all_routers_multicast,sizeof(all_routers_multicast));
    
-   icmpv6rpl_vars.dioPeriod                 = DIO_PORTION*(neighbors_getNumNeighbors()+1);
+   icmpv6rpl_vars.dioPeriod                 = 13;//DIO_PORTION*(neighbors_getNumNeighbors()+1);
    icmpv6rpl_vars.timerIdDIO                = opentimers_create();
+
+   icmpv6rpl_vars.dioTimerCounter = openrandom_get16b()%(1<<4);
 
    //initialize PIO -> move this to dagroot code
    icmpv6rpl_vars.pio.type                  = RPL_OPTION_PIO;
@@ -386,10 +388,10 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
     prevRankIncrease     = icmpv6rpl_vars.rankIncrease;
     // update my rank to current parent first
     if (icmpv6rpl_vars.haveParent==TRUE){
-        if (neighbors_reachedMaxTransmission(icmpv6rpl_vars.ParentIndex)==FALSE){
+        //if (neighbors_reachedMaxTransmission(icmpv6rpl_vars.ParentIndex)==FALSE){
             // I havn't enough transmission to my parent, don't update.
-            return;
-        }
+       //     return;
+        //}
         rankIncrease     = neighbors_getLinkMetric(icmpv6rpl_vars.ParentIndex);
         neighborRank     = neighbors_getNeighborRank(icmpv6rpl_vars.ParentIndex);
         tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
@@ -613,7 +615,7 @@ void icmpv6rpl_timer_DIO_task() {
     
     uint16_t newPeriod;
     // current period 
-    newPeriod = DIO_PORTION*(neighbors_getNumNeighbors()+1);
+    newPeriod = 13;//DIO_PORTION*(neighbors_getNumNeighbors()+1);
     if (
         icmpv6rpl_vars.dioPeriod        < newPeriod &&
         icmpv6rpl_vars.dioTimerCounter  > newPeriod
@@ -627,6 +629,7 @@ void icmpv6rpl_timer_DIO_task() {
         switch (icmpv6rpl_vars.dioTimerCounter) {
         case 0:
             sendDIO();
+            icmpv6rpl_vars.dioTimerCounter = openrandom_get16b()%(1<<4);
             break;
         default:
             break;
@@ -761,7 +764,7 @@ void sendDIO() {
    task.
 */
 void icmpv6rpl_timer_DAO_cb(opentimers_id_t id) {
-    scheduler_push_task(icmpv6rpl_timer_DAO_task,TASKPRIO_RPL);
+    /*scheduler_push_task(icmpv6rpl_timer_DAO_task,TASKPRIO_RPL);
     // update the period
     opentimers_scheduleIn(
         icmpv6rpl_vars.timerIdDAO,
@@ -769,7 +772,7 @@ void icmpv6rpl_timer_DAO_cb(opentimers_id_t id) {
         TIME_MS,
         TIMER_ONESHOT,
         icmpv6rpl_timer_DAO_cb
-    );
+    );*/
 }
 
 /**
@@ -778,7 +781,7 @@ void icmpv6rpl_timer_DAO_cb(opentimers_id_t id) {
 \note This function is executed in task context, called by the scheduler.
 */
 void icmpv6rpl_timer_DAO_task() {
-    icmpv6rpl_vars.daoTimerCounter = (icmpv6rpl_vars.daoTimerCounter+1)%icmpv6rpl_vars.daoPeriod;
+    /*icmpv6rpl_vars.daoTimerCounter = (icmpv6rpl_vars.daoTimerCounter+1)%icmpv6rpl_vars.daoPeriod;
     switch (icmpv6rpl_vars.daoTimerCounter) {
     case 0:
         // called every TIMER_DAO_TIMEOUT seconds
@@ -787,6 +790,7 @@ void icmpv6rpl_timer_DAO_task() {
     default:
         break;
     }
+    */
 }
 
 /**

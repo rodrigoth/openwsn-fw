@@ -1,7 +1,7 @@
 #include "opendefs.h"
 #include "topology.h"
 #include "idmanager.h"
-
+#include "openserial.h"
 //=========================== defines =========================================
 
 //=========================== variables =======================================
@@ -18,8 +18,8 @@ bool topology_isAcceptablePacket(ieee802154_header_iht* ieee802514_header) {
 #ifdef FORCETOPOLOGY
    bool returnVal=FALSE;
 
-   uint8_t sink_byte6 = 0xa4;
-   uint8_t sink_byte7 = 0x51;
+   uint8_t sink_byte6 = 0x96;
+   uint8_t sink_byte7 = 0x63;
 
    if(!isBuilt) {buildTopologyStructure();}
 
@@ -44,6 +44,7 @@ bool topology_isAcceptablePacket(ieee802154_header_iht* ieee802514_header) {
          }
       }
    }
+
    return returnVal;
 #else
    return TRUE;
@@ -72,8 +73,8 @@ void buildTopologyStructure() {
    //hop 1
    entry[hop].hop = hop;
 
-   entry[hop].bytes6[0] = 0xb2;
-   entry[hop].bytes7[0] = 0x52;
+   entry[hop].bytes6[0] = 0xb5;
+   entry[hop].bytes7[0] = 0x58;
 
    entry[hop].bytes6[1] = 0x85;
    entry[hop].bytes7[1] = 0x61;
@@ -106,8 +107,8 @@ void buildTopologyStructure() {
 
    entry[hop].hop = hop;
 
-   entry[hop].bytes6[0] = 0xb2;
-   entry[hop].bytes7[0] = 0x54;
+   entry[hop].bytes6[0] = 0x20;
+   entry[hop].bytes7[0] = 0x87;
 
    entry[hop].bytes6[1] = 0x99;
    entry[hop].bytes7[1] = 0x58;
@@ -142,7 +143,7 @@ void buildTopologyStructure() {
 
    entry[hop].hop = hop;
 
-   entry[hop].bytes6[0] = 0xb2;
+   entry[hop].bytes6[0] = 0xa9;
    entry[hop].bytes7[0] = 0x64;
 
    entry[hop].bytes6[1] = 0x88;
@@ -179,8 +180,8 @@ void buildTopologyStructure() {
 
    entry[hop].hop = hop;
 
-   entry[hop].bytes6[0] = 0xa8;
-   entry[hop].bytes7[0] = 0x54;
+   entry[hop].bytes6[0] = 0x13;
+   entry[hop].bytes7[0] = 0x85;
 
    entry[hop].bytes6[1] = 0x38;
    entry[hop].bytes7[1] = 0x85;
@@ -214,8 +215,8 @@ void buildTopologyStructure() {
 
    entry[hop].hop = hop;
 
-   entry[hop].bytes6[0] = 0xb0;
-   entry[hop].bytes7[0] = 0x67;
+   entry[hop].bytes6[0] = 0x36;
+   entry[hop].bytes7[0] = 0x87;
 
    entry[hop].bytes6[1] = 0xa5;
    entry[hop].bytes7[1] = 0x62;
@@ -246,4 +247,3 @@ void buildTopologyStructure() {
    isBuilt = TRUE;
 
 }
-

@@ -106,10 +106,13 @@ void sixtop_init() {
     sixtop_vars.dsn                = 0;
     sixtop_vars.mgtTaskCounter     = 0;
     sixtop_vars.kaPeriod           = MAXKAPERIOD;
-    sixtop_vars.ebPeriod           = EB_PORTION*(neighbors_getNumNeighbors()+1);
+    sixtop_vars.ebPeriod           = 23;//EB_PORTION*(neighbors_getNumNeighbors()+1);
     sixtop_vars.isResponseEnabled  = TRUE;
     sixtop_vars.six2six_state      = SIX_STATE_IDLE;
     
+
+    sixtop_vars.ebCounter = openrandom_get16b()%(1<<4);
+
     sixtop_vars.ebSendingTimerId   = opentimers_create();
     opentimers_scheduleIn(
         sixtop_vars.ebSendingTimerId,
@@ -129,6 +132,10 @@ void sixtop_init() {
     );
     
     sixtop_vars.timeoutTimerId      =  opentimers_create();
+}
+
+void sixtop_setDefaultState() {
+	sixtop_vars.six2six_state = SIX_STATE_IDLE;
 }
 
 void sixtop_setKaPeriod(uint16_t kaPeriod) {
@@ -199,6 +206,12 @@ owerror_t sixtop_request(
         );
         return E_FAIL;
     }
+
+    openserial_printError(COMPONENT_SCHEDULE,ERR_SIXTOP_LIST,
+                             (errorparameter_t)numCells,
+                             (errorparameter_t)code
+                          );
+
    
     // take ownership
     pkt->creator = COMPONENT_SIXTOP_RES;
@@ -633,7 +646,7 @@ void timer_sixtop_sendEb_fired(){
     
     uint16_t newPeriod;
     // current period 
-    newPeriod = EB_PORTION*(neighbors_getNumNeighbors()+1);
+    newPeriod = 23;//EB_PORTION*(neighbors_getNumNeighbors()+1);
     if (
         sixtop_vars.ebPeriod  < newPeriod &&
         sixtop_vars.ebCounter > newPeriod
@@ -647,6 +660,7 @@ void timer_sixtop_sendEb_fired(){
         switch (sixtop_vars.ebCounter) {
         case 0:
             sixtop_sendEB();
+            sixtop_vars.ebCounter = openrandom_get16b()%(1<<4);
             break;
         default:
             break;
@@ -692,9 +706,7 @@ port_INLINE void sixtop_sendEB() {
     uint16_t    temp16b;
    
     if ((ieee154e_isSynch()==FALSE)                     ||
-        (IEEE802154_security_isConfigured()==FALSE)     ||
-        (icmpv6rpl_getMyDAGrank()==DEFAULTDAGRANK)      ||
-        icmpv6rpl_daoSent()==FALSE) {
+        (icmpv6rpl_getMyDAGrank()==DEFAULTDAGRANK)) {
         // I'm not sync'ed, or did not join, or did not acquire a DAGrank or did not send out a DAO
         // before starting to advertize the network, we need to make sure that we are reachable downwards,
         // thus, the condition if DAO was sent
@@ -732,12 +744,13 @@ port_INLINE void sixtop_sendEB() {
     // declare ownership over that packet
     eb->creator = COMPONENT_SIXTOP;
     eb->owner   = COMPONENT_SIXTOP;
-    
+    uint8_t shared_slots[] = {0,20,40,60,80};
+
     // in case we none default number of shared cells defined in minimal configuration
     if (ebIEsBytestream[EB_SLOTFRAME_NUMLINK_OFFSET]>1){
-        for (i=ebIEsBytestream[EB_SLOTFRAME_NUMLINK_OFFSET]-1;i>0;i--){
+    	for(i = 0; i < sizeof(shared_slots); i++) {
             packetfunctions_reserveHeaderSize(eb,5);
-            eb->payload[0]   = i;    // slot offset
+            eb->payload[0]   = shared_slots[i];    // slot offset
             eb->payload[1]   = 0x00;
             eb->payload[2]   = 0x00; // channel offset
             eb->payload[3]   = 0x00;

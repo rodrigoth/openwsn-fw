@@ -114,6 +114,7 @@ typedef struct {
 
 // admin
 void      sixtop_init(void);
+void 	  sixtop_setDefaultState(void);
 void      sixtop_setKaPeriod(uint16_t kaPeriod);
 void      sixtop_setEBPeriod(uint8_t ebPeriod);
 void      sixtop_setSFcallback(
