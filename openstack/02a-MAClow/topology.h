@@ -12,7 +12,7 @@
 #include "IEEE802154.h"
 
 //=========================== define ==========================================
-#define NUMBER_OF_NODES_PER_HOP	9
+#define NUMBER_OF_NODES_PER_HOP	5
 //=========================== typedef =========================================
 typedef struct {
    uint8_t hop;
