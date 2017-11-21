@@ -110,7 +110,7 @@ void sf0_bandwidthEstimate_task(void){
     // get bandwidth of outgoing, incoming and self.
     // Here we just calculate the estimated bandwidth for 
     // the application sending on dedicate cells(TX or Rx).
-    bw_outgoing = schedule_getNumOfSlotsByType(CELLTYPE_TX);
+    bw_outgoing = schedule_getNumberSlotToPreferredParent(&neighbor);
     bw_incoming = schedule_getNumOfSlotsByType(CELLTYPE_RX);
     
     // get self required bandwith, you can design your
@@ -125,15 +125,22 @@ void sf0_bandwidthEstimate_task(void){
     //         requiredCells  = bw_incoming + bw_self
     // when scheduledCells<requiredCells, add one or more cell
     
-    if (bw_outgoing <= bw_incoming+bw_self){
-        if (sf0_candidateAddCellList(celllist_add,bw_incoming+bw_self-bw_outgoing+1)==FALSE){
+    if (bw_outgoing == 0 || bw_outgoing < bw_incoming+bw_self) {
+
+    	uint8_t requiredCells = bw_incoming+bw_self+1-bw_outgoing;
+		if(requiredCells > CELLLIST_MAX_LEN) {
+			requiredCells = CELLLIST_MAX_LEN;
+		}
+
+
+    	if (sf0_candidateAddCellList(celllist_add,requiredCells)==FALSE){
             // failed to get cell list to add
             return;
         }
         sixtop_request(
             IANA_6TOP_CMD_ADD,                  // code
             &neighbor,                          // neighbor
-            bw_incoming+bw_self-bw_outgoing+1,  // number cells
+            requiredCells, 					 	// number cells
             LINKOPTIONS_TX,                     // cellOptions
             celllist_add,                       // celllist to add
             NULL,                               // celllist to delete (not used)
@@ -144,14 +151,22 @@ void sf0_bandwidthEstimate_task(void){
     } else {
         // remove cell(s)
         if ( (bw_incoming+bw_self) < (bw_outgoing-SF0THRESHOLD)) {
-            if (sf0_candidateRemoveCellList(celllist_delete,&neighbor,SF0THRESHOLD)==FALSE){
+
+        	uint8_t cellsToRemove = bw_outgoing - (bw_incoming+bw_self+1);
+
+			if(cellsToRemove > CELLLIST_MAX_LEN ) {
+				cellsToRemove = CELLLIST_MAX_LEN;
+			}
+
+
+        	if (sf0_candidateRemoveCellList(celllist_delete,&neighbor,cellsToRemove)==FALSE){
                 // failed to get cell list to delete
                 return;
             }
             sixtop_request(
                 IANA_6TOP_CMD_DELETE,   // code
                 &neighbor,              // neighbor
-                SF0THRESHOLD,           // number cells
+				cellsToRemove,           // number cells
                 LINKOPTIONS_TX,         // cellOptions
                 NULL,                   // celllist to add (not used)
                 celllist_delete,        // celllist to delete
@@ -159,8 +174,6 @@ void sf0_bandwidthEstimate_task(void){
                 0,                      // list command offset (not used)
                 0                       // list command maximum celllist (not used)
             );
-        } else {
-            // nothing to do
         }
     }
 }

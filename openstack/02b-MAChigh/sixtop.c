@@ -16,6 +16,7 @@
 #include "IEEE802154_security.h"
 #include "idmanager.h"
 #include "schedule.h"
+#include "openreport.h"
 
 //=========================== define ==========================================
 
@@ -335,6 +336,7 @@ owerror_t sixtop_request(
     outcome = sixtop_send(pkt);
     
     if (outcome == E_SUCCESS){
+    	openreport_indicate6pRequest(code,numCells);
         neighbors_updateSequenceNumber(neighbor);
         //update states
         switch(code){
@@ -683,7 +685,8 @@ void timer_sixtop_management_fired(void) {
     switch (sixtop_vars.mgtTaskCounter) {
     case 0:
         // called every MAINTENANCE_PERIOD seconds
-        neighbors_removeOld();
+    	schedule_housekeeping();
+        //neighbors_removeOld();
         break;
     default:
         // called every second, except once every MAINTENANCE_PERIOD seconds

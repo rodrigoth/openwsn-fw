@@ -250,6 +250,38 @@ OpenQueueEntry_t* openqueue_macGetDataPacket(open_addr_t* toNeighbor) {
    return NULL;
 }
 
+
+OpenQueueEntry_t*  openqueue_macGetDioPacket() {
+    uint8_t i;
+    INTERRUPT_DECLARATION();
+    DISABLE_INTERRUPTS();
+    for (i=0;i<QUEUELENGTH;i++) {
+        if (openqueue_vars.queue[i].creator == COMPONENT_ICMPv6RPL && packetfunctions_isBroadcastMulticast(&(openqueue_vars.queue[i].l3_destinationAdd))==TRUE) {
+            ENABLE_INTERRUPTS();
+            return &openqueue_vars.queue[i];
+        }
+    }
+
+    ENABLE_INTERRUPTS();
+    return NULL;
+
+}
+OpenQueueEntry_t*  openqueue_macGet6pPacket() {
+    uint8_t i;
+    INTERRUPT_DECLARATION();
+    DISABLE_INTERRUPTS();
+    for (i=0;i<QUEUELENGTH;i++) {
+        if (openqueue_vars.queue[i].creator==COMPONENT_SIXTOP_RES && !packetfunctions_isBroadcastMulticast(&(openqueue_vars.queue[i].l2_nextORpreviousHop))) {
+            ENABLE_INTERRUPTS();
+            return &openqueue_vars.queue[i];
+        }
+    }
+
+    ENABLE_INTERRUPTS();
+    return NULL;
+}
+
+
 bool openqueue_isHighPriorityEntryEnough(){
     uint8_t i;
     uint8_t numberOfEntry;

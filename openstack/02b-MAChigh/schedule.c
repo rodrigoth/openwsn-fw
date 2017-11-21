@@ -891,6 +891,58 @@ bool schedule_getOneCellAfterOffset(uint8_t metadata,uint8_t offset,open_addr_t*
    return returnVal;
 }
 
+void schedule_housekeeping(){
+    uint8_t     i;
+    open_addr_t neighbor;
+
+
+    INTERRUPT_DECLARATION();
+    DISABLE_INTERRUPTS();
+
+    for(i=0;i<MAXACTIVESLOTS;i++) {
+        if(schedule_vars.scheduleBuf[i].type == CELLTYPE_TX){
+            // remove Tx cell if it's scheduled to non-preferred parent
+            if (icmpv6rpl_getPreferredParentEui64(&neighbor)==TRUE) {
+                if(packetfunctions_sameAddress(&neighbor,&(schedule_vars.scheduleBuf[i].neighbor))==FALSE){
+                	sixtop_request(
+                       IANA_6TOP_CMD_CLEAR,                             // code
+                       &(schedule_vars.scheduleBuf[i].neighbor),        // neighbor
+                       0,                                               // numCells (not used)
+                       LINKOPTIONS_TX,                                  // cellOptions
+                       NULL,                                            // celllist to add (not used)
+                       NULL,                                            // celllist to add (not used)
+                       0,                                   // sfid
+                       0,                                               // list command offset (not used)
+                       0                                                // list command maximum list of cells(not used)
+                    );
+                    break;
+                }
+            }
+        }
+    }
+
+    ENABLE_INTERRUPTS();
+}
+
+uint8_t schedule_getNumberSlotToPreferredParent(open_addr_t *preferredParent) {
+    uint8_t i;
+    uint8_t counter;
+
+    INTERRUPT_DECLARATION();
+    DISABLE_INTERRUPTS();
+
+    counter = 0;
+    for(i=0;i<MAXACTIVESLOTS;i++) {
+      if(schedule_vars.scheduleBuf[i].type == CELLTYPE_TX &&
+         packetfunctions_sameAddress(preferredParent,&(schedule_vars.scheduleBuf[i].neighbor))==TRUE) {
+         counter++;
+      }
+    }
+
+    ENABLE_INTERRUPTS();
+    return counter;
+}
+
 //=========================== private =========================================
 
 /**

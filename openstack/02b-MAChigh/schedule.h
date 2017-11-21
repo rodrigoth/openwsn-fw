@@ -210,6 +210,9 @@ void               schedule_indicateTx(
                         asn_t*    asnTimestamp,
                         bool      succesfullTx
                    );
+
+void               schedule_housekeeping();
+uint8_t            schedule_getNumberSlotToPreferredParent(open_addr_t *preferredParent);
 // from sixtop
 bool               schedule_getOneCellAfterOffset(
     uint8_t metadata,
