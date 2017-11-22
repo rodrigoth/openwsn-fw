@@ -604,8 +604,6 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 void  neighbors_removeOld() {
     uint8_t    i, j;
     bool       haveParent;
-    uint8_t    neighborIndexWithLowestRank[3];
-    dagrank_t  lowestRank;
     PORT_TIMER_WIDTH timeSinceHeard;
     
     // remove old neighbor
@@ -628,7 +626,7 @@ void  neighbors_removeOld() {
     // neighbors marked as NO_RES will never removed.
     
     // first round
-    lowestRank = MAXDAGRANK;
+   /* lowestRank = MAXDAGRANK;
     for (i=0;i<MAXNUMNEIGHBORS;i++) {
         if (neighbors_vars.neighbors[i].used==1) {
             if (
@@ -705,7 +703,7 @@ void  neighbors_removeOld() {
                 }
             }
         }
-    }
+    }*/
 }
 
 //===== debug
@@ -792,6 +790,7 @@ bool isNeighbor(open_addr_t* neighbor) {
 }
 
 void removeNeighbor(uint8_t neighborIndex) {
+   schedule_removeAllCells(0,&(neighbors_vars.neighbors[neighborIndex].addr_64b));
    neighbors_vars.neighbors[neighborIndex].used                      = FALSE;
    neighbors_vars.neighbors[neighborIndex].parentPreference          = 0;
    neighbors_vars.neighbors[neighborIndex].stableNeighbor            = FALSE;
