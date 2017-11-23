@@ -84,3 +84,36 @@ void openstack_init(void) {
    );
 }
 
+void openstack_reset(void){
+	//===== drivers
+   openserial_init();
+
+   //===== stack
+   //-- cross-layer
+   idmanager_init();    // call first since initializes EUI64 and isDAGroot
+   openqueue_init();
+   openrandom_init();
+   opentimers_init();
+   //-- 02a-TSCH
+//   adaptive_sync_init();
+   ieee154e_init();
+   //-- 02b-RES
+   schedule_init();
+   sixtop_init();
+   neighbors_init();
+   sf0_init();
+   //-- 03a-IPHC
+   openbridge_init();
+   iphc_init();
+   //-- 03b-IPv6
+   forwarding_init();
+   icmpv6_init();
+   icmpv6echo_init();
+   icmpv6rpl_init();
+   //-- 04-TRAN
+   openudp_init();
+
+   //===== applications
+   openapps_init();
+}
+

@@ -913,21 +913,14 @@ port_INLINE void activity_ti1ORri1() {
          // check whether we can send
          if (schedule_getOkToSend()) {
         	 schedule_getNeighbor(&neighbor);
-			 if (cellType==CELLTYPE_TXRX) {
+			 ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
+			 if ((ieee154e_vars.dataToSend==NULL) && (cellType==CELLTYPE_TXRX)) {
+				couldSendEB=TRUE;
+				// look for an EB packet in the queue
 				ieee154e_vars.dataToSend = openqueue_macGetEBPacket();
-				if(ieee154e_vars.dataToSend != NULL) {
-					 couldSendEB=TRUE;
-				} else {
-					 //DIO
-					 ieee154e_vars.dataToSend = openqueue_macGetDioPacket();
-					 if (ieee154e_vars.dataToSend == NULL) {
-						   ieee154e_vars.dataToSend = openqueue_macGet6pPacket();
-					 }
-				}
-			 } else {
-				  ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
-			}
+			 }
          }
+
          if (ieee154e_vars.dataToSend==NULL) {
             if (cellType==CELLTYPE_TX) {
                // abort

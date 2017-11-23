@@ -18,5 +18,6 @@
 //=========================== prototypes ======================================
 
 void openstack_init(void);
+void openstack_reset(void);
 
 #endif

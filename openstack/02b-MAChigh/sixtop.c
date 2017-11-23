@@ -741,18 +741,17 @@ port_INLINE void sixtop_sendEB() {
     // declare ownership over that packet
     eb->creator = COMPONENT_SIXTOP;
     eb->owner   = COMPONENT_SIXTOP;
-    uint8_t shared_slots[] = {0,20,40,60,80};
 
     // in case we none default number of shared cells defined in minimal configuration
     if (ebIEsBytestream[EB_SLOTFRAME_NUMLINK_OFFSET]>1){
-    	for(i = 0; i < sizeof(shared_slots); i++) {
-            packetfunctions_reserveHeaderSize(eb,5);
-            eb->payload[0]   = shared_slots[i];    // slot offset
-            eb->payload[1]   = 0x00;
-            eb->payload[2]   = 0x00; // channel offset
-            eb->payload[3]   = 0x00;
-            eb->payload[4]   = 0x0F; // link options
-        }
+    	 for (i=ebIEsBytestream[EB_SLOTFRAME_NUMLINK_OFFSET]-1;i>0;i--){
+			packetfunctions_reserveHeaderSize(eb,5);
+			eb->payload[0]   = i;    // slot offset
+			eb->payload[1]   = 0x00;
+			eb->payload[2]   = 0x00; // channel offset
+			eb->payload[3]   = 0x00;
+			eb->payload[4]   = 0x0F; // link options
+		}
     }
     
     // reserve space for EB IEs

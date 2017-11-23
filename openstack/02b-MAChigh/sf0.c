@@ -110,7 +110,7 @@ void sf0_bandwidthEstimate_task(void){
     // get bandwidth of outgoing, incoming and self.
     // Here we just calculate the estimated bandwidth for 
     // the application sending on dedicate cells(TX or Rx).
-    bw_outgoing = schedule_getNumberSlotToPreferredParent(&neighbor);
+    bw_outgoing = schedule_getNumOfSlotsByType(CELLTYPE_TX);
     bw_incoming = schedule_getNumOfSlotsByType(CELLTYPE_RX);
     
     // get self required bandwith, you can design your
@@ -126,6 +126,8 @@ void sf0_bandwidthEstimate_task(void){
     // when scheduledCells<requiredCells, add one or more cell
     
     if (bw_outgoing == 0 || bw_outgoing < bw_incoming+bw_self) {
+
+    	openserial_printInfo(COMPONENT_SIXTOP,ERR_SIXTOP_LIST,(errorparameter_t)bw_outgoing,(errorparameter_t) bw_incoming+bw_self);
 
     	uint8_t requiredCells = bw_incoming+bw_self+1-bw_outgoing;
 		if(requiredCells > CELLLIST_MAX_LEN) {

@@ -372,7 +372,9 @@ void forwarding_receive(
                 );
             }
             if (senderRank < icmpv6rpl_getMyDAGrank()){
-                // loop detected
+            	openstack_reset();
+            	return;
+            	// loop detected
                 // set flag
                 rpl_option->flags |= R_FLAG;
                 // log error
@@ -801,6 +803,8 @@ owerror_t forwarding_send_internal_SourceRouting(
             );
         }
         if (senderRank > icmpv6rpl_getMyDAGrank()){
+        	openstack_reset();
+        	return E_FAIL;
             // loop detected
             // set flag
             rpl_option->flags |= R_FLAG;

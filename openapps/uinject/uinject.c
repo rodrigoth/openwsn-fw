@@ -11,7 +11,6 @@
 
 uinject_vars_t uinject_vars;
 
-static const uint8_t uinject_payload[]    = "uinject";
 static const uint8_t uinject_dst_addr[]   = {
    0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
@@ -96,10 +95,10 @@ void uinject_task_cb() {
 	 //if(slots == 0) return;
 
 	 //don't run if I dont have slots to my preferred parent
-	 open_addr_t neighbor;
-	 icmpv6rpl_getPreferredParentEui64(&neighbor);
-	 uint8_t slots = schedule_getNumberSlotToPreferredParent(&neighbor);
-	 if(slots == 0) return;
+	 //open_addr_t neighbor;
+	 //icmpv6rpl_getPreferredParentEui64(&neighbor);
+	 //uint8_t slots = schedule_getNumberSlotToPreferredParent(&neighbor);
+	 //if(slots == 0) return;
 
 	 // if you get here, send a packet
 

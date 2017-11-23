@@ -771,9 +771,9 @@ void registerNewNeighbor(open_addr_t* address,
          i++;
       }
       if (i==MAXNUMNEIGHBORS) {
-         openserial_printError(COMPONENT_NEIGHBORS,ERR_NEIGHBORS_FULL,
+         /*openserial_printError(COMPONENT_NEIGHBORS,ERR_NEIGHBORS_FULL,
                                (errorparameter_t)MAXNUMNEIGHBORS,
-                               (errorparameter_t)0);
+                               (errorparameter_t)0);*/
          return;
       }
    }
