@@ -8,10 +8,12 @@
 #include "sf0.h"
 #include "icmpv6rpl.h"
 #include "neighbors.h"
+#include "IEEE802154E.h"
 
 //=========================== variables =======================================
 
 schedule_vars_t schedule_vars;
+uint8_t slotframeRepetition;
 
 //=========================== prototypes ======================================
 
@@ -599,12 +601,16 @@ slotOffset_t schedule_getNextActiveSlotOffset() {
    INTERRUPT_DECLARATION();
    DISABLE_INTERRUPTS();
 
-   if (schedule_vars.currentScheduleEntry->slotOffset >= ((scheduleEntry_t*)schedule_vars.currentScheduleEntry->next)->slotOffset
-       ) {
-       // one slotframe has elapsed
-       sf0_notifyNewSlotframe();
+   if (ieee154e_isSynch() == TRUE &&  schedule_vars.currentScheduleEntry->slotOffset >= ((scheduleEntry_t*)schedule_vars.currentScheduleEntry->next)->slotOffset) {
+       slotframeRepetition++;
+
    }   
    
+   if(slotframeRepetition == 10) {
+	   sf0_notifyNewSlotframe();
+	   slotframeRepetition = 0;
+   }
+
    res = ((scheduleEntry_t*)(schedule_vars.currentScheduleEntry->next))->slotOffset;
    
    ENABLE_INTERRUPTS();

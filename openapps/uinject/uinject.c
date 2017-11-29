@@ -43,7 +43,7 @@ void uinject_init() {
         uinject_vars.timerId,
         UINJECT_PERIOD_MS,
         TIME_MS,
-        TIMER_PERIODIC,
+        TIMER_ONESHOT,
         uinject_timer_cb
     );
 }
@@ -78,6 +78,15 @@ void uinject_timer_cb(opentimers_id_t id){
 void uinject_task_cb() {
    OpenQueueEntry_t*    pkt;
    uint8_t              asnArray[5];
+
+   uint16_t newTime =  UINJECT_PERIOD_MS - 10000+(openrandom_get16b()%(2*10000));
+   opentimers_scheduleIn(
+           uinject_vars.timerId,
+		   newTime,
+           TIME_MS,
+           TIMER_ONESHOT,
+           uinject_timer_cb
+       );
 
    // don't run if not synch
    if (ieee154e_isSynch() == FALSE) return;

@@ -57,15 +57,11 @@ metadata_t sf0_translateMetadata(void){
 }
 
 void sf0_handleRCError(uint8_t code){
-    if (code==IANA_6TOP_RC_BUSY){
+    if (code==IANA_6TOP_RC_BUSY || code==IANA_6TOP_RC_RESET ){
         // disable sf0 for [0...2^4] slotframe long time
-        sf0_setBackoff(openrandom_get16b()%(1<<4));
+    	sf0_setBackoff(openrandom_get16b()%(1<<4));
     }
     
-    if (code==IANA_6TOP_RC_RESET){
-        // TBD: the neighbor can't statisfy the 6p request with given cells, call sf0 to make a decision 
-        // (e.g. issue another 6p request with different cell list)
-    }
     
     if (code==IANA_6TOP_RC_ERROR){
         // TBD: the neighbor can't statisfy the 6p request, call sf0 to make a decision

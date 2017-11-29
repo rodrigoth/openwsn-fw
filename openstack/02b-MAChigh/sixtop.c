@@ -875,6 +875,8 @@ void timer_sixtop_six2six_timeout_fired(void) {
     // timeout timer fired, reset the state of sixtop to idle
     sixtop_vars.six2six_state = SIX_STATE_IDLE;
     opentimers_cancel(sixtop_vars.timeoutTimerId);
+
+    sixtop_vars.cb_sf_handleRCError(IANA_6TOP_RC_RESET);
 }
 
 void sixtop_six2six_sendDone(OpenQueueEntry_t* msg, owerror_t error){

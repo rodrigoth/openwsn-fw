@@ -826,6 +826,7 @@ port_INLINE void activity_ti1ORri1() {
             // declare myself desynchronized
             changeIsSync(FALSE);
             
+
             // log the error
             openserial_printError(COMPONENT_IEEE802154E,ERR_DESYNCHRONIZED,
                                   (errorparameter_t)ieee154e_vars.slotOffset,
