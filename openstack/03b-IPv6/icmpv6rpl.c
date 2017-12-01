@@ -209,6 +209,13 @@ owerror_t icmpv6rpl_getRPLDODAGid(uint8_t* address_128b){
    return E_FAIL;
 }
 
+dagrank_t icmpv6rpl_getPreferredParentRank() {
+	if(icmpv6rpl_vars.haveParent) {
+		return neighbors_getNeighborRank(icmpv6rpl_vars.ParentIndex);
+	}
+	return 0;
+}
+
 /**
 \brief Called when DIO/DAO was sent.
 

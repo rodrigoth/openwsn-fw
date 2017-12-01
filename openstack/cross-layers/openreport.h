@@ -29,6 +29,8 @@ typedef struct {
 	uint8_t channel;
 	uint32_t seqnum;
 	uint8_t component;
+	uint16_t nodeRank;
+	uint16_t destinationRank;
 } debug_reportTxEntry_t;
 END_PACK
 

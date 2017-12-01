@@ -914,12 +914,20 @@ port_INLINE void activity_ti1ORri1() {
          // check whether we can send
          if (schedule_getOkToSend()) {
         	 schedule_getNeighbor(&neighbor);
-			 ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
-			 if ((ieee154e_vars.dataToSend==NULL) && (cellType==CELLTYPE_TXRX)) {
-				couldSendEB=TRUE;
-				// look for an EB packet in the queue
+			 if (cellType==CELLTYPE_TXRX) {
 				ieee154e_vars.dataToSend = openqueue_macGetEBPacket();
-			 }
+				if(ieee154e_vars.dataToSend != NULL) {
+					 couldSendEB=TRUE;
+				} else {
+					 //DIO
+					 ieee154e_vars.dataToSend = openqueue_macGetDioPacket();
+					 if (ieee154e_vars.dataToSend == NULL) {
+						   ieee154e_vars.dataToSend = openqueue_macGet6pPacket();
+					 }
+				}
+			 } else {
+				  ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
+			}
          }
 
          if (ieee154e_vars.dataToSend==NULL) {
@@ -1372,7 +1380,7 @@ port_INLINE void activity_tie5() {
 
 			uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
 			openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),0,
-					ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray);
+					ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0]);
 		}
 
 
@@ -1571,7 +1579,7 @@ port_INLINE void activity_ti9(PORT_TIMER_WIDTH capturedTime) {
 
 			uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
 			openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),1,
-						ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray);
+						ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0]);
 		}
 
       

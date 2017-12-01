@@ -743,10 +743,13 @@ port_INLINE void sixtop_sendEB() {
     eb->owner   = COMPONENT_SIXTOP;
 
     // in case we none default number of shared cells defined in minimal configuration
+    uint8_t shared_slots[SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS];
+    memcpy(&shared_slots[0],schedule_getSharedSlots(),SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS);
+
     if (ebIEsBytestream[EB_SLOTFRAME_NUMLINK_OFFSET]>1){
-    	 for (i=ebIEsBytestream[EB_SLOTFRAME_NUMLINK_OFFSET]-1;i>0;i--){
+    	for(i = 0; i < sizeof(shared_slots); i++) {
 			packetfunctions_reserveHeaderSize(eb,5);
-			eb->payload[0]   = i;    // slot offset
+			eb->payload[0]   = shared_slots[i];    // slot offset
 			eb->payload[1]   = 0x00;
 			eb->payload[2]   = 0x00; // channel offset
 			eb->payload[3]   = 0x00;
@@ -1711,7 +1714,7 @@ bool sixtop_areAvailableCellsToBeRemoved(
 
     memset(&info,0,sizeof(slotinfo_element_t));
     for (i = 0; i < CELLLIST_MAX_LEN; i++) {
-    	schedule_getSlotInfo(cellList[i].slotoffset,&neighbor,&info);
+    	schedule_getSlotInfo(cellList[i].slotoffset,&neighbor[0],&info);
     	if(info.link_type != CELLTYPE_TX) {
     		numOfavailableCells++;
     	}

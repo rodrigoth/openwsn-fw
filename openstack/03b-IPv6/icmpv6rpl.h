@@ -227,6 +227,7 @@ void     icmpv6rpl_killPreferredParent(void);                            // new 
 void     icmpv6rpl_updateMyDAGrankAndParentSelection(void);              // new DB
 void     icmpv6rpl_indicateRxDIO(OpenQueueEntry_t* msg);                 // new DB
 bool     icmpv6rpl_daoSent(void);
+dagrank_t icmpv6rpl_getPreferredParentRank(void);
 
 
 /**

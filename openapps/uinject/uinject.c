@@ -7,6 +7,7 @@
 #include "IEEE802154E.h"
 #include "idmanager.h"
 #include "icmpv6rpl.h"
+#include "openrandom.h"
 //=========================== variables =======================================
 
 uinject_vars_t uinject_vars;
@@ -80,13 +81,9 @@ void uinject_task_cb() {
    uint8_t              asnArray[5];
 
    uint16_t newTime =  UINJECT_PERIOD_MS - 10000+(openrandom_get16b()%(2*10000));
-   opentimers_scheduleIn(
-           uinject_vars.timerId,
-		   newTime,
-           TIME_MS,
-           TIMER_ONESHOT,
-           uinject_timer_cb
-       );
+   opentimers_scheduleIn(uinject_vars.timerId,newTime,TIME_MS,TIMER_ONESHOT,uinject_timer_cb);
+
+   seqnum++;
 
    // don't run if not synch
    if (ieee154e_isSynch() == FALSE) return;
@@ -96,18 +93,14 @@ void uinject_task_cb() {
       opentimers_destroy(uinject_vars.timerId);
       return;
    }
-
-
-	 seqnum++;
-
 	 //uint8_t slots = schedule_getNumOfSlotsByType(CELLTYPE_TX);
 	 //if(slots == 0) return;
 
 	 //don't run if I dont have slots to my preferred parent
-	 //open_addr_t neighbor;
-	 //icmpv6rpl_getPreferredParentEui64(&neighbor);
-	 //uint8_t slots = schedule_getNumberSlotToPreferredParent(&neighbor);
-	 //if(slots == 0) return;
+	 open_addr_t neighbor;
+	 icmpv6rpl_getPreferredParentEui64(&neighbor);
+	 uint8_t slots = schedule_getNumberSlotToPreferredParent(&neighbor);
+	 if(slots == 0) return;
 
 	 // if you get here, send a packet
 
@@ -164,7 +157,6 @@ void uinject_task_cb() {
 	 if ((openudp_send(pkt))==E_FAIL) {
 		openqueue_freePacketBuffer(pkt);
 	 }
-
 }
 
 

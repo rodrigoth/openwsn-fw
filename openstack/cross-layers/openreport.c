@@ -1,6 +1,7 @@
 #include "openreport.h"
 #include "openserial.h"
 #include "IEEE802154E.h"
+#include "icmpv6rpl.h"
 
 
 //=========================== variables =======================================
@@ -42,7 +43,8 @@ void openreport_indicate6pRequest(uint8_t code,uint8_t requestedCells) {
     openserial_printStatus(STATUS_6PREQUEST,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }
 
-void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_t ack, uint8_t tx, uint8_t channel, uint32_t seqnum,uint8_t component, uint8_t *asn) {
+void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_t ack, uint8_t tx,
+		uint8_t channel, uint32_t seqnum,uint8_t component, uint8_t *asn) {
 	debug_reportTxEntry_t debug_reportEntry;
 
 	memset(&debug_reportEntry,0,sizeof(debug_reportTxEntry_t));
@@ -64,6 +66,9 @@ void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_
 
 	debug_reportEntry.seqnum = seqnum;
 	debug_reportEntry.component = component;
+	debug_reportEntry.nodeRank = icmpv6rpl_getMyDAGrank();
+	debug_reportEntry.destinationRank = icmpv6rpl_getPreferredParentRank();
+
 
 	openserial_printStatus(STATUS_TX,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }

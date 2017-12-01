@@ -14,6 +14,7 @@
 
 schedule_vars_t schedule_vars;
 uint8_t slotframeRepetition;
+uint8_t shared_slots[] = {0,20,40,60,80};
 
 //=========================== prototypes ======================================
 
@@ -64,11 +65,8 @@ void schedule_init() {
 \brief Starting the DAGroot schedule propagation.
 */
 void schedule_startDAGroot() {
-   slotOffset_t    start_slotOffset;
-   slotOffset_t    running_slotOffset;
    open_addr_t     temp_neighbor;
    
-   start_slotOffset = SCHEDULE_MINIMAL_6TISCH_SLOTOFFSET;
    // set frame length, handle and number (default 1 by now)
    if (schedule_vars.frameLength == 0) {
        // slotframe length is not set, set it to default length
@@ -80,16 +78,11 @@ void schedule_startDAGroot() {
    schedule_setFrameNumber(SCHEDULE_MINIMAL_6TISCH_DEFAULT_SLOTFRAME_NUMBER);
 
    // shared TXRX anycast slot(s)
+   uint8_t i;
    memset(&temp_neighbor,0,sizeof(temp_neighbor));
-   temp_neighbor.type             = ADDR_ANYCAST;
-   for (running_slotOffset=start_slotOffset;running_slotOffset<start_slotOffset+SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS;running_slotOffset++) {
-      schedule_addActiveSlot(
-         running_slotOffset,                 // slot offset
-         CELLTYPE_TXRX,                      // type of slot
-         TRUE,                               // shared?
-         SCHEDULE_MINIMAL_6TISCH_CHANNELOFFSET,    // channel offset
-         &temp_neighbor                      // neighbor
-      );
+   temp_neighbor.type = ADDR_ANYCAST;
+   for(i = 0; i < sizeof(shared_slots); i++) {
+	   schedule_addActiveSlot(shared_slots[i],CELLTYPE_TXRX,TRUE,SCHEDULE_MINIMAL_6TISCH_CHANNELOFFSET,&temp_neighbor);
    }
 }
 
@@ -606,7 +599,7 @@ slotOffset_t schedule_getNextActiveSlotOffset() {
 
    }   
    
-   if(slotframeRepetition == 10) {
+   if(slotframeRepetition == ESTIMATION_PERIODICITY) {
 	   sf0_notifyNewSlotframe();
 	   slotframeRepetition = 0;
    }
@@ -939,6 +932,10 @@ uint8_t schedule_getNumberSlotToPreferredParent(open_addr_t *preferredParent) {
 
     ENABLE_INTERRUPTS();
     return counter;
+}
+
+uint8_t* schedule_getSharedSlots() {
+	return &shared_slots[0];
 }
 
 //=========================== private =========================================
