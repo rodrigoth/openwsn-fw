@@ -36,7 +36,7 @@ static const uint8_t infoStackName[] = "OpenWSN ";
 #define LENGTH_ADDR64b   8
 #define LENGTH_ADDR128b  16
 
-#define MAXNUMNEIGHBORS  10
+#define MAXNUMNEIGHBORS  25
 
 // maximum celllist length
 #define CELLLIST_MAX_LEN 3
@@ -180,6 +180,7 @@ enum {
    COMPONENT_UMONITOR                  = 0x2a,
    COMPONENT_CJOIN                     = 0x2b,
    COMPONENT_OPENOSCOAP                = 0x2c,
+   COMPONENT_UINJECT_FORWARDING		   = 0x2d,
 };
 
 /**

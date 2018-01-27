@@ -271,20 +271,11 @@ void iphc_receive(OpenQueueEntry_t* msg) {
     iphc_retrieveIPv6Header(msg,&ipv6_outer_header,&ipv6_inner_header,&page_length);
     
     // if the address is broadcast address, the ipv6 header is the inner header
-    if (
-        idmanager_getIsDAGroot()==FALSE ||
-        packetfunctions_isBroadcastMulticast(&(ipv6_inner_header.dest))
-    ) {
+    if (idmanager_getIsDAGroot()==FALSE ||packetfunctions_isBroadcastMulticast(&(ipv6_inner_header.dest))) {
         packetfunctions_tossHeader(msg,page_length);
-        if (
-            ipv6_outer_header.next_header==IANA_IPv6HOPOPT &&
-            ipv6_outer_header.hopByhop_option != NULL
-        ) {
+        if (ipv6_outer_header.next_header==IANA_IPv6HOPOPT &&ipv6_outer_header.hopByhop_option != NULL) {
             // retrieve hop-by-hop header (includes RPL option)
-            rpi_length = iphc_retrieveIPv6HopByHopHeader(
-                              msg,
-                              &rpl_option
-                         );
+            rpi_length = iphc_retrieveIPv6HopByHopHeader(msg,&rpl_option);
                
 #ifdef DEADLINE_OPTION_ENABLED              
             if(ipv6_outer_header.deadline_option){  

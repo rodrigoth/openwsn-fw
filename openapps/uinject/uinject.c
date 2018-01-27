@@ -8,14 +8,16 @@
 #include "idmanager.h"
 #include "icmpv6rpl.h"
 #include "openrandom.h"
+
+
+#define PAYLOADLEN 17
+
 //=========================== variables =======================================
 
 uinject_vars_t uinject_vars;
 
-static const uint8_t uinject_dst_addr[]   = {
-   0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
-}; 
+uint8_t ipAddr_node[16] =   {0x00};
+uint8_t prefix[8] = {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 uint32_t seqnum = 0;
 
@@ -53,16 +55,44 @@ void uinject_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
    openqueue_freePacketBuffer(msg);
 }
 
+//I suspect there is a problem in the forwarding module that makes the most demanding nodes to reboot occasionally
 void uinject_receive(OpenQueueEntry_t* pkt) {
-   
-   openqueue_freePacketBuffer(pkt);
-   
-   openserial_printError(
-      COMPONENT_UINJECT,
-      ERR_RCVD_ECHO_REPLY,
-      (errorparameter_t)0,
-      (errorparameter_t)0
-   );
+	  OpenQueueEntry_t* new_pkt;
+	  open_addr_t neighbor;
+	  bool foundNeighbor;
+
+	  foundNeighbor = icmpv6rpl_getPreferredParentEui64(&neighbor);
+
+	  if(!foundNeighbor || schedule_getNumberSlotToPreferredParent(&neighbor) == 0) {
+		  openqueue_freePacketBuffer(pkt);
+		  return;
+	  }
+
+	  new_pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
+	  if (new_pkt==NULL) {
+	      openqueue_removeAllCreatedBy(COMPONENT_UINJECT);
+	      openserial_printError(COMPONENT_UINJECT,ERR_NO_FREE_PACKET_BUFFER,(errorparameter_t)0,(errorparameter_t)0);
+	      return;
+	  }
+
+	  memset(&(ipAddr_node[0]), 0x00, sizeof(ipAddr_node));
+	  memcpy(&(ipAddr_node[0]),&(prefix[0]),8);
+	  memcpy(&(ipAddr_node[8]),&neighbor.addr_64b[0],8);
+
+	  new_pkt->owner                         = COMPONENT_UINJECT_FORWARDING;
+	  new_pkt->creator                       = COMPONENT_UINJECT_FORWARDING;
+	  new_pkt->l4_protocol                   = IANA_UDP;
+	  new_pkt->l4_destination_port           = WKP_UDP_INJECT;
+	  new_pkt->l4_sourcePortORicmpv6Type     = WKP_UDP_INJECT;
+	  new_pkt->l3_destinationAdd.type        = ADDR_128B;
+	  memcpy(&new_pkt->l3_destinationAdd.addr_128b[0],&ipAddr_node[0],16);
+	  packetfunctions_reserveHeaderSize(new_pkt,PAYLOADLEN);
+
+	  memcpy(&(new_pkt->payload[0]),&(pkt->payload[2]),PAYLOADLEN);
+	  if ((openudp_send(new_pkt))==E_FAIL) {
+	      openqueue_freePacketBuffer(new_pkt);
+	  }
+	  openqueue_freePacketBuffer(pkt);
 }
 
 //=========================== private =========================================
@@ -104,6 +134,10 @@ void uinject_task_cb() {
 
 	 // if you get here, send a packet
 
+	 memset(&(ipAddr_node[0]), 0x00, sizeof(ipAddr_node));
+	 memcpy(&(ipAddr_node[0]),&(prefix[0]),8);
+	 memcpy(&(ipAddr_node[8]),&neighbor.addr_64b[0],8);
+
 	 // get a free packet buffer
 	 pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
 	 if (pkt==NULL) {
@@ -122,7 +156,7 @@ void uinject_task_cb() {
 	 pkt->l4_destination_port           = WKP_UDP_INJECT;
 	 pkt->l4_sourcePortORicmpv6Type     = WKP_UDP_INJECT;
 	 pkt->l3_destinationAdd.type        = ADDR_128B;
-	 memcpy(&pkt->l3_destinationAdd.addr_128b[0],uinject_dst_addr,16);
+	 memcpy(&pkt->l3_destinationAdd.addr_128b[0],&ipAddr_node[0],16);
 
 
 

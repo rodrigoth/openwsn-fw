@@ -81,8 +81,8 @@ void buildTopologyStructure() {
    entry[hop].bytes6[2] = 0xc0;
    entry[hop].bytes7[2] = 0x81;
 
-   entry[hop].bytes6[3] = 0x88;
-   entry[hop].bytes7[3] = 0x75;
+   entry[hop].bytes6[3] = 0x00;
+   entry[hop].bytes7[3] = 0x00;
 
    entry[hop].bytes6[4] = 0xb2;
    entry[hop].bytes7[4] = 0x80;
@@ -106,8 +106,11 @@ void buildTopologyStructure() {
 
    entry[hop].hop = hop;
 
-   entry[hop].bytes6[0] = 0xb1;
-   entry[hop].bytes7[0] = 0x80;
+   entry[hop].bytes6[0] = 0x88;
+   entry[hop].bytes7[0] = 0x75;
+
+   //entry[hop].bytes6[0] = 0xb1;
+   //entry[hop].bytes7[0] = 0x80;
 
    entry[hop].bytes6[1] = 0xc0;
    entry[hop].bytes7[1] = 0x68;

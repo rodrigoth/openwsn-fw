@@ -112,7 +112,7 @@ void ieee154e_init() {
    memset(&ieee154e_vars,0,sizeof(ieee154e_vars_t));
    memset(&ieee154e_dbg,0,sizeof(ieee154e_dbg_t));
    
-   ieee154e_vars.singleChannel     = 0; // 0 means channel hopping
+   ieee154e_vars.singleChannel     = 20; // 0 means channel hopping
    ieee154e_vars.isAckEnabled      = TRUE;
    ieee154e_vars.isSecurityEnabled = FALSE;
    ieee154e_vars.slotDuration      = TsSlotDuration;
@@ -534,7 +534,7 @@ port_INLINE void activity_synchronize_newSlot() {
         radio_rfOff();
         
         // update record of current channel
-        ieee154e_vars.freq = (openrandom_get16b()&0x0F) + 11;
+        ieee154e_vars.freq = 20;//(openrandom_get16b()&0x0F) + 11;
         
         // configure the radio to listen to the default synchronizing channel
         radio_setFrequency(ieee154e_vars.freq);
@@ -1363,28 +1363,27 @@ port_INLINE void activity_ti7() {
 port_INLINE void activity_tie5() {
     // indicate transmit failed to schedule to keep stats
     schedule_indicateTx(&ieee154e_vars.asn,FALSE);
+
+
+    uint8_t packetLengh = ieee154e_vars.dataToSend->length;
+	if ((packetLengh == 64 || packetLengh == 65) &&
+		(ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT || ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT_FORWARDING)) {
+		open_addr_t sender;
+		uint8_t asnArray[5];
+
+		memcpy(&asnArray,&(ieee154e_vars.dataToSend->payload[packetLengh-9]),5);
+		memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
+
+		uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
+		openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),0,1,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0]);
+	}
+
    
     // decrement transmits left counter
     ieee154e_vars.dataToSend->l2_retriesLeft--;
    
     if (ieee154e_vars.dataToSend->l2_retriesLeft==0) {
         // indicate tx fail if no more retries left
-    	uint8_t packetLengh = ieee154e_vars.dataToSend->length;
-		if ((packetLengh == 64 || packetLengh == 65) &&
-			(ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT || ieee154e_vars.dataToSend->creator == COMPONENT_FORWARDING)) {
-			open_addr_t sender;
-			uint8_t asnArray[5];
-
-			memcpy(&asnArray,&(ieee154e_vars.dataToSend->payload[packetLengh-9]),5);
-			memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
-
-			uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
-			openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),0,
-					ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0]);
-		}
-
-
-
         notif_sendDone(ieee154e_vars.dataToSend,E_FAIL);
     } else {
         // return packet to the virtual COMPONENT_SIXTOP_TO_IEEE802154E component
@@ -1570,7 +1569,7 @@ port_INLINE void activity_ti9(PORT_TIMER_WIDTH capturedTime) {
         //64 or 65 = expected payload size for uinject packets
 		uint8_t packetLengh = ieee154e_vars.dataToSend->length;
 		if ((packetLengh == 64 || packetLengh == 65) &&
-			(ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT || ieee154e_vars.dataToSend->creator == COMPONENT_FORWARDING)) {
+			(ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT || ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT_FORWARDING)) {
 			open_addr_t sender;
 			uint8_t asnArray[5];
 
@@ -1578,8 +1577,7 @@ port_INLINE void activity_ti9(PORT_TIMER_WIDTH capturedTime) {
 			memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
 
 			uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
-			openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),1,
-						ieee154e_vars.dataToSend->l2_numTxAttempts,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0]);
+			openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),1,1,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0]);
 		}
 
       

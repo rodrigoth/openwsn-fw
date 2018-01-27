@@ -281,7 +281,7 @@ bool neighbors_reachedMaxTransmission(uint8_t index){
     
     if (
         neighbors_vars.neighbors[index].used     == TRUE            &&
-        neighbors_vars.neighbors[index].numTx    >  DEFAULTLINKCOST
+        neighbors_vars.neighbors[index].numTx    >  LARGESTLINKCOST
     ) { 
         returnVal = TRUE;
     } else {
@@ -572,16 +572,12 @@ This really belongs to icmpv6rpl but it would require a much more complex interf
 uint16_t neighbors_getLinkMetric(uint8_t index) {
     uint16_t  rankIncrease;
     uint32_t  rankIncreaseIntermediary; // stores intermediary results of rankIncrease calculation
+    uint8_t parentIndex;
 
-
-    // we assume that this neighbor has already been checked for being in use         
-    // calculate link cost to this neighbor
-    if (neighbors_vars.neighbors[index].numTxACK==0) {
-        if (neighbors_vars.neighbors[index].numTx<=DEFAULTLINKCOST){
-            rankIncrease = (3*DEFAULTLINKCOST-2)*MINHOPRANKINCREASE;
-        } else {
-            rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
-        }
+    // it's not the preferred parent, use default link cost
+    bool hasParent = icmpv6rpl_getPreferredParentIndex(&parentIndex);
+    if (!hasParent || index != parentIndex) {
+        rankIncrease = ((3*DEFAULTLINKCOST)-2)*MINHOPRANKINCREASE;
     } else {
         //6TiSCH minimal draft using OF0 for rank computation: ((3*numTx/numTxAck)-2)*minHopRankIncrease
         // numTx is on 8 bits, so scaling up 10 bits won't lead to saturation

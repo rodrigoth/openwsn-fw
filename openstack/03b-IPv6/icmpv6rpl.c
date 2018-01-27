@@ -81,7 +81,7 @@ void icmpv6rpl_init() {
    icmpv6rpl_vars.dioDestination.type = ADDR_128B;
    memcpy(&icmpv6rpl_vars.dioDestination.addr_128b[0],all_routers_multicast,sizeof(all_routers_multicast));
    
-   icmpv6rpl_vars.dioPeriod                 = 13;//DIO_PORTION*(neighbors_getNumNeighbors()+1);
+   icmpv6rpl_vars.dioPeriod                 = 17;//DIO_PORTION*(neighbors_getNumNeighbors()+1);
    icmpv6rpl_vars.timerIdDIO                = opentimers_create();
 
    icmpv6rpl_vars.dioTimerCounter = openrandom_get16b()%(1<<4);
@@ -396,10 +396,10 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
     prevRankIncrease     = icmpv6rpl_vars.rankIncrease;
     // update my rank to current parent first
     if (icmpv6rpl_vars.haveParent==TRUE){
-        //if (neighbors_reachedMaxTransmission(icmpv6rpl_vars.ParentIndex)==FALSE){
+        if (neighbors_reachedMaxTransmission(icmpv6rpl_vars.ParentIndex)==FALSE){
             // I havn't enough transmission to my parent, don't update.
-       //     return;
-        //}
+            return;
+        }
         rankIncrease     = neighbors_getLinkMetric(icmpv6rpl_vars.ParentIndex);
         neighborRank     = neighbors_getNeighborRank(icmpv6rpl_vars.ParentIndex);
         tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
