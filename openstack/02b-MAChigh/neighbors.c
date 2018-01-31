@@ -570,29 +570,32 @@ This really belongs to icmpv6rpl but it would require a much more complex interf
 */
 
 uint16_t neighbors_getLinkMetric(uint8_t index) {
-    uint16_t  rankIncrease;
-    uint32_t  rankIncreaseIntermediary; // stores intermediary results of rankIncrease calculation
-    uint8_t parentIndex;
+	uint16_t  rankIncrease;
+	uint32_t  rankIncreaseIntermediary; // stores intermediary results of rankIncrease calculation
 
-    // it's not the preferred parent, use default link cost
-    bool hasParent = icmpv6rpl_getPreferredParentIndex(&parentIndex);
-    if (!hasParent || index != parentIndex) {
-        rankIncrease = ((3*DEFAULTLINKCOST)-2)*MINHOPRANKINCREASE;
-    } else {
-        //6TiSCH minimal draft using OF0 for rank computation: ((3*numTx/numTxAck)-2)*minHopRankIncrease
-        // numTx is on 8 bits, so scaling up 10 bits won't lead to saturation
-        // but this <<10 followed by >>10 does not provide any benefit either. Result is the same.
-        rankIncreaseIntermediary = (((uint32_t)neighbors_vars.neighbors[index].numTx) << 10);
-        rankIncreaseIntermediary = (3*rankIncreaseIntermediary * MINHOPRANKINCREASE) / ((uint32_t)neighbors_vars.neighbors[index].numTxACK);
-        rankIncreaseIntermediary = rankIncreaseIntermediary - ((uint32_t)(2 * MINHOPRANKINCREASE)<<10);
-        // this could still overflow for numTx large and numTxAck small, Casting to 16 bits will yiel the least significant bits
-        if (rankIncreaseIntermediary >= (65536<<10)) {
-            rankIncrease = 65535;
-        } else {
-            rankIncrease = (uint16_t)(rankIncreaseIntermediary >> 10);
-        }
-    }
-    return rankIncrease;
+	// we assume that this neighbor has already been checked for being in use
+	// calculate link cost to this neighbor
+	if (neighbors_vars.neighbors[index].numTxACK==0) {
+		if (neighbors_vars.neighbors[index].numTx<=DEFAULTLINKCOST){
+			rankIncrease = (3*DEFAULTLINKCOST-2)*MINHOPRANKINCREASE;
+		} else {
+			rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
+		}
+	} else {
+		//6TiSCH minimal draft using OF0 for rank computation: ((3*numTx/numTxAck)-2)*minHopRankIncrease
+		// numTx is on 8 bits, so scaling up 10 bits won't lead to saturation
+		// but this <<10 followed by >>10 does not provide any benefit either. Result is the same.
+		rankIncreaseIntermediary = (((uint32_t)neighbors_vars.neighbors[index].numTx) << 10);
+		rankIncreaseIntermediary = (3*rankIncreaseIntermediary * MINHOPRANKINCREASE) / ((uint32_t)neighbors_vars.neighbors[index].numTxACK);
+		rankIncreaseIntermediary = rankIncreaseIntermediary - ((uint32_t)(2 * MINHOPRANKINCREASE)<<10);
+		// this could still overflow for numTx large and numTxAck small, Casting to 16 bits will yiel the least significant bits
+		if (rankIncreaseIntermediary >= (65536<<10)) {
+			rankIncrease = 65535;
+		} else {
+			rankIncrease = (uint16_t)(rankIncreaseIntermediary >> 10);
+		}
+	}
+	return rankIncrease;
 }
 
 //===== maintenance
@@ -606,7 +609,7 @@ void  neighbors_removeOld() {
     for (i=0;i<MAXNUMNEIGHBORS;i++) {
         if (neighbors_vars.neighbors[i].used==1) {
             timeSinceHeard = ieee154e_asnDiff(&neighbors_vars.neighbors[i].asn);
-            if (timeSinceHeard>DESYNCTIMEOUT*3) {
+            if (timeSinceHeard>DESYNCTIMEOUT*2) {
                 haveParent = icmpv6rpl_getPreferredParentIndex(&j);
                 if (haveParent && (i==j)) { // this is our preferred parent, carefully!
                     icmpv6rpl_killPreferredParent();
@@ -618,88 +621,17 @@ void  neighbors_removeOld() {
             }
         }
     }
-    
-    // neighbors marked as NO_RES will never removed.
-    
-    // first round
-   /* lowestRank = MAXDAGRANK;
+
+   /* //reset ack,tx counters for all other nodes execpt the parent (old information)
+    haveParent = icmpv6rpl_getPreferredParentIndex(&j);
     for (i=0;i<MAXNUMNEIGHBORS;i++) {
-        if (neighbors_vars.neighbors[i].used==1) {
-            if (
-                lowestRank>neighbors_vars.neighbors[i].DAGrank && 
-                neighbors_vars.neighbors[i].f6PNORES == FALSE
-            ){
-                lowestRank = neighbors_vars.neighbors[i].DAGrank;
-                neighborIndexWithLowestRank[0] = i;
-            }
-        }
-    }
-    
-    if (lowestRank==MAXDAGRANK){
-        // none of the neighbors have rank yet
-        return;
-    }
-   
-    // second round
-    lowestRank = MAXDAGRANK;
-    for (i=0;i<MAXNUMNEIGHBORS;i++) {
-        if (neighbors_vars.neighbors[i].used==1) {
-            if (
-                lowestRank>neighbors_vars.neighbors[i].DAGrank &&
-                i != neighborIndexWithLowestRank[0]           && 
-                neighbors_vars.neighbors[i].f6PNORES == FALSE
-            ){
-                lowestRank = neighbors_vars.neighbors[i].DAGrank;
-                neighborIndexWithLowestRank[1] = i;
-            }
-        }
-    }
-   
-    if (lowestRank==MAXDAGRANK){
-        // only one neighbor has rank
-        return;
-    }
-   
-    // third round
-    lowestRank = MAXDAGRANK;
-    for (i=0;i<MAXNUMNEIGHBORS;i++) {
-        if (neighbors_vars.neighbors[i].used==1) {
-            if (
-                lowestRank>neighbors_vars.neighbors[i].DAGrank &&
-                i != neighborIndexWithLowestRank[0]           &&
-                i != neighborIndexWithLowestRank[1]           && 
-                neighbors_vars.neighbors[i].f6PNORES == FALSE
-            ){
-                lowestRank = neighbors_vars.neighbors[i].DAGrank;
-                neighborIndexWithLowestRank[2] = i;
-            }
-        }
-    }
-    
-    if (lowestRank==MAXDAGRANK){
-        // only two neighbors have rank
-        return;
-    }
-    
-    // remove all neighbors except the ones that f6PNORES flag is set or is recorded as lowest 3 rank neighbors
-    for (i=0;i<MAXNUMNEIGHBORS;i++) {
-        if (neighbors_vars.neighbors[i].used==1) {
-            if (
-                i!= neighborIndexWithLowestRank[0] &&
-                i!= neighborIndexWithLowestRank[1] &&
-                i!= neighborIndexWithLowestRank[2]
-            ) {
-                haveParent = icmpv6rpl_getPreferredParentIndex(&j);
-                if (haveParent && (i==j)) { // this is our preferred parent, carefully!
-                    icmpv6rpl_killPreferredParent();
-                    icmpv6rpl_updateMyDAGrankAndParentSelection();
-                }
-                if (neighbors_vars.neighbors[i].f6PNORES == FALSE){
-                    removeNeighbor(i);
-                }
-            }
-        }
-    }*/
+    	if (neighbors_vars.neighbors[i].used==1) {
+    		if (haveParent && (i!=j)){
+			   neighbors_vars.neighbors[i].numRx = 0;
+			   neighbors_vars.neighbors[i].numTx = 0;
+    		}
+		}
+     }*/
 }
 
 //===== debug

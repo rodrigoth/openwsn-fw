@@ -420,6 +420,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
             if (neighbors_getNeighborNoResource(i)==TRUE) {
                 continue;
             }
+
             // get link cost to this neighbor
             rankIncrease=neighbors_getLinkMetric(i);
             // get this neighbor's advertized rank
@@ -430,10 +431,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
             tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
             if (tentativeDAGrank > 65535) {tentativeDAGrank = 65535;}
             // if not low enough to justify switch, pass (i.e. hysterisis)
-            if (
-                (previousDAGrank<tentativeDAGrank) ||
-                (previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)
-            ) {
+            if ((previousDAGrank<tentativeDAGrank) ||(previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
                   continue;
             }
             // remember that we have at least one valid candidate parent
@@ -448,12 +446,17 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
     }
    
    if (foundBetterParent) {
+	  open_addr_t addr;
       icmpv6rpl_vars.haveParent=TRUE;
       if (!prevHadParent) {
          // in case preParent is killed before calling this function, clear the preferredParent flag
          neighbors_setPreferredParent(prevParentIndex, FALSE);
          // set neighbors as preferred parent
          neighbors_setPreferredParent(icmpv6rpl_vars.ParentIndex, TRUE);
+
+
+         icmpv6rpl_getPreferredParentEui64(&addr);
+         openreport_indicateParentSwitch(&addr);
       } else {
          if (icmpv6rpl_vars.ParentIndex==prevParentIndex) {
              // report on the rank change if any, not on the deletion/creation of parent
@@ -466,12 +469,12 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
              neighbors_setPreferredParent(prevParentIndex, FALSE);
              // set neighbors as preferred parent
              neighbors_setPreferredParent(icmpv6rpl_vars.ParentIndex, TRUE);
+
+             icmpv6rpl_getPreferredParentEui64(&addr);
+             openreport_indicateParentSwitch(&addr);
          }
       }
 
-      open_addr_t addr;
-      icmpv6rpl_getPreferredParentEui64(&addr);
-      openreport_indicateParentSwitch(&addr);
    } else {
       // restore routing table as we found it on entry
       icmpv6rpl_vars.myDAGrank   = previousDAGrank;
