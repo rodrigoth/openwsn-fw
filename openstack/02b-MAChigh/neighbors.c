@@ -281,7 +281,7 @@ bool neighbors_reachedMaxTransmission(uint8_t index){
     
     if (
         neighbors_vars.neighbors[index].used     == TRUE            &&
-        neighbors_vars.neighbors[index].numTx    >  LARGESTLINKCOST
+        neighbors_vars.neighbors[index].numTx    >  10
     ) { 
         returnVal = TRUE;
     } else {
@@ -622,7 +622,7 @@ void  neighbors_removeOld() {
         }
     }
 
-   /* //reset ack,tx counters for all other nodes execpt the parent (old information)
+    //reset ack,tx counters for all other nodes execpt the parent (old information)
     haveParent = icmpv6rpl_getPreferredParentIndex(&j);
     for (i=0;i<MAXNUMNEIGHBORS;i++) {
     	if (neighbors_vars.neighbors[i].used==1) {
@@ -631,7 +631,17 @@ void  neighbors_removeOld() {
 			   neighbors_vars.neighbors[i].numTx = 0;
     		}
 		}
-     }*/
+     }
+}
+
+void neighbors_resetPreferredParentTx() {
+	uint8_t parentIndex ;
+
+	bool haveParent = icmpv6rpl_getPreferredParentIndex(&parentIndex);
+	if(haveParent) {
+		neighbors_vars.neighbors[parentIndex].numTx = 0;
+		neighbors_vars.neighbors[parentIndex].numTxACK = 0;
+	}
 }
 
 //===== debug

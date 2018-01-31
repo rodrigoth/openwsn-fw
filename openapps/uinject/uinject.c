@@ -109,6 +109,7 @@ void uinject_timer_cb(opentimers_id_t id){
 void uinject_task_cb() {
    OpenQueueEntry_t*    pkt;
    uint8_t              asnArray[5];
+   bool foundNeighbor;
 
    uint16_t newTime =  UINJECT_PERIOD_MS - 10000+(openrandom_get16b()%(2*10000));
    opentimers_scheduleIn(uinject_vars.timerId,newTime,TIME_MS,TIMER_ONESHOT,uinject_timer_cb);
@@ -128,9 +129,11 @@ void uinject_task_cb() {
 
 	 //don't run if I dont have slots to my preferred parent
 	 open_addr_t neighbor;
-	 icmpv6rpl_getPreferredParentEui64(&neighbor);
-	 uint8_t slots = schedule_getNumberSlotToPreferredParent(&neighbor);
-	 if(slots == 0) return;
+	 foundNeighbor = icmpv6rpl_getPreferredParentEui64(&neighbor);
+	 if(!foundNeighbor || schedule_getNumberSlotToPreferredParent(&neighbor) == 0) {
+		  return;
+	  }
+
 
 	 // if you get here, send a packet
 

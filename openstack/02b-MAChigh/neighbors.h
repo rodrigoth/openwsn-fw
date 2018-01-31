@@ -104,6 +104,7 @@ bool          neighbors_backoffHitZero(open_addr_t* address);
 void          neighbors_resetBackoff(open_addr_t* address);
 // maintenance
 void          neighbors_removeOld(void);
+void 		  neighbors_resetPreferredParentTx(void);
 // debug
 bool          debugPrint_neighbors(void);
 

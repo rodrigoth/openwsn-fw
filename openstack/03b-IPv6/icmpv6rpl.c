@@ -483,6 +483,8 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
       icmpv6rpl_vars.rankIncrease= prevRankIncrease;
       // no change to report on
    }
+
+   neighbors_resetPreferredParentTx();
 }
 
 /**
