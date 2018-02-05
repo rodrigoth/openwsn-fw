@@ -484,7 +484,9 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
       // no change to report on
    }
 
-   neighbors_resetPreferredParentTx();
+   if (!idmanager_getIsDAGroot()) {
+	   neighbors_resetPreferredParentTx();
+   }
 }
 
 /**

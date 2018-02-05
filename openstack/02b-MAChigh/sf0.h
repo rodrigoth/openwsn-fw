@@ -9,14 +9,19 @@
 */
 
 #include "opendefs.h"
+#include "opentimers.h"
+
 
 //=========================== define ==========================================
-#define ESTIMATION_PERIODICITY 10
+#define ESTIMATION_PERIODICITY 5
 //=========================== typedef =========================================
 
 typedef struct {
    uint8_t numAppPacketsPerSlotFrame;
    uint8_t backoff;
+   bool allowDelete;
+   uint8_t genErrorCounter;
+   opentimers_id_t timerId;
 } sf0_vars_t;
 
 //=========================== module variables ================================
@@ -41,6 +46,12 @@ bool sf0_candidateRemoveCellList(
    open_addr_t*         neighbor,
    uint8_t              requiredCells
 );
+
+void sf0_resetGenErrorCounter(void);
+
+void sf0_blockDeletionTemporarily(void);
+
+
 /**
 \}
 \}

@@ -1131,10 +1131,16 @@ void sixtop_six2six_notifyReceive(
                 break;
             }
             // generation check
-            /*if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code != IANA_6TOP_CMD_CLEAR){
+            if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code != IANA_6TOP_CMD_CLEAR){
                 returnCode = IANA_6TOP_RC_GEN_ERR;
                 break;
-            }*/
+            }
+
+            // block the deletetion for some minutes to allow the node to reallocate the cells
+			if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code == IANA_6TOP_CMD_CLEAR){
+				sf0_blockDeletionTemporarily();
+			}
+
             // previous 6p transcation check
             if (sixtop_vars.six2six_state != SIX_STATE_IDLE){
                 returnCode = IANA_6TOP_RC_RESET;
@@ -1453,6 +1459,7 @@ void sixtop_six2six_notifyReceive(
       
         // if the code is SUCCESS
         if (code == IANA_6TOP_RC_SUCCESS || code == IANA_6TOP_RC_EOL){
+        	sf0_resetGenErrorCounter();
             switch(sixtop_vars.six2six_state){
             case SIX_STATE_WAIT_ADDRESPONSE:
                 i = 0;
@@ -1704,24 +1711,59 @@ bool sixtop_areAvailableCellsToBeRemoved(
     ){
     uint8_t              i;
     uint8_t              numOfavailableCells;
+    bool                 available;
     slotinfo_element_t   info;
+    cellType_t           type;
+    open_addr_t          anycastAddr;
 
+    i                   = 0;
     numOfavailableCells = 0;
+    available           = TRUE;
 
-    if(numOfCells == 0 || numOfCells > CELLLIST_MAX_LEN){
-    	return FALSE;
+    // translate cellOptions to cell type
+    if (cellOptions == LINKOPTIONS_TX){
+        type = CELLTYPE_TX;
+    }
+    if (cellOptions == LINKOPTIONS_RX){
+        type = CELLTYPE_RX;
+    }
+    if (cellOptions == (LINKOPTIONS_TX | LINKOPTIONS_RX | LINKOPTIONS_SHARED)){
+        type = CELLTYPE_TXRX;
+        memset(&anycastAddr,0,sizeof(open_addr_t));
+        anycastAddr.type = ADDR_ANYCAST;
     }
 
-    memset(&info,0,sizeof(slotinfo_element_t));
-    for (i = 0; i < CELLLIST_MAX_LEN; i++) {
-    	schedule_getSlotInfo(cellList[i].slotoffset,&neighbor[0],&info);
-    	if(info.link_type != CELLTYPE_TX) {
-    		numOfavailableCells++;
-    	}
+    if(numOfCells == 0 || numOfCells>CELLLIST_MAX_LEN){
+        available = FALSE;
+    } else {
+        do {
+            if (cellList[i].isUsed){
+                memset(&info,0,sizeof(slotinfo_element_t));
+                if (type==CELLTYPE_TXRX){
+                    schedule_getSlotInfo(cellList[i].slotoffset,&anycastAddr,&info);
+                } else {
+                    schedule_getSlotInfo(cellList[i].slotoffset,neighbor,&info);
+                }
+                if(info.link_type != type){
+                    available = FALSE;
+                    break;
+                } else {
+                    numOfavailableCells++;
+                }
+            }
+            i++;
+        }while(i<CELLLIST_MAX_LEN && numOfavailableCells<numOfCells);
 
-    	if(numOfavailableCells == numOfCells) {
-    		return TRUE;
-    	}
+        if(numOfavailableCells==numOfCells && available == TRUE){
+            //the rest link will not be scheduled, mark them as off type
+            while(i<CELLLIST_MAX_LEN){
+                cellList[i].isUsed = FALSE;
+                i++;
+            }
+        } else {
+            // local schedule can't satisfy the bandwidth of cell request
+            available = FALSE;
+        }
     }
-    return FALSE;
+    return available;
 }

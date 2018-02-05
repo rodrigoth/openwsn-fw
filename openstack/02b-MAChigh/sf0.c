@@ -12,6 +12,8 @@
 
 #define SF0_ID            0
 #define SF0THRESHOLD      2
+#define GEN_ERROR_THRESHOLD 3
+#define BLOCK_DELETION_TIME 180000
 
 //=========================== variables =======================================
 
@@ -24,12 +26,17 @@ void sf0_bandwidthEstimate_task(void);
 uint16_t sf0_getMetadata(void);
 metadata_t sf0_translateMetadata(void);
 void sf0_handleRCError(uint8_t code);
-
+void sf0_allowDelete(bool flag);
+void sf0_task_cb();
+void sf0_timer_cb(opentimers_id_t id);
 //=========================== public ==========================================
 
 void sf0_init(void) {
     memset(&sf0_vars,0,sizeof(sf0_vars_t));
     sf0_vars.numAppPacketsPerSlotFrame = 0;
+    sf0_vars.allowDelete = TRUE;
+    sf0_vars.genErrorCounter = 0;
+    sf0_vars.timerId = opentimers_create();
     sixtop_setSFcallback(sf0_getsfid,sf0_getMetadata,sf0_translateMetadata,sf0_handleRCError);
 }
 
@@ -42,7 +49,24 @@ void sf0_setBackoff(uint8_t value){
     sf0_vars.backoff = value;
 }
 
+void sf0_resetGenErrorCounter() {
+	sf0_vars.genErrorCounter = 0;
+}
+
+void sf0_blockDeletionTemporarily() {
+	sf0_allowDelete(FALSE);
+	opentimers_scheduleIn(sf0_vars.timerId,BLOCK_DELETION_TIME,TIME_MS,TIMER_ONESHOT,sf0_timer_cb);
+}
+
 //=========================== callback =========================================
+
+void sf0_timer_cb(opentimers_id_t id){
+   scheduler_push_task(sf0_task_cb,TASKPRIO_SF0);
+}
+
+void sf0_task_cb() {
+	sf0_allowDelete(TRUE);
+}
 
 uint8_t sf0_getsfid(void){
     return SF0_ID;
@@ -62,9 +86,8 @@ void sf0_handleRCError(uint8_t code){
     	sf0_setBackoff(openrandom_get16b()%(1<<4));
     }
     
-    
     if (code==IANA_6TOP_RC_ERROR){
-        // TBD: the neighbor can't statisfy the 6p request, call sf0 to make a decision
+    	sf0_setBackoff(openrandom_get16b()%(1<<4));
     }
     
     if (code==IANA_6TOP_RC_VER_ERR){
@@ -73,6 +96,10 @@ void sf0_handleRCError(uint8_t code){
     
     if (code==IANA_6TOP_RC_SFID_ERR){
         // TBD: the sfId does not match
+    }
+
+    if(code==IANA_6TOP_RC_GEN_ERR) {
+    	sf0_vars.genErrorCounter++;
     }
 }
 
@@ -103,6 +130,25 @@ void sf0_bandwidthEstimate_task(void){
         return;
     }
     
+    // if the generation is different tries to clear the schedule to make it consistent again
+    if(sf0_vars.genErrorCounter >= GEN_ERROR_THRESHOLD) {
+		bool foundNeighbor;
+		open_addr_t    neighbor;
+		owerror_t outcome;
+
+		foundNeighbor = icmpv6rpl_getPreferredParentEui64(&neighbor);
+
+		if(foundNeighbor) {
+			outcome = sixtop_request(IANA_6TOP_CMD_CLEAR,&neighbor,0,LINKOPTIONS_TX,NULL,NULL,0,0,0);
+		}
+
+		if (outcome == E_SUCCESS) {
+			sf0_resetGenErrorCounter();
+		}
+		return;
+	}
+
+
     // get bandwidth of outgoing, incoming and self.
     // Here we just calculate the estimated bandwidth for 
     // the application sending on dedicate cells(TX or Rx).
@@ -121,56 +167,27 @@ void sf0_bandwidthEstimate_task(void){
     //         requiredCells  = bw_incoming + bw_self
     // when scheduledCells<requiredCells, add one or more cell
     
-    if (bw_outgoing == 0 || bw_outgoing < bw_incoming+bw_self) {
+    if (bw_outgoing <= bw_incoming+bw_self){
     	uint8_t requiredCells = bw_incoming+bw_self+1-bw_outgoing;
-		if(requiredCells > CELLLIST_MAX_LEN) {
+
+    	if(requiredCells > CELLLIST_MAX_LEN) {
 			requiredCells = CELLLIST_MAX_LEN;
+    	}
+
+		if (sf0_candidateAddCellList(celllist_add,requiredCells)==FALSE){
+			return;
 		}
-
-
-    	if (sf0_candidateAddCellList(celllist_add,requiredCells)==FALSE){
-            // failed to get cell list to add
-            return;
-        }
-        sixtop_request(
-            IANA_6TOP_CMD_ADD,                  // code
-            &neighbor,                          // neighbor
-            requiredCells, 					 	// number cells
-            LINKOPTIONS_TX,                     // cellOptions
-            celllist_add,                       // celllist to add
-            NULL,                               // celllist to delete (not used)
-            SF0_ID,                             // sfid
-            0,                                  // list command offset (not used)
-            0                                   // list command maximum celllist (not used)
-        );
+		sixtop_request(IANA_6TOP_CMD_ADD,&neighbor,requiredCells,LINKOPTIONS_TX,celllist_add,NULL,SF0_ID,0,0);
     } else {
-        // remove cell(s)
-        if ( (bw_incoming+bw_self) < (bw_outgoing-SF0THRESHOLD)) {
-
-        	uint8_t cellsToRemove = bw_outgoing - (bw_incoming+bw_self+1);
-
-			if(cellsToRemove > CELLLIST_MAX_LEN ) {
-				cellsToRemove = CELLLIST_MAX_LEN;
-			}
-
-
-        	if (sf0_candidateRemoveCellList(celllist_delete,&neighbor,cellsToRemove)==FALSE){
-                // failed to get cell list to delete
-                return;
+            // remove cell(s)
+            if ( (bw_incoming+bw_self) < (bw_outgoing-SF0THRESHOLD) && (sf0_vars.allowDelete) ) {
+                if (sf0_candidateRemoveCellList(celllist_delete,&neighbor,SF0THRESHOLD)==FALSE){
+                    // failed to get cell list to delete
+                    return;
+                }
+                sixtop_request(IANA_6TOP_CMD_DELETE,&neighbor,SF0THRESHOLD,LINKOPTIONS_TX,NULL,celllist_delete,SF0_ID,0,0);
             }
-            sixtop_request(
-                IANA_6TOP_CMD_DELETE,   // code
-                &neighbor,              // neighbor
-				cellsToRemove,           // number cells
-                LINKOPTIONS_TX,         // cellOptions
-                NULL,                   // celllist to add (not used)
-                celllist_delete,        // celllist to delete
-                SF0_ID,                 // sfid
-                0,                      // list command offset (not used)
-                0                       // list command maximum celllist (not used)
-            );
         }
-    }
 }
 
 void sf0_appPktPeriod(uint8_t numAppPacketsPerSlotFrame){
@@ -233,4 +250,8 @@ bool sf0_candidateRemoveCellList(
    }else{
       return TRUE;
    }
+}
+
+void sf0_allowDelete(bool flag) {
+	sf0_vars.allowDelete = flag;
 }

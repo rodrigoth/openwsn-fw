@@ -609,7 +609,7 @@ void  neighbors_removeOld() {
     for (i=0;i<MAXNUMNEIGHBORS;i++) {
         if (neighbors_vars.neighbors[i].used==1) {
             timeSinceHeard = ieee154e_asnDiff(&neighbors_vars.neighbors[i].asn);
-            if (timeSinceHeard>DESYNCTIMEOUT*2) {
+            if (timeSinceHeard>DESYNCTIMEOUT*3) {
                 haveParent = icmpv6rpl_getPreferredParentIndex(&j);
                 if (haveParent && (i==j)) { // this is our preferred parent, carefully!
                     icmpv6rpl_killPreferredParent();
@@ -622,16 +622,18 @@ void  neighbors_removeOld() {
         }
     }
 
-    //reset ack,tx counters for all other nodes execpt the parent (old information)
-    haveParent = icmpv6rpl_getPreferredParentIndex(&j);
-    for (i=0;i<MAXNUMNEIGHBORS;i++) {
-    	if (neighbors_vars.neighbors[i].used==1) {
-    		if (haveParent && (i!=j)){
-			   neighbors_vars.neighbors[i].numRx = 0;
-			   neighbors_vars.neighbors[i].numTx = 0;
-    		}
-		}
-     }
+    if (!idmanager_getIsDAGroot()) {
+		//reset ack,tx counters for all other nodes execpt the parent (old information)
+		haveParent = icmpv6rpl_getPreferredParentIndex(&j);
+		for (i=0;i<MAXNUMNEIGHBORS;i++) {
+			if (neighbors_vars.neighbors[i].used==1) {
+				if (haveParent && (i!=j)){
+				   neighbors_vars.neighbors[i].numRx = 0;
+				   neighbors_vars.neighbors[i].numTx = 0;
+				}
+			}
+		 }
+    }
 }
 
 void neighbors_resetPreferredParentTx() {
