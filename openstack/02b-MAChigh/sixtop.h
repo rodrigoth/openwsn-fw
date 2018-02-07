@@ -72,6 +72,8 @@ typedef enum {
     SIX_STATE_WAIT_COUNTRESPONSE                = 0x0a,
     SIX_STATE_WAIT_LISTRESPONSE                 = 0x0b,
     SIX_STATE_WAIT_CLEARRESPONSE                = 0x0c,
+	// request received
+	SIX_STATE_WAIT_REQUESTRECEIVED              = 0x0d,
 } six2six_state_t;
 
 typedef enum {
@@ -79,7 +81,7 @@ typedef enum {
 }metadata_t;
 //=========================== typedef =========================================
 
-#define SIX2SIX_TIMEOUT_MS 15000
+#define SIX2SIX_TIMEOUT_MS 8000
 typedef uint8_t                 (*sixtop_sf_getsfid)(void);
 typedef uint16_t                (*sixtop_sf_getmetadata)(void);
 typedef metadata_t              (*sixtop_sf_translatemetadata)(void);

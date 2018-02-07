@@ -181,8 +181,8 @@ bool packetfunctions_isLinkLocal(open_addr_t* address) {
 
 bool packetfunctions_sameAddress(open_addr_t* address_1, open_addr_t* address_2) {
    uint8_t address_length;
-   
-   if (address_1->type!=address_2->type) {
+
+   if ((address_1 == NULL || address_2 == NULL) ||  address_1->type!=address_2->type) {
       return FALSE;
    }
    switch (address_1->type) {

@@ -330,7 +330,9 @@ owerror_t sixtop_request(
     outcome = sixtop_send(pkt);
     
     if (outcome == E_SUCCESS){
-    	openreport_indicate6pRequest(code,numCells);
+    	uint8_t totalTx = schedule_getNumberSlotToPreferredParent(neighbor);
+    	uint8_t totalRx = schedule_getNumOfSlotsByType(CELLTYPE_RX);
+    	openreport_indicate6pRequest(code,numCells,neighbor,totalTx,totalRx);
         neighbors_updateSequenceNumber(neighbor);
         //update states
         switch(code){
@@ -588,13 +590,13 @@ owerror_t sixtop_send_internal(
     bool    payloadIEPresent) {
 
     // assign a number of retries
-    if (
-        packetfunctions_isBroadcastMulticast(&(msg->l2_nextORpreviousHop))==TRUE
-        ) {
+	//not retry sending 6p packets (leads to inconsistencies)
+    if (packetfunctions_isBroadcastMulticast(&(msg->l2_nextORpreviousHop))==TRUE) {
         msg->l2_retriesLeft = 1;
     } else {
         msg->l2_retriesLeft = TXRETRIES + 1;
     }
+
     // record this packet's dsn (for matching the ACK)
     msg->l2_dsn = sixtop_vars.dsn++;
     // this is a new packet which I never attempted to send
@@ -947,14 +949,7 @@ void sixtop_six2six_sendDone(OpenQueueEntry_t* msg, owerror_t error){
                 }
                 
                 if (msg->l2_sixtop_command == IANA_6TOP_CMD_DELETE){
-                    if (
-                        sixtop_removeCells(
-                            msg->l2_sixtop_frameID,
-                            msg->l2_sixtop_celllist_delete,
-                            &(msg->l2_nextORpreviousHop),
-                            msg->l2_sixtop_cellOptions
-                        ) == TRUE
-                    ){
+                    if (sixtop_removeCells(msg->l2_sixtop_frameID, msg->l2_sixtop_celllist_delete, &(msg->l2_nextORpreviousHop), msg->l2_sixtop_cellOptions) == TRUE){
                         neighbors_updateGeneration(&(msg->l2_nextORpreviousHop));
                     }
                 }
@@ -992,6 +987,7 @@ void sixtop_six2six_sendDone(OpenQueueEntry_t* msg, owerror_t error){
             // doesn't receive the ACK of response packet from request side. 
             // Do nothing, request side will timeout when it doesn't receive the response packet.
         }
+        sixtop_vars.six2six_state = SIX_STATE_IDLE;
     }
     // free the buffer
     openqueue_freePacketBuffer(msg);
@@ -1093,6 +1089,7 @@ void sixtop_six2six_notifyReceive(
     uint8_t           response_pktLen   = 0;
     cellInfo_ht       celllist_list[CELLLIST_MAX_LEN];
     bool              scheduleChanged;
+
     
     if (type == SIXTOP_CELL_REQUEST){
         // if this is a 6p request message
@@ -1158,6 +1155,9 @@ void sixtop_six2six_notifyReceive(
                 break;
             }
             
+            sixtop_vars.six2six_state = SIX_STATE_WAIT_REQUESTRECEIVED;
+
+
             // commands check
             
             // get metadata, metadata indicates frame id 
@@ -1170,6 +1170,7 @@ void sixtop_six2six_notifyReceive(
             if (code == IANA_6TOP_CMD_CLEAR){
                 // the cells will be removed when the repsonse sendone successfully
                 // don't clear cells here
+            	 openreport_indicate6pReceived(code,0,&(pkt->l2_nextORpreviousHop),schedule_getNumberSlotToPreferredParent(&(pkt->l2_nextORpreviousHop)),schedule_getNumOfSlotsByType(CELLTYPE_RX),sixtop_vars.six2six_state);
                 returnCode = IANA_6TOP_RC_SUCCESS;
                 break;
             }
@@ -1270,6 +1271,9 @@ void sixtop_six2six_notifyReceive(
             ptr     += 1;
             pktLen  -= 1;
             
+       	    openreport_indicate6pReceived(code,numCells,&(pkt->l2_nextORpreviousHop),schedule_getNumberSlotToPreferredParent(&(pkt->l2_nextORpreviousHop)),schedule_getNumOfSlotsByType(CELLTYPE_RX),sixtop_vars.six2six_state);
+
+
             // add command
             if (code == IANA_6TOP_CMD_ADD){
                 if (schedule_getNumberOfFreeEntries() < numCells){
@@ -1449,8 +1453,13 @@ void sixtop_six2six_notifyReceive(
         if (sixtop_vars.isResponseEnabled){
             // send packet
             sixtop_send(response_pkt);
+            uint8_t totalTx = schedule_getNumberSlotToPreferredParent(&(pkt->l2_nextORpreviousHop));
+            uint8_t totalRx = schedule_getNumOfSlotsByType(CELLTYPE_RX);
+			openreport_indicate6pResponse(returnCode,numCells,&(pkt->l2_nextORpreviousHop),totalTx,totalRx,sixtop_vars.six2six_state);
+
         } else {
             openqueue_freePacketBuffer(response_pkt);
+            sixtop_vars.six2six_state = SIX_STATE_IDLE;
         }
     }
     
@@ -1559,11 +1568,9 @@ void sixtop_six2six_notifyReceive(
                 );
                 break;
             case SIX_STATE_WAIT_CLEARRESPONSE:
-                schedule_removeAllCells(
-                    sixtop_vars.cb_sf_getMetadata(),
-                    &(pkt->l2_nextORpreviousHop)
-                );
+                schedule_removeAllCells(sixtop_vars.cb_sf_getMetadata(),&(pkt->l2_nextORpreviousHop));
                 neighbors_resetGeneration(&(pkt->l2_nextORpreviousHop));
+    			sf0_resetGenErrorCounter();
                 break;
             default:
                 // should neven happen
@@ -1631,27 +1638,21 @@ bool sixtop_addCells(
     return hasCellsAdded;
 }
 
-bool sixtop_removeCells(
-      uint8_t      slotframeID,
-      cellInfo_ht* cellList,
-      open_addr_t* previousHop,
-    uint8_t      cellOptions
-   ){
+bool sixtop_removeCells(uint8_t slotframeID,cellInfo_ht* cellList, open_addr_t* previousHop,uint8_t cellOptions){
     uint8_t     i;
     open_addr_t temp_neighbor;
     bool        hasCellsRemoved;
-
+    slotinfo_element_t   info;
     memcpy(&temp_neighbor,previousHop,sizeof(open_addr_t));
     
     hasCellsRemoved = FALSE;
     // delete cells from schedule
     for(i=0;i<CELLLIST_MAX_LEN;i++){
-        if (cellList[i].isUsed){
+    	schedule_getSlotInfo(cellList[i].slotoffset,previousHop,&info);
+
+    	if (info.link_type != CELLTYPE_OFF && cellList[i].isUsed){
             hasCellsRemoved = TRUE;
-            schedule_removeActiveSlot(
-                cellList[i].slotoffset,
-                &temp_neighbor
-            );
+            schedule_removeActiveSlot(cellList[i].slotoffset,&temp_neighbor);
         }
     }
     

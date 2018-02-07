@@ -16,8 +16,37 @@ typedef struct {
 	asn_t asn;
 	uint8_t code;
 	uint8_t requestedCells;
+	open_addr_t destination;
+	uint8_t totalTx;
+	uint8_t totalRx;
 } debug_report6pRequestEntry_t;
 END_PACK
+
+BEGIN_PACK
+typedef struct {
+	asn_t asn;
+	uint8_t code;
+	uint8_t requestedCells;
+	open_addr_t sender;
+	uint8_t totalTx;
+	uint8_t totalRx;
+	uint8_t state;
+} debug_report6pReceivedEntry_t;
+END_PACK
+
+
+BEGIN_PACK
+typedef struct {
+	asn_t asn;
+	uint8_t code;
+	uint8_t requestedCells;
+	open_addr_t destination;
+	uint8_t totalTx;
+	uint8_t totalRx;
+	uint8_t state;
+} debug_report6pResponseEntry_t;
+END_PACK
+
 
 BEGIN_PACK
 typedef struct {
@@ -44,7 +73,9 @@ END_PACK
 // admin
 void openreport_init(void);
 void openreport_indicateParentSwitch(open_addr_t *newParent);
-void openreport_indicate6pRequest(uint8_t code,uint8_t requestedCells);
+void openreport_indicate6pRequest(uint8_t code,uint8_t requestedCells,open_addr_t *destination, uint8_t totalTx, uint8_t totalRx);
+void openreport_indicate6pReceived(uint8_t code,uint8_t requestedCells,open_addr_t *sender, uint8_t totalTx, uint8_t totalRx,uint8_t state);
+void openreport_indicate6pResponse(uint8_t code,uint8_t requestedCells,open_addr_t *destination, uint8_t totalTx, uint8_t totalRx,uint8_t state);
 void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_t ack, uint8_t tx, uint8_t channel, uint32_t seqnum,uint8_t component,uint8_t *asn);
 
 

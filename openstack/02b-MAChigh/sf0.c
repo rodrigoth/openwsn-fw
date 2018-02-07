@@ -12,8 +12,8 @@
 
 #define SF0_ID            0
 #define SF0THRESHOLD      2
-#define GEN_ERROR_THRESHOLD 3
-#define BLOCK_DELETION_TIME 180000
+#define GEN_ERROR_THRESHOLD 1
+#define BLOCK_DELETION_TIME 120000
 
 //=========================== variables =======================================
 
@@ -83,11 +83,11 @@ metadata_t sf0_translateMetadata(void){
 void sf0_handleRCError(uint8_t code){
     if (code==IANA_6TOP_RC_BUSY || code==IANA_6TOP_RC_RESET ){
         // disable sf0 for [0...2^4] slotframe long time
-    	sf0_setBackoff(openrandom_get16b()%(1<<4));
+    	sf0_setBackoff(openrandom_get16b()%(1<<3));
     }
     
     if (code==IANA_6TOP_RC_ERROR){
-    	sf0_setBackoff(openrandom_get16b()%(1<<4));
+    	sf0_setBackoff(openrandom_get16b()%(1<<3));
     }
     
     if (code==IANA_6TOP_RC_VER_ERR){
@@ -142,9 +142,6 @@ void sf0_bandwidthEstimate_task(void){
 			outcome = sixtop_request(IANA_6TOP_CMD_CLEAR,&neighbor,0,LINKOPTIONS_TX,NULL,NULL,0,0,0);
 		}
 
-		if (outcome == E_SUCCESS) {
-			sf0_resetGenErrorCounter();
-		}
 		return;
 	}
 

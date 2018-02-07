@@ -116,6 +116,8 @@ enum {
    STATUS_PARENTSWITCH                 = 13,
    STATUS_6PREQUEST                    = 14,
    STATUS_TX		  				   = 15,
+   STATUS_6PREQUEST_RECEIVED		   = 16,
+   STATUS_6PRESPONSE				   = 17,
 };
 
 //component identifiers

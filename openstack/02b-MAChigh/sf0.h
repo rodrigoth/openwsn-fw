@@ -13,7 +13,7 @@
 
 
 //=========================== define ==========================================
-#define ESTIMATION_PERIODICITY 5
+#define ESTIMATION_PERIODICITY 2
 //=========================== typedef =========================================
 
 typedef struct {

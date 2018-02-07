@@ -384,11 +384,7 @@ owerror_t schedule_removeActiveSlot(slotOffset_t slotOffset, open_addr_t* neighb
    // find the schedule entry
    slotContainer = &schedule_vars.scheduleBuf[0];
    while (slotContainer<=&schedule_vars.scheduleBuf[schedule_vars.maxActiveSlots-1]) {
-      if (
-            slotContainer->slotOffset==slotOffset
-            &&
-            packetfunctions_sameAddress(neighbor,&(slotContainer->neighbor))
-            ){
+      if (slotContainer->slotOffset==slotOffset && packetfunctions_sameAddress(neighbor,&(slotContainer->neighbor))){
          break;
       }
       slotContainer++;
