@@ -281,7 +281,7 @@ bool neighbors_reachedMaxTransmission(uint8_t index){
     
     if (
         neighbors_vars.neighbors[index].used     == TRUE            &&
-        neighbors_vars.neighbors[index].numTx    >  10
+        neighbors_vars.neighbors[index].numTx    >  15
     ) { 
         returnVal = TRUE;
     } else {
@@ -609,7 +609,7 @@ void  neighbors_removeOld() {
     for (i=0;i<MAXNUMNEIGHBORS;i++) {
         if (neighbors_vars.neighbors[i].used==1) {
             timeSinceHeard = ieee154e_asnDiff(&neighbors_vars.neighbors[i].asn);
-            if (timeSinceHeard>DESYNCTIMEOUT*3) {
+            if (timeSinceHeard>DESYNCTIMEOUT*2) {
                 haveParent = icmpv6rpl_getPreferredParentIndex(&j);
                 if (haveParent && (i==j)) { // this is our preferred parent, carefully!
                     icmpv6rpl_killPreferredParent();

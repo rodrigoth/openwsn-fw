@@ -8,6 +8,7 @@
 #include "idmanager.h"
 #include "icmpv6rpl.h"
 #include "openrandom.h"
+#include "openreport.h"
 
 
 #define PAYLOADLEN 17
@@ -92,6 +93,17 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 	  if ((openudp_send(new_pkt))==E_FAIL) {
 	      openqueue_freePacketBuffer(new_pkt);
 	  }
+
+	  uint8_t asnArray[5];
+	  open_addr_t sender;
+
+
+	  memcpy(&(sender.addr_64b[0]),&(pkt->payload[2]),8);
+	  memcpy(&asnArray,&(pkt->payload[10]),5);
+	  uint32_t uinject_seqnum = pkt->payload[18] | (pkt->payload[17] << 8) | (pkt->payload[16] << 16) | (pkt->payload[15] << 24);
+
+	  openreport_indicateTxReceived(&sender,uinject_seqnum,&asnArray[0]);
+
 	  openqueue_freePacketBuffer(pkt);
 }
 
@@ -111,7 +123,7 @@ void uinject_task_cb() {
    uint8_t              asnArray[5];
    bool foundNeighbor;
 
-   uint16_t newTime =  UINJECT_PERIOD_MS - 15000+(openrandom_get16b()%(2*15000));
+   uint16_t newTime =  UINJECT_PERIOD_MS - 5000+(openrandom_get16b()%(2*5000));
    opentimers_scheduleIn(uinject_vars.timerId,newTime,TIME_MS,TIMER_ONESHOT,uinject_timer_cb);
 
    seqnum++;

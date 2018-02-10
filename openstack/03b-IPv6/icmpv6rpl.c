@@ -431,7 +431,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
             tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
             if (tentativeDAGrank > 65535) {tentativeDAGrank = 65535;}
             // if not low enough to justify switch, pass (i.e. hysterisis)
-            if ((previousDAGrank<tentativeDAGrank) ||(previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
+            if ((previousDAGrank<tentativeDAGrank) ||(previousDAGrank-tentativeDAGrank < MINHOPRANKINCREASE)) {
                   continue;
             }
             // remember that we have at least one valid candidate parent

@@ -90,7 +90,7 @@ void openreport_indicate6pResponse(uint8_t code,uint8_t requestedCells,open_addr
 
 
 void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_t ack, uint8_t tx,
-		uint8_t channel, uint32_t seqnum,uint8_t component, uint8_t *asn) {
+	uint8_t channel, uint32_t seqnum,uint8_t component, uint8_t *asn) {
 	debug_reportTxEntry_t debug_reportEntry;
 
 	memset(&debug_reportEntry,0,sizeof(debug_reportTxEntry_t));
@@ -117,4 +117,20 @@ void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_
 
 
 	openserial_printStatus(STATUS_TX,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
+}
+
+void openreport_indicateTxReceived(open_addr_t *sender, uint32_t seqnum,uint8_t *asn) {
+	debug_reportTxReceivedEntry_t debug_reportEntry;
+
+	memset(&debug_reportEntry,0,sizeof(debug_reportTxReceivedEntry_t));
+
+	debug_reportEntry.asn.bytes0and1 = ((uint16_t)asn[1] << 8) | asn[0];
+	debug_reportEntry.asn.bytes2and3 = ((uint16_t)asn[3] << 8) | asn[2];
+	debug_reportEntry.asn.byte4 = asn[4];
+
+	debug_reportEntry.seqnum = seqnum;
+
+	memcpy(&(debug_reportEntry.sender.addr_64b[0]),&(sender->addr_64b[0]),8);
+
+	openserial_printStatus(STATUS_TX_RECEIVED,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }

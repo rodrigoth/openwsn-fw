@@ -329,6 +329,8 @@ void forwarding_receive(
         }
     } else {
         // this packet is not for me: relay
+
+    	openserial_printError(COMPONENT_FORWARDING,ERR_RCVD_ECHO_REQUEST,(errorparameter_t)0,(errorparameter_t)0);
       
         // change the creator of the packet
         msg->creator = COMPONENT_FORWARDING;
