@@ -431,7 +431,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
             tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
             if (tentativeDAGrank > 65535) {tentativeDAGrank = 65535;}
             // if not low enough to justify switch, pass (i.e. hysterisis)
-            if ((previousDAGrank<tentativeDAGrank) ||(previousDAGrank-tentativeDAGrank < MINHOPRANKINCREASE)) {
+            if ((previousDAGrank<tentativeDAGrank) ||(previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
                   continue;
             }
             // remember that we have at least one valid candidate parent
@@ -485,7 +485,10 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
    }
 
    if (!idmanager_getIsDAGroot()) {
-	   neighbors_resetPreferredParentTx();
+	   open_addr_t addr;
+       if (icmpv6rpl_getPreferredParentEui64(&addr)) {
+    	   schedule_resetTxAck(&addr);
+       }
    }
 }
 
@@ -634,7 +637,7 @@ void icmpv6rpl_timer_DIO_task() {
     
     uint16_t newPeriod;
     // current period 
-    newPeriod = 13;//DIO_PORTION*(neighbors_getNumNeighbors()+1);
+    newPeriod = 17;//DIO_PORTION*(neighbors_getNumNeighbors()+1);
     if (
         icmpv6rpl_vars.dioPeriod        < newPeriod &&
         icmpv6rpl_vars.dioTimerCounter  > newPeriod

@@ -14,7 +14,7 @@
 
 schedule_vars_t schedule_vars;
 uint8_t slotframeRepetition;
-uint8_t shared_slots[] = {0,20,40,60,80};
+uint8_t shared_slots[] = {0,25,50,75,100,125,150,175};
 
 //=========================== prototypes ======================================
 
@@ -210,6 +210,58 @@ void schedule_setFrameNumber(uint8_t frameNumber) {
    
    ENABLE_INTERRUPTS();
 }
+
+uint16_t schedule_getTotalTxToNeighbor(open_addr_t* neighbor) {
+	uint8_t i;
+	uint16_t counter = 0;
+
+	INTERRUPT_DECLARATION();
+	DISABLE_INTERRUPTS();
+
+	counter = 0;
+	for(i=0;i<MAXACTIVESLOTS;i++) {
+	  if(schedule_vars.scheduleBuf[i].type == CELLTYPE_TX && packetfunctions_sameAddress(neighbor,&(schedule_vars.scheduleBuf[i].neighbor))==TRUE) {
+		 counter += schedule_vars.scheduleBuf[i].numTx;
+	  }
+	}
+
+	ENABLE_INTERRUPTS();
+	return counter;
+}
+
+uint16_t schedule_getTotalAckFromNeighbor(open_addr_t* neighbor) {
+	uint8_t i;
+	uint16_t counter = 0;
+
+	INTERRUPT_DECLARATION();
+	DISABLE_INTERRUPTS();
+
+	counter = 0;
+	for(i=0;i<MAXACTIVESLOTS;i++) {
+	  if(schedule_vars.scheduleBuf[i].type == CELLTYPE_TX && packetfunctions_sameAddress(neighbor,&(schedule_vars.scheduleBuf[i].neighbor))==TRUE) {
+		 counter += schedule_vars.scheduleBuf[i].numTxACK;
+	  }
+	}
+
+	ENABLE_INTERRUPTS();
+	return counter;
+}
+
+void schedule_resetTxAck(open_addr_t* neighbor) {
+	uint8_t i;
+
+	INTERRUPT_DECLARATION();
+	DISABLE_INTERRUPTS();
+
+	for(i=0;i<MAXACTIVESLOTS;i++) {
+	  if(schedule_vars.scheduleBuf[i].type == CELLTYPE_TX && packetfunctions_sameAddress(neighbor,&(schedule_vars.scheduleBuf[i].neighbor))==TRUE) {
+		 schedule_vars.scheduleBuf[i].numTxACK = 0;
+		 schedule_vars.scheduleBuf[i].numTx = 0;
+	  }
+	}
+	ENABLE_INTERRUPTS();
+}
+
 
 /**
 \brief Get the information of a specific slot.

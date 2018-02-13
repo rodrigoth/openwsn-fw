@@ -6,10 +6,14 @@
 #include "openserial.h"
 #include "IEEE802154E.h"
 #include "openrandom.h"
+#include "openreport.h"
+
+#define CLEARNEIGHBORS 10
 
 //=========================== variables =======================================
 
 static neighbors_vars_t neighbors_vars;
+uint8_t clearInactiveNeighborsCounter;
 
 //=========================== prototypes ======================================
 
@@ -277,13 +281,16 @@ bool neighbors_isNeighborWithHigherDAGrank(uint8_t index) {
 }
 
 bool neighbors_reachedMaxTransmission(uint8_t index){
-    bool    returnVal;
+	bool returnVal;
+	uint8_t totalTx  = (uint8_t)schedule_getTotalTxToNeighbor(&neighbors_vars.neighbors[index].addr_64b);
+	uint8_t totalAck = (uint8_t)schedule_getTotalAckFromNeighbor(&neighbors_vars.neighbors[index].addr_64b);
     
-    if (
-        neighbors_vars.neighbors[index].used     == TRUE            &&
-        neighbors_vars.neighbors[index].numTx    >  15
-    ) { 
+    if (totalTx  >=  10) {
         returnVal = TRUE;
+        uint8_t parentIndex ;
+		if(icmpv6rpl_getPreferredParentIndex(&parentIndex)) {
+			openreport_indicatePDR(&(neighbors_vars.neighbors[parentIndex].addr_64b),totalTx,totalAck);
+		}
     } else {
         returnVal = FALSE;
     }
@@ -573,10 +580,13 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 	uint16_t  rankIncrease;
 	uint32_t  rankIncreaseIntermediary; // stores intermediary results of rankIncrease calculation
 
+	uint16_t totalTx = schedule_getTotalTxToNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
+	uint16_t totalAck = schedule_getTotalAckFromNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
+
 	// we assume that this neighbor has already been checked for being in use
 	// calculate link cost to this neighbor
-	if (neighbors_vars.neighbors[index].numTxACK==0) {
-		if (neighbors_vars.neighbors[index].numTx<=DEFAULTLINKCOST){
+	if (totalAck == 0) {
+		if (totalTx<=DEFAULTLINKCOST){
 			rankIncrease = (3*DEFAULTLINKCOST-2)*MINHOPRANKINCREASE;
 		} else {
 			rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
@@ -585,8 +595,9 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 		//6TiSCH minimal draft using OF0 for rank computation: ((3*numTx/numTxAck)-2)*minHopRankIncrease
 		// numTx is on 8 bits, so scaling up 10 bits won't lead to saturation
 		// but this <<10 followed by >>10 does not provide any benefit either. Result is the same.
-		rankIncreaseIntermediary = (((uint32_t)neighbors_vars.neighbors[index].numTx) << 10);
-		rankIncreaseIntermediary = (3*rankIncreaseIntermediary * MINHOPRANKINCREASE) / ((uint32_t)neighbors_vars.neighbors[index].numTxACK);
+		//rankIncreaseIntermediary = (((uint32_t)neighbors_vars.neighbors[index].numTx) << 10);
+		rankIncreaseIntermediary = (((uint32_t)totalTx) << 10);
+		rankIncreaseIntermediary = (3*rankIncreaseIntermediary * MINHOPRANKINCREASE) / ((uint32_t)totalAck);
 		rankIncreaseIntermediary = rankIncreaseIntermediary - ((uint32_t)(2 * MINHOPRANKINCREASE)<<10);
 		// this could still overflow for numTx large and numTxAck small, Casting to 16 bits will yiel the least significant bits
 		if (rankIncreaseIntermediary >= (65536<<10)) {
@@ -609,7 +620,7 @@ void  neighbors_removeOld() {
     for (i=0;i<MAXNUMNEIGHBORS;i++) {
         if (neighbors_vars.neighbors[i].used==1) {
             timeSinceHeard = ieee154e_asnDiff(&neighbors_vars.neighbors[i].asn);
-            if (timeSinceHeard>DESYNCTIMEOUT*2) {
+            if (timeSinceHeard>DESYNCTIMEOUT*4) {
                 haveParent = icmpv6rpl_getPreferredParentIndex(&j);
                 if (haveParent && (i==j)) { // this is our preferred parent, carefully!
                     icmpv6rpl_killPreferredParent();
@@ -622,28 +633,22 @@ void  neighbors_removeOld() {
         }
     }
 
-    if (!idmanager_getIsDAGroot()) {
-		//reset ack,tx counters for all other nodes execpt the parent (old information)
-		haveParent = icmpv6rpl_getPreferredParentIndex(&j);
-		for (i=0;i<MAXNUMNEIGHBORS;i++) {
-			if (neighbors_vars.neighbors[i].used==1) {
-				if (haveParent && (i!=j)){
-				   neighbors_vars.neighbors[i].numRx = 0;
-				   neighbors_vars.neighbors[i].numTx = 0;
+    if (clearInactiveNeighborsCounter >= CLEARNEIGHBORS) {
+		if (!idmanager_getIsDAGroot()) {
+			//reset ack,tx counters for all other nodes execpt the parent (old information)
+			haveParent = icmpv6rpl_getPreferredParentIndex(&j);
+			for (i=0;i<MAXNUMNEIGHBORS;i++) {
+				if (neighbors_vars.neighbors[i].used==1) {
+					if (haveParent && (i!=j)){
+						schedule_resetTxAck(&(neighbors_vars.neighbors[i].addr_64b));
+					}
 				}
-			}
-		 }
+			 }
+		}
+		clearInactiveNeighborsCounter = 0;
+    } else {
+    	clearInactiveNeighborsCounter++;
     }
-}
-
-void neighbors_resetPreferredParentTx() {
-	uint8_t parentIndex ;
-
-	bool haveParent = icmpv6rpl_getPreferredParentIndex(&parentIndex);
-	if(haveParent) {
-		neighbors_vars.neighbors[parentIndex].numTx = 0;
-		neighbors_vars.neighbors[parentIndex].numTxACK = 0;
-	}
 }
 
 //===== debug
@@ -700,6 +705,7 @@ void registerNewNeighbor(open_addr_t* address,
             neighbors_vars.neighbors[i].numRx                  = 1;
             neighbors_vars.neighbors[i].numTx                  = 0;
             neighbors_vars.neighbors[i].numTxACK               = 0;
+            neighbors_vars.neighbors[i].generation             = 0;
             memcpy(&neighbors_vars.neighbors[i].asn,asnTimestamp,sizeof(asn_t));
             //update jp
             if (joinPrioPresent==TRUE){
@@ -748,6 +754,7 @@ void removeNeighbor(uint8_t neighborIndex) {
    neighbors_vars.neighbors[neighborIndex].asn.byte4                 = 0;
    neighbors_vars.neighbors[neighborIndex].f6PNORES                  = FALSE;
    neighbors_vars.neighbors[neighborIndex].sequenceNumber            = 0;
+   neighbors_vars.neighbors[neighborIndex].generation   	         = 0;
 }
 
 //=========================== helpers =========================================
