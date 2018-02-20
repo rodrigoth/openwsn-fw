@@ -2295,6 +2295,10 @@ port_INLINE uint16_t ieee154e_getTimeCorrection() {
     return returnVal;
 }
 
+uint8_t ieee154e_getNumOfDesync() {
+	return ieee154e_stats.numDeSync;
+}
+
 port_INLINE void joinPriorityStoreFromEB(uint8_t jp){
   ieee154e_vars.dataReceived->l2_joinPriority = jp;
   ieee154e_vars.dataReceived->l2_joinPriorityPresent = TRUE;     

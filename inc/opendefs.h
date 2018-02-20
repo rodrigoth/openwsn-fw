@@ -276,6 +276,8 @@ enum {
    ERR_REPLAY_FAILED                   = 0x47, // OSCOAP replay protection failed
    ERR_DECRYPTION_FAILED               = 0x48, // OSCOAP decryption and tag verification failed
    ERR_ABORT_JOIN_PROCESS              = 0x49, // Aborted join process {code location {0}}
+
+   ERR_NEIGHBORS_DESYNC				   = 0X50, // Bad neighbor, desync counter {0},{1}
 };
 
 //=========================== typedef =========================================

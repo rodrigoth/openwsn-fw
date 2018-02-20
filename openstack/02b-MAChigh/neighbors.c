@@ -14,6 +14,7 @@
 
 static neighbors_vars_t neighbors_vars;
 uint8_t clearInactiveNeighborsCounter;
+uint8_t prevDesync;
 
 //=========================== prototypes ======================================
 
@@ -284,6 +285,8 @@ bool neighbors_reachedMaxTransmission(uint8_t index){
 	bool returnVal;
 	uint8_t totalTx  = (uint8_t)schedule_getTotalTxToNeighbor(&neighbors_vars.neighbors[index].addr_64b);
 	uint8_t totalAck = (uint8_t)schedule_getTotalAckFromNeighbor(&neighbors_vars.neighbors[index].addr_64b);
+
+	if (prevDesync == 0) {prevDesync = ieee154e_getNumOfDesync();}
     
     if (totalTx  >=  10) {
         returnVal = TRUE;
@@ -292,7 +295,12 @@ bool neighbors_reachedMaxTransmission(uint8_t index){
 			openreport_indicatePDR(&(neighbors_vars.neighbors[parentIndex].addr_64b),totalTx,totalAck);
 		}
     } else {
-        returnVal = FALSE;
+    	if(ieee154e_getNumOfDesync() - prevDesync >= DESYNCTHRESHOLD) {
+    		prevDesync = ieee154e_getNumOfDesync();
+    		returnVal = TRUE;
+    	} else {
+    		returnVal = FALSE;
+    	}
     }
     
     return returnVal;
@@ -586,10 +594,11 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 	// we assume that this neighbor has already been checked for being in use
 	// calculate link cost to this neighbor
 	if (totalAck == 0) {
-		if (totalTx<=DEFAULTLINKCOST){
+		if (totalTx<=DEFAULTLINKCOST && ieee154e_getNumOfDesync() - prevDesync < DESYNCTHRESHOLD){
 			rankIncrease = (3*DEFAULTLINKCOST-2)*MINHOPRANKINCREASE;
 		} else {
 			rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
+			openserial_printError(COMPONENT_NEIGHBORS,ERR_NEIGHBORS_DESYNC,(errorparameter_t)ieee154e_getNumOfDesync(),(errorparameter_t)prevDesync);
 		}
 	} else {
 		//6TiSCH minimal draft using OF0 for rank computation: ((3*numTx/numTxAck)-2)*minHopRankIncrease
@@ -620,7 +629,7 @@ void  neighbors_removeOld() {
     for (i=0;i<MAXNUMNEIGHBORS;i++) {
         if (neighbors_vars.neighbors[i].used==1) {
             timeSinceHeard = ieee154e_asnDiff(&neighbors_vars.neighbors[i].asn);
-            if (timeSinceHeard>DESYNCTIMEOUT*4) {
+            if (timeSinceHeard>DESYNCTIMEOUT*2) {
                 haveParent = icmpv6rpl_getPreferredParentIndex(&j);
                 if (haveParent && (i==j)) { // this is our preferred parent, carefully!
                     icmpv6rpl_killPreferredParent();
@@ -634,6 +643,7 @@ void  neighbors_removeOld() {
     }
 
     if (clearInactiveNeighborsCounter >= CLEARNEIGHBORS) {
+    	prevDesync = 0;
 		if (!idmanager_getIsDAGroot()) {
 			//reset ack,tx counters for all other nodes execpt the parent (old information)
 			haveParent = icmpv6rpl_getPreferredParentIndex(&j);

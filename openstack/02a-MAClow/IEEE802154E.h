@@ -299,6 +299,8 @@ void               ieee154e_orderToASNStructure(uint8_t* in,asn_t* val_asn);
 #endif
 bool               ieee154e_isSynch(void);
 void               ieee154e_getAsn(uint8_t* array);
+uint8_t            ieee154e_getNumOfDesync(void);
+
 void               ieee154e_setIsAckEnabled(bool isEnabled);
 void               ieee154e_setSingleChannel(uint8_t channel);
 void               ieee154e_setIsSecurityEnabled(bool isEnabled);
