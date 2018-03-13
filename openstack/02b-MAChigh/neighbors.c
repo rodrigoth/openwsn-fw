@@ -296,6 +296,7 @@ bool neighbors_reachedMaxTransmission(uint8_t index){
 		}
     } else {
     	if(ieee154e_getNumOfDesync() - prevDesync >= DESYNCTHRESHOLD) {
+			openserial_printError(COMPONENT_NEIGHBORS,ERR_NEIGHBORS_DESYNC,(errorparameter_t)ieee154e_getNumOfDesync(),(errorparameter_t)prevDesync);
     		prevDesync = ieee154e_getNumOfDesync();
     		returnVal = TRUE;
     	} else {

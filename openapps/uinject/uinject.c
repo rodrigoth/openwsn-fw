@@ -159,8 +159,8 @@ void uinject_task_cb() {
 		openserial_printError(
 		   COMPONENT_UINJECT,
 		   ERR_NO_FREE_PACKET_BUFFER,
-		   (errorparameter_t)0,
-		   (errorparameter_t)0
+		   (errorparameter_t)1,
+		   (errorparameter_t)1
 		);
 		return;
 	 }

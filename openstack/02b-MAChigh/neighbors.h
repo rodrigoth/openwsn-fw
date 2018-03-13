@@ -18,7 +18,7 @@
 #define SWITCHSTABILITYTHRESHOLD  3
 #define DEFAULTLINKCOST           2
 #define LARGESTLINKCOST           5
-#define DESYNCTHRESHOLD			  2
+#define DESYNCTHRESHOLD			  3
 
 #define MAXDAGRANK                0xffff
 #define DEFAULTDAGRANK            MAXDAGRANK
