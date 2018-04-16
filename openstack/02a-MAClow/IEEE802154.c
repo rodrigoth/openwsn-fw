@@ -404,7 +404,7 @@ void ieee802154_retrieveHeader(OpenQueueEntry_t*      msg,
    msg->l2_payload = &msg->payload[ieee802514_header->headerLength];
 
    // apply topology filter
-   if (topology_isAcceptablePacket(ieee802514_header)==FALSE) {
+   if (topology_isAcceptablePacket(ieee802514_header,msg->l1_rssi)==FALSE) {
       // the topology filter does accept this packet, return
       return;
    }

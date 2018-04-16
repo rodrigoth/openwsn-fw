@@ -25,7 +25,7 @@ typedef struct {
 
 //=========================== prototypes ======================================
 
-bool topology_isAcceptablePacket(ieee802154_header_iht* ieee802514_header);
+bool topology_isAcceptablePacket(ieee802154_header_iht* ieee802514_header,int8_t rssi);
 
 /**
 \}

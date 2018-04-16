@@ -402,6 +402,8 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
         }
         rankIncrease     = neighbors_getLinkMetric(icmpv6rpl_vars.ParentIndex);
         neighborRank     = neighbors_getNeighborRank(icmpv6rpl_vars.ParentIndex);
+
+
         tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
         if (tentativeDAGrank>65535) {
             icmpv6rpl_vars.myDAGrank = 65535;
@@ -430,10 +432,28 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
             // compute tentative cost of full path to root through this neighbor
             tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
             if (tentativeDAGrank > 65535) {tentativeDAGrank = 65535;}
-            // if not low enough to justify switch, pass (i.e. hysterisis)
-            if ((previousDAGrank<tentativeDAGrank) ||(previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
-                  continue;
-            }
+
+            #ifdef USEETX
+				// if not low enough to justify switch, pass (i.e. hysterisis)
+				if ((previousDAGrank<tentativeDAGrank) ||(previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
+					  continue;
+				}
+			#endif
+
+			#ifdef USEMINHOP
+				if (previousDAGrank<tentativeDAGrank) {
+					continue;
+				}
+			#endif
+
+			#ifdef USERSSI
+				uint8_t rssi_hysterisis = 5;
+				if (previousDAGrank<tentativeDAGrank ||(previousDAGrank-tentativeDAGrank < rssi_hysterisis)) {
+					continue;
+				}
+			#endif
+
+
             // remember that we have at least one valid candidate parent
             foundBetterParent=TRUE;
             // select best candidate so far

@@ -135,6 +135,10 @@ command_line_options = {
     'panid':            [''],
     'dagroot':          ['0','1'],
     'forcetopology':    ['0','1'],
+    'useminhop':		['0','1'],
+    'useetx':			['0','1'],
+    'useetxn':			['0','1'],
+    'userssi':			['0','1'],
     'debug':            ['0','1'],
     'noadaptivesync':   ['0','1'],
     'l2_security':      ['0','1'],
@@ -261,6 +265,34 @@ command_line_vars.AddVariables(
         'forcetopology',                                   # key
         '',                                                # help
         command_line_options['forcetopology'][0],          # default
+        validate_option,                                   # validator
+        int,                                               # converter
+    ),
+    (
+        'useminhop',	                                   # key
+        '',                                                # help
+        command_line_options['useminhop'][0], 	 	       # default
+        validate_option,                                   # validator
+        int,                                               # converter
+    ),
+    (
+        'useetx',	           		                       # key
+        '',                                                # help
+        command_line_options['useetx'][0], 	 	       	   # default
+        validate_option,                                   # validator
+        int,                                               # converter
+    ),
+    (
+        'useetxn',	           		                       # key
+        '',                                                # help
+        command_line_options['useetxn'][0], 	 	       # default
+        validate_option,                                   # validator
+        int,                                               # converter
+    ),
+    (
+        'userssi',	           		                       # key
+        '',                                                # help
+        command_line_options['userssi'][0], 	 	       # default
         validate_option,                                   # validator
         int,                                               # converter
     ),

@@ -42,6 +42,14 @@ if env['dagroot']==1:
     env.Append(CPPDEFINES    = 'DAGROOT')
 if env['forcetopology']==1:
     env.Append(CPPDEFINES    = 'FORCETOPOLOGY')
+if env['useminhop']==1:
+    env.Append(CPPDEFINES    = 'USEMINHOP')
+if env['useetx']==1:
+    env.Append(CPPDEFINES    = 'USEETX')
+if env['useetxn']==1:
+    env.Append(CPPDEFINES    = 'USEETXN')
+if env['userssi']==1:
+    env.Append(CPPDEFINES    = 'USERSSI')
 if env['noadaptivesync']==1:
     env.Append(CPPDEFINES    = 'NOADAPTIVESYNC')
 if env['l2_security']==1:
