@@ -447,8 +447,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
 			#endif
 
 			#ifdef USERSSI
-				uint8_t rssi_hysterisis = 10;
-				if (previousDAGrank<tentativeDAGrank ||(previousDAGrank-tentativeDAGrank < rssi_hysterisis)) {
+				if (previousDAGrank<tentativeDAGrank ||(previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
 					continue;
 				}
 			#endif

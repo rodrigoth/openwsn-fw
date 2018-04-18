@@ -123,8 +123,8 @@ void uinject_task_cb() {
    uint8_t              asnArray[5];
    bool foundNeighbor;
 
-   uint16_t newTime =  UINJECT_PERIOD_MS - 5000+(openrandom_get16b()%(2*5000));
-   opentimers_scheduleIn(uinject_vars.timerId,newTime,TIME_MS,TIMER_ONESHOT,uinject_timer_cb);
+   //uint16_t newTime =  UINJECT_PERIOD_MS - 5000+(openrandom_get16b()%(2*5000));
+   opentimers_scheduleIn(uinject_vars.timerId,UINJECT_PERIOD_MS,TIME_MS,TIMER_ONESHOT,uinject_timer_cb);
 
    seqnum++;
 
