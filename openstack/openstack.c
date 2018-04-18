@@ -36,6 +36,8 @@
 //===== applications
 #include "openapps.h"
 
+#include "openreport.h"
+
 //=========================== variables =======================================
 
 //=========================== prototypes ======================================
@@ -77,6 +79,8 @@ void openstack_init(void) {
    //===== applications
    openapps_init();
    
+   openreport_init();
+
    openserial_printInfo(
       COMPONENT_OPENWSN,ERR_BOOTED,
       (errorparameter_t)0,

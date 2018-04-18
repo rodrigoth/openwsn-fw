@@ -8,6 +8,7 @@ BEGIN_PACK
 typedef struct {
 	asn_t asn;
 	open_addr_t newParent;
+	uint8_t experiment_id;
 } debug_reportParentChangeEntry_t;
 END_PACK
 
@@ -19,6 +20,7 @@ typedef struct {
 	open_addr_t destination;
 	uint8_t totalTx;
 	uint8_t totalRx;
+	uint8_t experiment_id;
 } debug_report6pRequestEntry_t;
 END_PACK
 
@@ -31,6 +33,7 @@ typedef struct {
 	uint8_t totalTx;
 	uint8_t totalRx;
 	uint8_t state;
+	uint8_t experiment_id;
 } debug_report6pReceivedEntry_t;
 END_PACK
 
@@ -44,6 +47,7 @@ typedef struct {
 	uint8_t totalTx;
 	uint8_t totalRx;
 	uint8_t state;
+	uint8_t experiment_id;
 } debug_report6pResponseEntry_t;
 END_PACK
 
@@ -60,6 +64,7 @@ typedef struct {
 	uint8_t component;
 	uint16_t nodeRank;
 	uint16_t destinationRank;
+	uint8_t experiment_id;
 } debug_reportTxEntry_t;
 END_PACK
 
@@ -70,6 +75,7 @@ typedef struct {
 	open_addr_t destination;
 	uint8_t totalTx;
 	uint8_t totalAck;
+	uint8_t experiment_id;
 } debug_reportPDR_t;
 END_PACK
 
@@ -79,6 +85,7 @@ typedef struct {
 	open_addr_t sender;
 	asn_t asn;
 	uint32_t seqnum;
+	uint8_t experiment_id;
 } debug_reportTxReceivedEntry_t;
 END_PACK
 

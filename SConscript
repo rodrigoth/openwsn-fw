@@ -38,6 +38,8 @@ dummyFunc = Builder(
 )
 if env['panid']:
     env.Append(CPPDEFINES    = {'PANID_DEFINED' : env['panid']})
+if env['experimentid']:
+    env.Append(CPPDEFINES    = {'EXPERIMENT_ID_DEFINED' : env['experimentid']})
 if env['dagroot']==1:
     env.Append(CPPDEFINES    = 'DAGROOT')
 if env['forcetopology']==1:

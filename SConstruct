@@ -133,6 +133,7 @@ command_line_options = {
     'simhost':          ['amd64-linux','x86-linux','amd64-windows','x86-windows'],
     'simhostpy':        [''],                               # No reasonable default
     'panid':            [''],
+    'experimentid':     [''],
     'dagroot':          ['0','1'],
     'forcetopology':    ['0','1'],
     'useminhop':		['0','1'],
@@ -251,6 +252,13 @@ command_line_vars.AddVariables(
         'panid',                                           # key
         '0xFFFF',                                          # help
         command_line_options['panid'][0],                  # default
+        None,                                              # validator
+        None,                                              # converter
+    ),
+    (
+        'experimentid',                                    # key
+        '',                                          	   # help
+        command_line_options['experimentid'][0],           # default
         None,                                              # validator
         None,                                              # converter
     ),
