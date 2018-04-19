@@ -218,6 +218,11 @@ owerror_t openserial_printData(uint8_t* buffer, uint8_t length) {
     for (i=0;i<length;i++){
         outputHdlcWrite(buffer[i]);
     }
+	#ifdef EXPERIMENT_ID_DEFINED
+    	outputHdlcWrite(EXPERIMENT_ID_DEFINED);
+	#endif
+
+
     outputHdlcClose();
     ENABLE_INTERRUPTS();
     
