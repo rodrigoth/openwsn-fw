@@ -403,8 +403,13 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
         rankIncrease     = neighbors_getLinkMetric(icmpv6rpl_vars.ParentIndex);
         neighborRank     = neighbors_getNeighborRank(icmpv6rpl_vars.ParentIndex);
 
+		#ifdef USEETXN
+        	tentativeDAGrank = (uint32_t)((neighborRank/MINHOPRANKINCREASE)+rankIncrease)*MINHOPRANKINCREASE;
+		#else
+        	tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
+		#endif
 
-        tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
+
         if (tentativeDAGrank>65535) {
             icmpv6rpl_vars.myDAGrank = 65535;
         } else {
@@ -430,7 +435,13 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
             // if this neighbor has unknown/infinite rank, pass on it
             if (neighborRank==DEFAULTDAGRANK) continue;
             // compute tentative cost of full path to root through this neighbor
-            tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
+
+			#ifdef USEETXN
+        		tentativeDAGrank = (uint32_t)((neighborRank/MINHOPRANKINCREASE)+rankIncrease)*MINHOPRANKINCREASE;
+			#else
+        		tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
+			#endif
+
             if (tentativeDAGrank > 65535) {tentativeDAGrank = 65535;}
 
             #ifdef USEETX
@@ -454,7 +465,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
 
 			#ifdef USEETXN
 				// if not low enough to justify switch, pass (i.e. hysterisis)
-				if ((previousDAGrank<tentativeDAGrank)||(previousDAGrank-tentativeDAGrank < 4*MINHOPRANKINCREASE)) {
+				if ((previousDAGrank<tentativeDAGrank) ||(previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
 					  continue;
 				}
 			#endif
