@@ -593,7 +593,7 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 	#endif
 
 	#ifdef USERSSI
-		return 256 + (-1)*neighbors_vars.neighbors[index].rssi;
+		return 256*(((-1)*neighbors_vars.neighbors[index].rssi)/10);
 	#endif
 
 	#ifdef USEETXN
