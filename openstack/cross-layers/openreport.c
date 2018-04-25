@@ -19,7 +19,7 @@ void openreport_init(void) {
 }
 
 
-void openreport_indicateParentSwitch(open_addr_t *newParent) {
+void openreport_indicateParentSwitch(open_addr_t *newParent, uint16_t previousRank, uint16_t newRank) {
 	uint8_t asnArray[5];
 	debug_reportParentChangeEntry_t debug_reportEntry;
 
@@ -28,6 +28,8 @@ void openreport_indicateParentSwitch(open_addr_t *newParent) {
     debug_reportEntry.asn.bytes2and3 = ((uint16_t)asnArray[3] << 8) | asnArray[2];
     debug_reportEntry.asn.byte4 = asnArray[4];
     debug_reportEntry.experiment_id = experiment_id;
+    debug_reportEntry.previousRank = previousRank;
+    debug_reportEntry.newRank = newRank;
 
     memcpy(&(debug_reportEntry.newParent.addr_64b[0]),&(newParent->addr_64b[0]),8);
 

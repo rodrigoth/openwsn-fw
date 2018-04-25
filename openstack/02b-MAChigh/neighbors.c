@@ -586,14 +586,16 @@ This really belongs to icmpv6rpl but it would require a much more complex interf
 */
 
 uint16_t neighbors_getLinkMetric(uint8_t index) {
-	uint32_t  rankIncreaseIntermediary; // stores intermediary results of rankIncrease calculation
-
 	#ifdef USEMINHOP
 		return MINHOPRANKINCREASE;
 	#endif
 
 	#ifdef USERSSI
-		return 256*(((-1)*neighbors_vars.neighbors[index].rssi)/10);
+		if(neighbors_vars.neighbors[index].rssi >= -87) {
+			return MINHOPRANKINCREASE;
+		} else {
+			return LARGESTLINKCOST*DEFAULTLINKCOST*MINHOPRANKINCREASE;
+		}
 	#endif
 
 	#ifdef USEETXN
@@ -617,6 +619,7 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 
 	#ifdef USEETX
 		uint16_t  rankIncrease;
+		uint32_t  rankIncreaseIntermediary; // stores intermediary results of rankIncrease calculation
 
 		uint16_t totalTx = schedule_getTotalTxToNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
 		uint16_t totalAck = schedule_getTotalAckFromNeighbor(&(neighbors_vars.neighbors[index].addr_64b));

@@ -9,6 +9,8 @@ typedef struct {
 	asn_t asn;
 	open_addr_t newParent;
 	uint8_t experiment_id;
+	uint16_t previousRank;
+	uint16_t newRank;
 } debug_reportParentChangeEntry_t;
 END_PACK
 
@@ -97,7 +99,7 @@ END_PACK
 
 // admin
 void openreport_init(void);
-void openreport_indicateParentSwitch(open_addr_t *newParent);
+void openreport_indicateParentSwitch(open_addr_t *newParent, uint16_t previousRank, uint16_t newRank);
 void openreport_indicate6pRequest(uint8_t code,uint8_t requestedCells,open_addr_t *destination, uint8_t totalTx, uint8_t totalRx);
 void openreport_indicate6pReceived(uint8_t code,uint8_t requestedCells,open_addr_t *sender, uint8_t totalTx, uint8_t totalRx,uint8_t state);
 void openreport_indicate6pResponse(uint8_t code,uint8_t requestedCells,open_addr_t *destination, uint8_t totalTx, uint8_t totalRx,uint8_t state);

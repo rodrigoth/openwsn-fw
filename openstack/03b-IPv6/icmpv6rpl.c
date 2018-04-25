@@ -493,7 +493,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
 
 
          icmpv6rpl_getPreferredParentEui64(&addr);
-         openreport_indicateParentSwitch(&addr);
+         openreport_indicateParentSwitch(&addr,previousDAGrank,icmpv6rpl_vars.myDAGrank);
       } else {
          if (icmpv6rpl_vars.ParentIndex==prevParentIndex) {
              // report on the rank change if any, not on the deletion/creation of parent
@@ -508,7 +508,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
              neighbors_setPreferredParent(icmpv6rpl_vars.ParentIndex, TRUE);
 
              icmpv6rpl_getPreferredParentEui64(&addr);
-             openreport_indicateParentSwitch(&addr);
+             openreport_indicateParentSwitch(&addr,previousDAGrank,icmpv6rpl_vars.myDAGrank);
          }
       }
 
