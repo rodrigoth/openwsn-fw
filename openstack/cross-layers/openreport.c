@@ -31,7 +31,7 @@ void openreport_indicateParentSwitch(open_addr_t *newParent) {
 
     memcpy(&(debug_reportEntry.newParent.addr_64b[0]),&(newParent->addr_64b[0]),8);
 
-    openserial_printStatus(STATUS_PARENTSWITCH,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
+    //openserial_printStatus(STATUS_PARENTSWITCH,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }
 
 void openreport_indicate6pRequest(uint8_t code,uint8_t requestedCells,open_addr_t *destination, uint8_t totalTx, uint8_t totalRx) {
@@ -52,7 +52,7 @@ void openreport_indicate6pRequest(uint8_t code,uint8_t requestedCells,open_addr_
 
     debug_reportEntry.experiment_id = experiment_id;
 
-    openserial_printStatus(STATUS_6PREQUEST,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
+    //openserial_printStatus(STATUS_6PREQUEST,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }
 
 void openreport_indicate6pReceived(uint8_t code,uint8_t requestedCells,open_addr_t *sender, uint8_t totalTx, uint8_t totalRx, uint8_t state) {
@@ -74,7 +74,7 @@ void openreport_indicate6pReceived(uint8_t code,uint8_t requestedCells,open_addr
 
 	debug_reportEntry.experiment_id = experiment_id;
 
-	openserial_printStatus(STATUS_6PREQUEST_RECEIVED,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
+	//openserial_printStatus(STATUS_6PREQUEST_RECEIVED,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }
 
 void openreport_indicate6pResponse(uint8_t code,uint8_t requestedCells,open_addr_t *destination, uint8_t totalTx, uint8_t totalRx,uint8_t state){
@@ -96,7 +96,7 @@ void openreport_indicate6pResponse(uint8_t code,uint8_t requestedCells,open_addr
 
 	debug_reportEntry.experiment_id = experiment_id;
 
-	openserial_printStatus(STATUS_6PRESPONSE,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
+	//openserial_printStatus(STATUS_6PRESPONSE,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }
 
 void openreport_indicatePDR(open_addr_t *destination, uint8_t totalTx, uint8_t totalAck) {
@@ -114,7 +114,7 @@ void openreport_indicatePDR(open_addr_t *destination, uint8_t totalTx, uint8_t t
 
 	debug_reportEntry.experiment_id = experiment_id;
 
-	openserial_printStatus(STATUS_PDR,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
+	//openserial_printStatus(STATUS_PDR,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }
 
 void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_t ack, uint8_t tx,
@@ -145,7 +145,7 @@ void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_
 	debug_reportEntry.destinationRank = icmpv6rpl_getPreferredParentRank();
 
 
-	openserial_printStatus(STATUS_TX,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
+	//openserial_printStatus(STATUS_TX,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }
 
 void openreport_indicateTxReceived(open_addr_t *sender, uint32_t seqnum,uint8_t *asn) {
@@ -163,5 +163,5 @@ void openreport_indicateTxReceived(open_addr_t *sender, uint32_t seqnum,uint8_t 
 
 	memcpy(&(debug_reportEntry.sender.addr_64b[0]),&(sender->addr_64b[0]),8);
 
-	openserial_printStatus(STATUS_TX_RECEIVED,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
+	//openserial_printStatus(STATUS_TX_RECEIVED,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }

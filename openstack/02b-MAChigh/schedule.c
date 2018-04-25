@@ -14,7 +14,7 @@
 
 schedule_vars_t schedule_vars;
 uint8_t slotframeRepetition;
-uint8_t shared_slots[] = {0,25,50,75,100,125,150,175};
+uint8_t shared_slots[] = {0,20};
 
 //=========================== prototypes ======================================
 
@@ -248,7 +248,7 @@ uint16_t schedule_getTotalAckFromNeighbor(open_addr_t* neighbor) {
 }
 
 void schedule_resetTxAck(open_addr_t* neighbor) {
-	uint8_t i;
+	/*uint8_t i;
 
 	INTERRUPT_DECLARATION();
 	DISABLE_INTERRUPTS();
@@ -259,7 +259,7 @@ void schedule_resetTxAck(open_addr_t* neighbor) {
 		 schedule_vars.scheduleBuf[i].numTx = 0;
 	  }
 	}
-	ENABLE_INTERRUPTS();
+	ENABLE_INTERRUPTS();*/
 }
 
 

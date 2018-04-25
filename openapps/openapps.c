@@ -14,6 +14,7 @@
 #include "cjoin.h"
 #include "cwellknown.h"
 #include "rrt.h"
+#include "cexample.h"
 // UDP
 #include "uecho.h"
 #include "uinject.h"
@@ -40,10 +41,11 @@ void openapps_init(void) {
    //cjoin_init();
    //cwellknown_init();
    //rrt_init();
+	cexample_init();
    
    // UDP
    //uecho_init();
-   uinject_init();
+   //uinject_init();
    //userialbridge_init();
    //uexpiration_init();
    //umonitor_init();

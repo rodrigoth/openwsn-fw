@@ -220,6 +220,8 @@ owerror_t openserial_printData(uint8_t* buffer, uint8_t length) {
     }
 	#ifdef EXPERIMENT_ID_DEFINED
     	outputHdlcWrite(EXPERIMENT_ID_DEFINED);
+	#else
+    	outputHdlcWrite(99);
 	#endif
 
 
@@ -336,7 +338,7 @@ void openserial_startOutput() {
     debugPrintCounter = openserial_vars.debugPrintCounter;
     ENABLE_INTERRUPTS();
     
-    /*switch (debugPrintCounter) {
+    switch (debugPrintCounter) {
         case STATUS_ISSYNC:
             if (debugPrint_isSync()==TRUE) {
                 break;
@@ -389,7 +391,7 @@ void openserial_startOutput() {
             DISABLE_INTERRUPTS();
             openserial_vars.debugPrintCounter=0;
             ENABLE_INTERRUPTS();
-    }*/
+    }
     
     //=== flush TX buffer
     

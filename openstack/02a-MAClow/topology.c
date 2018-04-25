@@ -11,9 +11,19 @@
 
 bool topology_isAcceptablePacket(ieee802154_header_iht* ieee802514_header,int8_t rssi) {
 #ifdef FORCETOPOLOGY
-   if(rssi < -65) return FALSE;
+	bool returnVal;
+	returnVal=FALSE;
 
-   return TRUE;
+	if (idmanager_getIsDAGroot()) {
+		returnVal = TRUE;
+	} else {
+
+		if(ieee802514_header->src.addr_64b[6] == 0x09  && ieee802514_header->src.addr_64b[7] == 0x62) {
+				   returnVal = TRUE;
+		 }
+	}
+
+   return returnVal;
 
 #else
    return TRUE;
