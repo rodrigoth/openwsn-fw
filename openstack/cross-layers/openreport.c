@@ -101,7 +101,7 @@ void openreport_indicate6pResponse(uint8_t code,uint8_t requestedCells,open_addr
 	openserial_printStatus(STATUS_6PRESPONSE,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }
 
-void openreport_indicatePDR(open_addr_t *destination, uint8_t totalTx, uint8_t totalAck) {
+void openreport_indicatePDR(open_addr_t *destination, uint8_t totalTx, uint8_t totalAck, uint8_t pdrWMEMA) {
 	uint8_t asnArray[5];
 	debug_reportPDR_t debug_reportEntry;
 
@@ -115,6 +115,7 @@ void openreport_indicatePDR(open_addr_t *destination, uint8_t totalTx, uint8_t t
 	debug_reportEntry.totalTx = totalTx;
 
 	debug_reportEntry.experiment_id = experiment_id;
+	debug_reportEntry.pdrWMEMA = pdrWMEMA;
 
 	openserial_printStatus(STATUS_PDR,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }

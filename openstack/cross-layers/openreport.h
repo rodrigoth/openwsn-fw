@@ -78,6 +78,7 @@ typedef struct {
 	uint8_t totalTx;
 	uint8_t totalAck;
 	uint8_t experiment_id;
+	uint8_t pdrWMEMA;
 } debug_reportPDR_t;
 END_PACK
 
@@ -104,7 +105,7 @@ void openreport_indicate6pRequest(uint8_t code,uint8_t requestedCells,open_addr_
 void openreport_indicate6pReceived(uint8_t code,uint8_t requestedCells,open_addr_t *sender, uint8_t totalTx, uint8_t totalRx,uint8_t state);
 void openreport_indicate6pResponse(uint8_t code,uint8_t requestedCells,open_addr_t *destination, uint8_t totalTx, uint8_t totalRx,uint8_t state);
 void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_t ack, uint8_t tx, uint8_t channel, uint32_t seqnum,uint8_t component,uint8_t *asn);
-void openreport_indicatePDR(open_addr_t *destination, uint8_t totalTx, uint8_t totalAck);
+void openreport_indicatePDR(open_addr_t *destination, uint8_t totalTx, uint8_t totalAck, uint8_t pdrWMEMA);
 void openreport_indicateTxReceived(open_addr_t *sender, uint32_t seqnum,uint8_t *asn);
 
 

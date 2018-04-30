@@ -403,11 +403,8 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
         rankIncrease     = neighbors_getLinkMetric(icmpv6rpl_vars.ParentIndex);
         neighborRank     = neighbors_getNeighborRank(icmpv6rpl_vars.ParentIndex);
 
-		#ifdef USEETXN
-        	tentativeDAGrank = (uint32_t)((neighborRank/MINHOPRANKINCREASE)+rankIncrease)*MINHOPRANKINCREASE;
-		#else
-        	tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
-		#endif
+		tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
+
 
 
         if (tentativeDAGrank>65535) {
@@ -436,19 +433,16 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
             if (neighborRank==DEFAULTDAGRANK) continue;
             // compute tentative cost of full path to root through this neighbor
 
-			#ifdef USEETXN
-        		tentativeDAGrank = (uint32_t)((neighborRank/MINHOPRANKINCREASE)+rankIncrease)*MINHOPRANKINCREASE;
-			#else
-        		tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
-			#endif
+			tentativeDAGrank = (uint32_t)neighborRank+rankIncrease;
+
 
             if (tentativeDAGrank > 65535) {tentativeDAGrank = 65535;}
 
             #ifdef USEETX
-				// if not low enough to justify switch, pass (i.e. hysterisis)
-				if ((previousDAGrank<tentativeDAGrank) ||(previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
-					  continue;
-				}
+            //just change parent if the PDR is lower than 80%
+			if ( (previousDAGrank<tentativeDAGrank) || (prevHadParent == TRUE && neighbors_getLinkMetric(prevParentIndex) <= RANKINCREASEETX80)) {
+				continue;
+			}
 			#endif
 
 			#ifdef USEMINHOP
@@ -458,15 +452,15 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
 			#endif
 
 			#ifdef USERSSI
-				if (previousDAGrank<tentativeDAGrank ||(previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
+				if ( previousDAGrank<tentativeDAGrank ||(previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
 					continue;
 				}
 			#endif
 
 			#ifdef USEETXN
-				// if not low enough to justify switch, pass (i.e. hysterisis)
-				if ((previousDAGrank<tentativeDAGrank) ||(previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
-					  continue;
+				//just change parent if the PDR is lower than 80%
+				if ( (previousDAGrank<tentativeDAGrank) || (prevHadParent == TRUE && neighbors_getLinkMetric(prevParentIndex) <= RANKINCREASEETXN80)) {
+					continue;
 				}
 			#endif
 

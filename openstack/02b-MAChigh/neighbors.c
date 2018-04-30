@@ -44,6 +44,8 @@ void neighbors_init() {
    memset(&neighbors_vars,0,sizeof(neighbors_vars_t));
    // The .used fields get reset to FALSE by this memset.
    
+   neighbors_vars.pdrWMEMA = 1.0;
+
 }
 
 //===== getters
@@ -150,6 +152,10 @@ uint8_t neighbors_getSequenceNumber(open_addr_t* address){
     }
     return neighbors_vars.neighbors[i].sequenceNumber;
 
+}
+
+uint8_t neighbors_getpdrWMEMA() {
+	return neighbors_vars.pdrWMEMA;
 }
 
 //===== interrogators
@@ -288,12 +294,8 @@ bool neighbors_reachedMaxTransmission(uint8_t index){
 
 	if (prevDesync == 0) {prevDesync = ieee154e_getNumOfDesync();}
     
-    if (totalTx  >=  10) {
+    if (totalTx  >=  15) {
         returnVal = TRUE;
-        uint8_t parentIndex ;
-		if(icmpv6rpl_getPreferredParentIndex(&parentIndex)) {
-			openreport_indicatePDR(&(neighbors_vars.neighbors[parentIndex].addr_64b),totalTx,totalAck);
-		}
     } else {
     	if(ieee154e_getNumOfDesync() - prevDesync >= DESYNCTHRESHOLD) {
 			openserial_printError(COMPONENT_NEIGHBORS,ERR_NEIGHBORS_DESYNC,(errorparameter_t)ieee154e_getNumOfDesync(),(errorparameter_t)prevDesync);
@@ -575,6 +577,7 @@ void neighbors_setNeighborNoResource(open_addr_t* address){
 
 void neighbors_setPreferredParent(uint8_t index, bool isPreferred){
     neighbors_vars.neighbors[index].parentPreference = isPreferred;
+    neighbors_vars.pdrWMEMA = 1.0;
 }
 
 //===== managing routing info
@@ -600,52 +603,66 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 
 	#ifdef USEETXN
 		uint16_t  rankIncrease;
+		uint16_t  rankIncrease80 = RANKINCREASEETXN80; // (1/0.8 * 1/0.8)*256
+
 		uint16_t totalTx = schedule_getTotalTxToNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
 		uint16_t totalAck = schedule_getTotalAckFromNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
 
-		// we assume that this neighbor has already been checked for being in use
-		// calculate link cost to this neighbor
 		if (totalAck == 0) {
-			if (totalTx<=DEFAULTLINKCOST && ieee154e_getNumOfDesync() - prevDesync < DESYNCTHRESHOLD){
-				rankIncrease = DEFAULTLINKCOST*DEFAULTLINKCOST;
+			if (totalTx<=DEFAULTLINKCOST && ieee154e_getNumOfDesync() - prevDesync < DESYNCTHRESHOLD) {
+				return rankIncrease80;
 			} else {
-				rankIncrease = LARGESTLINKCOST*LARGESTLINKCOST;
+				rankIncrease = LARGESTLINKCOST*DEFAULTLINKCOST*MINHOPRANKINCREASE;
 			}
+
 		} else {
-			rankIncrease = (totalTx/totalAck)*(totalTx/totalAck);
+			neighbors_vars.pdrWMEMA = 0.8f*neighbors_vars.pdrWMEMA + (0.2f)*(float)totalAck/totalTx;
+			float etx2 = ((float)1/neighbors_vars.pdrWMEMA) * ((float)1/neighbors_vars.pdrWMEMA);
+			rankIncrease = MINHOPRANKINCREASE*etx2;
+
+			//penalize bad parent(nodes 1 hop away from sink with bad link quality werent changing their preferred parent)
+			if(rankIncrease > rankIncrease80) {
+				rankIncrease = rankIncrease*2;
+			}
+
+			uint8_t parentIndex ;
+			if(icmpv6rpl_getPreferredParentIndex(&parentIndex)) {
+					openreport_indicatePDR(&(neighbors_vars.neighbors[parentIndex].addr_64b),totalTx,totalAck,(uint8_t)(neighbors_vars.pdrWMEMA*100));
+			}
 		}
+
+
+
 		return rankIncrease;
 	#endif
 
 	#ifdef USEETX
 		uint16_t  rankIncrease;
-		uint32_t  rankIncreaseIntermediary; // stores intermediary results of rankIncrease calculation
+		uint16_t  rankIncrease80 = RANKINCREASEETX80; // (1/0.8)*256
 
 		uint16_t totalTx = schedule_getTotalTxToNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
 		uint16_t totalAck = schedule_getTotalAckFromNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
 
-		// we assume that this neighbor has already been checked for being in use
-		// calculate link cost to this neighbor
 		if (totalAck == 0) {
-			if (totalTx<=DEFAULTLINKCOST && ieee154e_getNumOfDesync() - prevDesync < DESYNCTHRESHOLD){
-				rankIncrease = (3*DEFAULTLINKCOST-2)*MINHOPRANKINCREASE;
+			if (totalTx<=DEFAULTLINKCOST && ieee154e_getNumOfDesync() - prevDesync < DESYNCTHRESHOLD) {
+				return rankIncrease80;
 			} else {
-				rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
-				openserial_printError(COMPONENT_NEIGHBORS,ERR_NEIGHBORS_DESYNC,(errorparameter_t)ieee154e_getNumOfDesync(),(errorparameter_t)prevDesync);
+				rankIncrease = LARGESTLINKCOST*DEFAULTLINKCOST*MINHOPRANKINCREASE;
 			}
+
 		} else {
-			//6TiSCH minimal draft using OF0 for rank computation: ((3*numTx/numTxAck)-2)*minHopRankIncrease
-			// numTx is on 8 bits, so scaling up 10 bits won't lead to saturation
-			// but this <<10 followed by >>10 does not provide any benefit either. Result is the same.
-			//rankIncreaseIntermediary = (((uint32_t)neighbors_vars.neighbors[index].numTx) << 10);
-			rankIncreaseIntermediary = (((uint32_t)totalTx) << 10);
-			rankIncreaseIntermediary = (3*rankIncreaseIntermediary * MINHOPRANKINCREASE) / ((uint32_t)totalAck);
-			rankIncreaseIntermediary = rankIncreaseIntermediary - ((uint32_t)(2 * MINHOPRANKINCREASE)<<10);
-			// this could still overflow for numTx large and numTxAck small, Casting to 16 bits will yiel the least significant bits
-			if (rankIncreaseIntermediary >= (65536<<10)) {
-				rankIncrease = 65535;
-			} else {
-				rankIncrease = (uint16_t)(rankIncreaseIntermediary >> 10);
+			neighbors_vars.pdrWMEMA = 0.8f*neighbors_vars.pdrWMEMA + (0.2f)*(float)totalAck/totalTx;
+			float etx = ((float)1/neighbors_vars.pdrWMEMA);
+			rankIncrease = MINHOPRANKINCREASE*etx;
+
+			//penalize bad parent(nodes 1 hop away from sink with bad link quality werent changing their preferred parent)
+			if(rankIncrease > rankIncrease80) {
+				rankIncrease = rankIncrease*2;
+			}
+
+			uint8_t parentIndex ;
+			if(icmpv6rpl_getPreferredParentIndex(&parentIndex)) {
+				openreport_indicatePDR(&(neighbors_vars.neighbors[parentIndex].addr_64b),totalTx,totalAck,(uint8_t)(neighbors_vars.pdrWMEMA*100));
 			}
 		}
 		return rankIncrease;

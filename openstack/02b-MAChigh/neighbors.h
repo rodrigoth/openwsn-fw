@@ -23,6 +23,8 @@
 #define MAXDAGRANK                0xffff
 #define DEFAULTDAGRANK            MAXDAGRANK
 #define MINHOPRANKINCREASE        256  //default value in RPL and Minimal 6TiSCH draft
+#define RANKINCREASEETXN80		  400 // (1/0.8 * 1/0.8)*256
+#define RANKINCREASEETX80		  320 // (1/0.8)*256
 
 
 //=========================== typedef =========================================
@@ -50,6 +52,7 @@ typedef struct {
    neighborRow_t        neighbors[MAXNUMNEIGHBORS];
    dagrank_t            myDAGrank;
    uint8_t              debugRow;
+   float				pdrWMEMA;
 } neighbors_vars_t;
 
 //=========================== prototypes ======================================
@@ -65,6 +68,7 @@ open_addr_t*  neighbors_getJoinProxy(void);
 bool          neighbors_getNeighborNoResource(uint8_t index);
 uint8_t       neighbors_getGeneration(open_addr_t* address);
 uint8_t       neighbors_getSequenceNumber(open_addr_t* address);
+uint8_t	      neighbors_getpdrWMEMA(void);
 // setters
 void          neighbors_setNeighborRank(uint8_t index, dagrank_t rank);
 void          neighbors_setNeighborNoResource(open_addr_t* address);
