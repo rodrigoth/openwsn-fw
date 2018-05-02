@@ -590,10 +590,24 @@ This really belongs to icmpv6rpl but it would require a much more complex interf
 
 uint16_t neighbors_getLinkMetric(uint8_t index) {
 	#ifdef USEMINHOP
+		uint8_t parentIndex ;
+		if(icmpv6rpl_getPreferredParentIndex(&parentIndex) && index == parentIndex) {
+			uint16_t totalTx = schedule_getTotalTxToNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
+			uint16_t totalAck = schedule_getTotalAckFromNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
+			openreport_indicatePDR(&(neighbors_vars.neighbors[index].addr_64b),totalTx,totalAck,0);
+		}
+
 		return MINHOPRANKINCREASE;
 	#endif
 
 	#ifdef USERSSI
+		uint8_t parentIndex ;
+		if(icmpv6rpl_getPreferredParentIndex(&parentIndex) && index == parentIndex) {
+			uint16_t totalTx = schedule_getTotalTxToNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
+			uint16_t totalAck = schedule_getTotalAckFromNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
+			openreport_indicatePDR(&(neighbors_vars.neighbors[index].addr_64b),totalTx,totalAck,0);
+		}
+
 		if(neighbors_vars.neighbors[index].rssi >= -87) {
 			return MINHOPRANKINCREASE;
 		} else {
