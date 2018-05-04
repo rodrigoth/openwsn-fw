@@ -451,8 +451,9 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
 				}
 			#endif
 
+			//just change if the rssi to preferred parent is lower than -82dbm
 			#ifdef USERSSI
-				if ( previousDAGrank<tentativeDAGrank ||(previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
+				if ( (previousDAGrank<tentativeDAGrank) || (prevHadParent == TRUE && neighbors_getLinkMetric(prevParentIndex) <= MINHOPRANKINCREASE)) {
 					continue;
 				}
 			#endif
