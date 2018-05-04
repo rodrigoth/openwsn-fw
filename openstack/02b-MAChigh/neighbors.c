@@ -291,11 +291,17 @@ bool neighbors_isNeighborWithHigherDAGrank(uint8_t index) {
 bool neighbors_reachedMaxTransmission(uint8_t index){
 	bool returnVal;
 	uint8_t totalTx  = (uint8_t)schedule_getTotalTxToNeighbor(&neighbors_vars.neighbors[index].addr_64b);
-	uint8_t totalAck = (uint8_t)schedule_getTotalAckFromNeighbor(&neighbors_vars.neighbors[index].addr_64b);
+	uint8_t attempt;
+
+	#if defined(USERSSI) || defined(USEMINHOP)
+		attempt = 1;
+	#else
+		attempt = 15;
+	#endif
 
 	if (prevDesync == 0) {prevDesync = ieee154e_getNumOfDesync();}
     
-    if (totalTx  >=  15) {
+    if (totalTx  >=  attempt) {
         returnVal = TRUE;
     } else {
     	if(ieee154e_getNumOfDesync() - prevDesync >= DESYNCTHRESHOLD) {
