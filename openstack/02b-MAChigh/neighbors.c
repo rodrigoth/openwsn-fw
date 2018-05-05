@@ -158,6 +158,14 @@ uint8_t neighbors_getpdrWMEMA() {
 	return neighbors_vars.pdrWMEMA;
 }
 
+uint8_t	neighbors_getParentRSSI() {
+	uint8_t parentIndex ;
+	if(icmpv6rpl_getPreferredParentIndex(&parentIndex)) {
+		return (-1)*neighbors_vars.neighbors[parentIndex].rssi;
+	}
+	return 0;
+}
+
 
 //===== interrogators
 

@@ -67,6 +67,7 @@ typedef struct {
 	uint16_t nodeRank;
 	uint16_t destinationRank;
 	uint8_t experiment_id;
+	uint8_t rssi;
 } debug_reportTxEntry_t;
 END_PACK
 

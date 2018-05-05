@@ -69,6 +69,7 @@ bool          neighbors_getNeighborNoResource(uint8_t index);
 uint8_t       neighbors_getGeneration(open_addr_t* address);
 uint8_t       neighbors_getSequenceNumber(open_addr_t* address);
 uint8_t	      neighbors_getpdrWMEMA(void);
+uint8_t	      neighbors_getParentRSSI(void);
 // setters
 void          neighbors_setNeighborRank(uint8_t index, dagrank_t rank);
 void          neighbors_setNeighborNoResource(open_addr_t* address);

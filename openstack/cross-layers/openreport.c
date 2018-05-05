@@ -2,6 +2,7 @@
 #include "openserial.h"
 #include "IEEE802154E.h"
 #include "icmpv6rpl.h"
+#include "neighbors.h"
 
 
 //=========================== variables =======================================
@@ -141,6 +142,7 @@ void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_
 	debug_reportEntry.channel = channel;
 
 	debug_reportEntry.experiment_id = experiment_id;
+	debug_reportEntry.rssi = neighbors_getParentRSSI();
 
 	debug_reportEntry.seqnum = seqnum;
 	debug_reportEntry.component = component;
