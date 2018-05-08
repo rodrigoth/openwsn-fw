@@ -123,8 +123,8 @@ void uinject_task_cb() {
    uint8_t              asnArray[5];
    bool foundNeighbor;
 
-   //uint16_t newTime =  UINJECT_PERIOD_MS - 5000+(openrandom_get16b()%(2*5000));
-   opentimers_scheduleIn(uinject_vars.timerId,UINJECT_PERIOD_MS,TIME_MS,TIMER_ONESHOT,uinject_timer_cb);
+   uint16_t newTime =  UINJECT_PERIOD_MS - 5000+(openrandom_get16b()%(2*5000));
+   opentimers_scheduleIn(uinject_vars.timerId,newTime,TIME_MS,TIMER_ONESHOT,uinject_timer_cb);
 
    seqnum++;
 
@@ -156,12 +156,8 @@ void uinject_task_cb() {
 	 // get a free packet buffer
 	 pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
 	 if (pkt==NULL) {
-		openserial_printError(
-		   COMPONENT_UINJECT,
-		   ERR_NO_FREE_PACKET_BUFFER,
-		   (errorparameter_t)1,
-		   (errorparameter_t)1
-		);
+		openqueue_removeAllCreatedBy(COMPONENT_UINJECT);
+		openserial_printError(COMPONENT_UINJECT,ERR_NO_FREE_PACKET_BUFFER,(errorparameter_t)1,(errorparameter_t)1);
 		return;
 	 }
 

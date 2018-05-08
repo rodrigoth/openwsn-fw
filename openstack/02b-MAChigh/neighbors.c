@@ -623,7 +623,7 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 			openreport_indicatePDR(&(neighbors_vars.neighbors[index].addr_64b),totalTx,totalAck,0);
 		}
 
-		if(neighbors_vars.neighbors[index].rssi >= -81) {
+		if(neighbors_vars.neighbors[index].rssi >= -87) {
 			return MINHOPRANKINCREASE;
 		} else {
 			return LARGESTLINKCOST*DEFAULTLINKCOST*MINHOPRANKINCREASE;
