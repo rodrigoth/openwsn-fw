@@ -439,8 +439,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
             if (tentativeDAGrank > 65535) {tentativeDAGrank = 65535;}
 
             #ifdef USEETX
-            //just change parent if the PDR is lower than 80%
-			if ( (previousDAGrank<tentativeDAGrank) || (prevHadParent == TRUE && neighbors_getLinkMetric(prevParentIndex) <= RANKINCREASEETX80)) {
+			if ((previousDAGrank<tentativeDAGrank) || (previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
 				continue;
 			}
 			#endif
@@ -451,16 +450,14 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
 				}
 			#endif
 
-			//just change if the rssi to preferred parent is lower than -82dbm
 			#ifdef USERSSI
-				if ( (previousDAGrank<tentativeDAGrank) || previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE) {
+				if ( (previousDAGrank<tentativeDAGrank) || (previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
 					continue;
 				}
 			#endif
 
 			#ifdef USEETXN
-				//just change parent if the PDR is lower than 80%
-				if ( (previousDAGrank<tentativeDAGrank) || (prevHadParent == TRUE && neighbors_getLinkMetric(prevParentIndex) <= RANKINCREASEETXN80)) {
+				if ((previousDAGrank<tentativeDAGrank) || (previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
 					continue;
 				}
 			#endif

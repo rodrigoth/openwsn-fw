@@ -8,7 +8,7 @@
 #include "openrandom.h"
 #include "openreport.h"
 
-#define CLEARNEIGHBORS 10
+#define CLEARNEIGHBORS 20
 
 //=========================== variables =======================================
 
@@ -632,27 +632,21 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 
 	#ifdef USEETXN
 		uint16_t  rankIncrease;
-		uint16_t  rankIncrease80 = RANKINCREASEETXN80; // (1/0.8 * 1/0.8)*256
 
 		uint16_t totalTx = schedule_getTotalTxToNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
 		uint16_t totalAck = schedule_getTotalAckFromNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
 
 		if (totalAck == 0) {
 			if (totalTx<=DEFAULTLINKCOST && ieee154e_getNumOfDesync() - prevDesync < DESYNCTHRESHOLD) {
-				return rankIncrease80;
+				rankIncrease = DEFAULTLINKCOST*DEFAULTLINKCOST*MINHOPRANKINCREASE;
 			} else {
-				rankIncrease = LARGESTLINKCOST*DEFAULTLINKCOST*MINHOPRANKINCREASE;
+				rankIncrease = LARGESTLINKCOST*LARGESTLINKCOST*MINHOPRANKINCREASE;
 			}
 
 		} else {
 			neighbors_vars.pdrWMEMA = 0.8f*neighbors_vars.pdrWMEMA + (0.2f)*(float)totalAck/totalTx;
 			float etx2 = ((float)1/neighbors_vars.pdrWMEMA) * ((float)1/neighbors_vars.pdrWMEMA);
 			rankIncrease = MINHOPRANKINCREASE*etx2;
-
-			//penalize bad parent(nodes 1 hop away from sink with bad link quality werent changing their preferred parent)
-			if(rankIncrease > rankIncrease80) {
-				rankIncrease = rankIncrease*2;
-			}
 
 			uint8_t parentIndex ;
 			if(icmpv6rpl_getPreferredParentIndex(&parentIndex)) {
@@ -667,27 +661,21 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 
 	#ifdef USEETX
 		uint16_t  rankIncrease;
-		uint16_t  rankIncrease80 = RANKINCREASEETX80; // (1/0.8)*256
 
 		uint16_t totalTx = schedule_getTotalTxToNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
 		uint16_t totalAck = schedule_getTotalAckFromNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
 
 		if (totalAck == 0) {
 			if (totalTx<=DEFAULTLINKCOST && ieee154e_getNumOfDesync() - prevDesync < DESYNCTHRESHOLD) {
-				return rankIncrease80;
+				rankIncrease = (3*DEFAULTLINKCOST-2)*MINHOPRANKINCREASE;
 			} else {
-				rankIncrease = LARGESTLINKCOST*DEFAULTLINKCOST*MINHOPRANKINCREASE;
+				rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
 			}
 
 		} else {
 			neighbors_vars.pdrWMEMA = 0.8f*neighbors_vars.pdrWMEMA + (0.2f)*(float)totalAck/totalTx;
 			float etx = ((float)1/neighbors_vars.pdrWMEMA);
 			rankIncrease = MINHOPRANKINCREASE*etx;
-
-			//penalize bad parent(nodes 1 hop away from sink with bad link quality werent changing their preferred parent)
-			if(rankIncrease > rankIncrease80) {
-				rankIncrease = rankIncrease*2;
-			}
 
 			uint8_t parentIndex ;
 			if(icmpv6rpl_getPreferredParentIndex(&parentIndex)) {
