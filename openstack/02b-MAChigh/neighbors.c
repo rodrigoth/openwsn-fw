@@ -638,7 +638,7 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 
 		if (totalAck == 0) {
 			if (totalTx<=DEFAULTLINKCOST && ieee154e_getNumOfDesync() - prevDesync < DESYNCTHRESHOLD) {
-				rankIncrease = DEFAULTLINKCOST*DEFAULTLINKCOST*MINHOPRANKINCREASE;
+				rankIncrease = 519; //70
 			} else {
 				rankIncrease = LARGESTLINKCOST*LARGESTLINKCOST*MINHOPRANKINCREASE;
 			}
@@ -667,7 +667,7 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 
 		if (totalAck == 0) {
 			if (totalTx<=DEFAULTLINKCOST && ieee154e_getNumOfDesync() - prevDesync < DESYNCTHRESHOLD) {
-				rankIncrease = (3*DEFAULTLINKCOST-2)*MINHOPRANKINCREASE;
+				rankIncrease = 365; //(3*DEFAULTLINKCOST-2)*MINHOPRANKINCREASE; (70%)
 			} else {
 				rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
 			}
