@@ -144,6 +144,13 @@ void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_
 	debug_reportEntry.experiment_id = experiment_id;
 	debug_reportEntry.rssi = neighbors_getParentRSSI();
 
+	open_addr_t neighbor;
+	icmpv6rpl_getPreferredParentEui64(&neighbor);
+	debug_reportEntry.totalTx = schedule_getNumberSlotToPreferredParent(&neighbor);
+	debug_reportEntry.totalRx = schedule_getNumOfSlotsByType(CELLTYPE_RX);
+
+
+
 	debug_reportEntry.seqnum = seqnum;
 	debug_reportEntry.component = component;
 	debug_reportEntry.nodeRank = icmpv6rpl_getMyDAGrank();
