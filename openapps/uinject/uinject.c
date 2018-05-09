@@ -71,7 +71,9 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 
 	  new_pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
 	  if (new_pkt==NULL) {
-	      openqueue_init();
+		  if(schedule_getNumberSlotToPreferredParent(&neighbor) == 0) {
+			openqueue_init();
+		  }
 	      openserial_printError(COMPONENT_UINJECT,ERR_NO_FREE_PACKET_BUFFER,(errorparameter_t)0,(errorparameter_t)0);
 	      return;
 	  }
@@ -156,7 +158,10 @@ void uinject_task_cb() {
 	 // get a free packet buffer
 	 pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
 	 if (pkt==NULL) {
-		openqueue_init();
+		if(schedule_getNumberSlotToPreferredParent(&neighbor) == 0) {
+			openqueue_init();
+		}
+
 		openserial_printError(COMPONENT_UINJECT,ERR_NO_FREE_PACKET_BUFFER,(errorparameter_t)1,(errorparameter_t)1);
 		return;
 	 }
