@@ -3,6 +3,7 @@
 #include "IEEE802154E.h"
 #include "icmpv6rpl.h"
 #include "neighbors.h"
+#include "openqueue.h"
 
 
 //=========================== variables =======================================
@@ -148,6 +149,8 @@ void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_
 	icmpv6rpl_getPreferredParentEui64(&neighbor);
 	debug_reportEntry.totalTx = schedule_getNumberSlotToPreferredParent(&neighbor);
 	debug_reportEntry.totalRx = schedule_getNumOfSlotsByType(CELLTYPE_RX);
+
+	debug_reportEntry.queueCapacity = openqueue_getCurrentCapacity();
 
 
 

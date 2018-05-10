@@ -12,6 +12,8 @@
 
 
 #define PAYLOADLEN 17
+#define MAX_DIFF_TX_RX 3
+#define MAX_QUEUE_CAPACITY_TO_FORWARD 20
 
 //=========================== variables =======================================
 
@@ -69,11 +71,18 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 		  return;
 	  }
 
+	  //workaround to avoid buffer overflow during the parent changing or clear command
+	  //The node needs to pre-reserve slots before changing
+	  uint8_t totalTx = schedule_getNumberSlotToPreferredParent(&neighbor);
+	  uint8_t totalRx = schedule_getNumOfSlotsByType(CELLTYPE_RX);
+
+	  if ((totalRx > totalTx + MAX_DIFF_TX_RX) || (openqueue_getCurrentCapacity() >= MAX_QUEUE_CAPACITY_TO_FORWARD)) {
+		  openqueue_freePacketBuffer(pkt);
+		  return;
+	  }
+
 	  new_pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
 	  if (new_pkt==NULL) {
-		  if(schedule_getNumberSlotToPreferredParent(&neighbor) == 0) {
-			openqueue_init();
-		  }
 	      openserial_printError(COMPONENT_UINJECT,ERR_NO_FREE_PACKET_BUFFER,(errorparameter_t)0,(errorparameter_t)0);
 	      return;
 	  }
@@ -125,8 +134,8 @@ void uinject_task_cb() {
    uint8_t              asnArray[5];
    bool foundNeighbor;
 
-   uint16_t newTime =  UINJECT_PERIOD_MS - 5000+(openrandom_get16b()%(2*5000));
-   opentimers_scheduleIn(uinject_vars.timerId,newTime,TIME_MS,TIMER_ONESHOT,uinject_timer_cb);
+   //uint16_t newTime =  UINJECT_PERIOD_MS - 5000+(openrandom_get16b()%(2*5000));
+   opentimers_scheduleIn(uinject_vars.timerId,UINJECT_PERIOD_MS,TIME_MS,TIMER_ONESHOT,uinject_timer_cb);
 
    seqnum++;
 
@@ -145,7 +154,11 @@ void uinject_task_cb() {
 	 open_addr_t neighbor;
 	 foundNeighbor = icmpv6rpl_getPreferredParentEui64(&neighbor);
 	 if(!foundNeighbor || schedule_getNumberSlotToPreferredParent(&neighbor) == 0) {
-		  return;
+		 if (openqueue_getCurrentCapacity() == QUEUELENGTH) {
+			 openqueue_removeAllCreatedBy(COMPONENT_UINJECT);
+			 openqueue_removeAllCreatedBy(COMPONENT_UINJECT_FORWARDING);
+		 }
+		 return;
 	  }
 
 
@@ -158,10 +171,6 @@ void uinject_task_cb() {
 	 // get a free packet buffer
 	 pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
 	 if (pkt==NULL) {
-		if(schedule_getNumberSlotToPreferredParent(&neighbor) == 0) {
-			openqueue_init();
-		}
-
 		openserial_printError(COMPONENT_UINJECT,ERR_NO_FREE_PACKET_BUFFER,(errorparameter_t)1,(errorparameter_t)1);
 		return;
 	 }

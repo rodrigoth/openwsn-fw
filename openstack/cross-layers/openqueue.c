@@ -316,6 +316,17 @@ OpenQueueEntry_t* openqueue_macGetEBPacket() {
    return NULL;
 }
 
+uint8_t openqueue_getCurrentCapacity(void) {
+	uint8_t i;
+	uint8_t entryCounter = 0;
+	for (i=0;i<QUEUELENGTH;i++) {
+		if (openqueue_vars.queue[i].owner!=COMPONENT_NULL) {
+			entryCounter++;
+		}
+	}
+	return entryCounter;
+}
+
 //=========================== private =========================================
 
 void openqueue_reset_entry(OpenQueueEntry_t* entry) {

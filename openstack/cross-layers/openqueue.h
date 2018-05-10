@@ -48,6 +48,8 @@ OpenQueueEntry_t*  openqueue_macGetEBPacket(void);
 OpenQueueEntry_t*  openqueue_macGetDioPacket(void);
 OpenQueueEntry_t*  openqueue_macGet6pPacket(void);
 
+uint8_t 		   openqueue_getCurrentCapacity(void);
+
 /**
 \}
 \}

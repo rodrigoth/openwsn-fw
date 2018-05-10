@@ -623,11 +623,21 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 			openreport_indicatePDR(&(neighbors_vars.neighbors[index].addr_64b),totalTx,totalAck,0);
 		}
 
-		if(neighbors_vars.neighbors[index].rssi >= -87) {
-			return MINHOPRANKINCREASE;
+		float min = -91.0f;
+		float max = -80.0f;
+		int8_t rssi = neighbors_vars.neighbors[index].rssi;
+
+		//division by zero when transforming to etx
+		if(rssi == -91) {
+			rssi = -90;
 		} else {
-			return LARGESTLINKCOST*DEFAULTLINKCOST*MINHOPRANKINCREASE;
+			if(rssi > -80) {
+				rssi = -80;
+			 }
 		}
+
+		float etxFromRSSI = 1/((rssi - min)/(max - min));
+		return MINHOPRANKINCREASE*etxFromRSSI;
 	#endif
 
 	#ifdef USEETXN
@@ -645,7 +655,7 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 
 		} else {
 			neighbors_vars.pdrWMEMA = 0.8f*neighbors_vars.pdrWMEMA + (0.2f)*(float)totalAck/totalTx;
-			float etx2 = ((float)1/neighbors_vars.pdrWMEMA) * ((float)1/neighbors_vars.pdrWMEMA);
+			float etx2 = ((float)totalTx/totalAck) * ((float)totalTx/totalAck);
 			rankIncrease = MINHOPRANKINCREASE*etx2;
 
 			uint8_t parentIndex ;
@@ -667,14 +677,14 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 
 		if (totalAck == 0) {
 			if (totalTx<=DEFAULTLINKCOST && ieee154e_getNumOfDesync() - prevDesync < DESYNCTHRESHOLD) {
-				rankIncrease = 365; //(3*DEFAULTLINKCOST-2)*MINHOPRANKINCREASE; (70%)
+				rankIncrease = 365; // (70%)
 			} else {
 				rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
 			}
 
 		} else {
 			neighbors_vars.pdrWMEMA = 0.8f*neighbors_vars.pdrWMEMA + (0.2f)*(float)totalAck/totalTx;
-			float etx = ((float)1/neighbors_vars.pdrWMEMA);
+			float etx = ((float)totalTx/totalAck);
 			rankIncrease = MINHOPRANKINCREASE*etx;
 
 			uint8_t parentIndex ;

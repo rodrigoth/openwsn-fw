@@ -70,6 +70,7 @@ typedef struct {
 	uint8_t rssi;
 	uint8_t totalTx;
 	uint8_t totalRx;
+	uint8_t queueCapacity;
 } debug_reportTxEntry_t;
 END_PACK
 
