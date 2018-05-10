@@ -1849,10 +1849,7 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
 
         //drop packet to avoid buffer overflow (parent changing or clear command)
         if (ieee802514_header.frameType == IEEE154_TYPE_DATA) {
-        	if (openqueue_getCurrentCapacity() >= QUEUELENGTH - 5) {
-        		openserial_printError(COMPONENT_IEEE802154E,ERR_QUEUE_HIGH_CAPACITY,(errorparameter_t)openqueue_getCurrentCapacity(),(errorparameter_t)0);
-        		break;
-        	}
+        	if (openqueue_getCurrentCapacity() >= QUEUELENGTH - 5) {break;}
         }
       
         // toss the IEs including Synch
