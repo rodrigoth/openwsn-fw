@@ -1838,15 +1838,21 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
         packetfunctions_tossHeader(ieee154e_vars.dataReceived,ieee802514_header.headerLength);
       
       
-        if (
-            ieee802514_header.frameType       == IEEE154_TYPE_BEACON                             && // if it is not a beacon and have ie, the ie will be processed in sixtop
+        if (ieee802514_header.frameType       == IEEE154_TYPE_BEACON                             && // if it is not a beacon and have ie, the ie will be processed in sixtop
             ieee802514_header.ieListPresent   == TRUE                                            && 
-            packetfunctions_sameAddress(&ieee802514_header.panid,idmanager_getMyID(ADDR_PANID))
-        ) {
+            packetfunctions_sameAddress(&ieee802514_header.panid,idmanager_getMyID(ADDR_PANID))) {
             if (ieee154e_processIEs(ieee154e_vars.dataReceived,&lenIE)==FALSE){
                 // retrieve EB IE failed, break the do-while loop and execute the clean up code below
                 break;
             }
+        }
+
+        //drop packet to avoid buffer overflow (parent changing or clear command)
+        if (ieee802514_header.frameType == IEEE154_TYPE_DATA) {
+        	if (openqueue_getCurrentCapacity() >= QUEUELENGTH - 5) {
+        		openserial_printError(COMPONENT_IEEE802154E,ERR_QUEUE_HIGH_CAPACITY,(errorparameter_t)openqueue_getCurrentCapacity(),(errorparameter_t)0);
+        		break;
+        	}
         }
       
         // toss the IEs including Synch

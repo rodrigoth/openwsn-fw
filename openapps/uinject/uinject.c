@@ -71,16 +71,6 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 		  return;
 	  }
 
-	  //workaround to avoid buffer overflow during the parent changing or clear command
-	  //The node needs to pre-reserve slots before changing
-	  uint8_t totalTx = schedule_getNumberSlotToPreferredParent(&neighbor);
-	  uint8_t totalRx = schedule_getNumOfSlotsByType(CELLTYPE_RX);
-
-	  if ((totalRx > totalTx + MAX_DIFF_TX_RX) || (openqueue_getCurrentCapacity() >= MAX_QUEUE_CAPACITY_TO_FORWARD)) {
-		  openqueue_freePacketBuffer(pkt);
-		  return;
-	  }
-
 	  new_pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
 	  if (new_pkt==NULL) {
 	      openserial_printError(COMPONENT_UINJECT,ERR_NO_FREE_PACKET_BUFFER,(errorparameter_t)0,(errorparameter_t)0);
@@ -154,10 +144,6 @@ void uinject_task_cb() {
 	 open_addr_t neighbor;
 	 foundNeighbor = icmpv6rpl_getPreferredParentEui64(&neighbor);
 	 if(!foundNeighbor || schedule_getNumberSlotToPreferredParent(&neighbor) == 0) {
-		 if (openqueue_getCurrentCapacity() == QUEUELENGTH) {
-			 openqueue_removeAllCreatedBy(COMPONENT_UINJECT);
-			 openqueue_removeAllCreatedBy(COMPONENT_UINJECT_FORWARDING);
-		 }
 		 return;
 	  }
 

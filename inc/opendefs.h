@@ -278,6 +278,7 @@ enum {
    ERR_ABORT_JOIN_PROCESS              = 0x49, // Aborted join process {code location {0}}
 
    ERR_NEIGHBORS_DESYNC				   = 0X50, // Bad neighbor, desync counter {0},{1}
+   ERR_QUEUE_HIGH_CAPACITY			   = 0X51, // Dropping packet, queue current capacity {0}
 };
 
 //=========================== typedef =========================================
