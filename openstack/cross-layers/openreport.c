@@ -195,5 +195,5 @@ void openreport_indicateBroadcastRx(open_addr_t *neighbor, uint8_t channel,uint8
 
 	debug_reportEntry.experiment_id = experiment_id;
 
-	openserial_printStatus(STATUS_BROADCAST_RX,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntryEB_t));
+	//openserial_printStatus(STATUS_BROADCAST_RX,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntryEB_t));
 }
