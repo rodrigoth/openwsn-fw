@@ -178,7 +178,7 @@ void openreport_indicateTxReceived(open_addr_t *sender, uint32_t seqnum,uint8_t 
 
 	memcpy(&(debug_reportEntry.sender.addr_64b[0]),&(sender->addr_64b[0]),8);
 
-	openserial_printStatus(STATUS_TX_RECEIVED,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
+	//openserial_printStatus(STATUS_TX_RECEIVED,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }
 
 void openreport_indicateBroadcastRx(open_addr_t *neighbor, uint8_t channel,uint8_t iseb) {
