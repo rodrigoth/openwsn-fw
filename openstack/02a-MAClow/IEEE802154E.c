@@ -1954,6 +1954,11 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
                 IEEE802154_security_isConfigured() == FALSE) {
             synchronizePacket(ieee154e_vars.syncCapturedTime);
             }
+
+            if(ieee154e_vars.dataReceived->l2_frameType == IEEE154_TYPE_BEACON) {
+				 openreport_indicateBroadcastRx(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop),ieee154e_vars.freq,1);
+            }
+
             // indicate reception to upper layer (no ACK asked)
             notif_receive(ieee154e_vars.dataReceived);
             // reset local variable
@@ -2947,4 +2952,8 @@ void endSlot() {
 
 bool ieee154e_isSynch(){
    return ieee154e_vars.isSync;
+}
+
+uint8_t ieee154e_getLastFreq() {
+	return ieee154e_vars.freq;
 }

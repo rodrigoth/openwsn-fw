@@ -541,6 +541,10 @@ void icmpv6rpl_indicateRxDIO(OpenQueueEntry_t* msg) {
    open_addr_t      myPrefix;
    uint8_t*         current;
    uint8_t          optionsLen;
+
+
+   openreport_indicateBroadcastRx(&(msg->l2_nextORpreviousHop),ieee154e_getLastFreq(),0);
+
    // take ownership over the packet
    msg->owner = COMPONENT_NEIGHBORS;
    

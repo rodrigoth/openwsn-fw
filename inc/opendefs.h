@@ -120,6 +120,7 @@ enum {
    STATUS_6PRESPONSE				   = 17,
    STATUS_TX_RECEIVED				   = 18,
    STATUS_PDR				  		   = 19,
+   STATUS_BROADCAST_RX				   = 20,
 };
 
 //component identifiers
