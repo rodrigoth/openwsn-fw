@@ -677,7 +677,7 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 
 		if (totalAck == 0) {
 			if (totalTx<=DEFAULTLINKCOST && ieee154e_getNumOfDesync() - prevDesync < DESYNCTHRESHOLD) {
-				rankIncrease = 365; // (70%)
+				rankIncrease = 578; // (70% (3*1.42 -2)*256)
 			} else {
 				rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
 			}
@@ -685,7 +685,7 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 		} else {
 			neighbors_vars.pdrWMEMA = 0.8f*neighbors_vars.pdrWMEMA + (0.2f)*(float)totalAck/totalTx;
 			float etx = ((float)totalTx/totalAck);
-			rankIncrease = MINHOPRANKINCREASE*etx;
+			rankIncrease = (3*etx - 2)*MINHOPRANKINCREASE;
 
 			uint8_t parentIndex ;
 			if(icmpv6rpl_getPreferredParentIndex(&parentIndex)) {
