@@ -726,23 +726,25 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 			} else {
 				neighbors_vars.pdrWMEMA = 0.8f*neighbors_vars.pdrWMEMA + (0.2f)*(float)totalAck/totalTx;
 				float etx = ((float)totalTx/totalAck);
-				rankIncrease = MINHOPRANKINCREASE*etx;
+				rankIncrease = (3*etx - 2)*MINHOPRANKINCREASE;
 				openreport_indicatePDR(&(neighbors_vars.neighbors[parentIndex].addr_64b),totalTx,totalAck,(uint8_t)(neighbors_vars.pdrWMEMA*100));
 
 			}
 		}else{
 			uint8_t broadcastRx = neighbors_vars.neighbors[index].broadcast_rx;
 
-
 			if(broadcastRx == 0) {
 				rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
 			} else {
-				uint8_t maxBroadcast = getMaxBroadcastRx()+1;
-				uint8_t minBroadcast = getMinBroadcastRx()-1;
+				uint8_t maxBroadcast = getMaxBroadcastRx();
+				uint8_t minBroadcast = getMinBroadcastRx();
 
-				float etxFromBroadcast = 1/(((float)broadcastRx - minBroadcast)/(maxBroadcast - minBroadcast));
-				rankIncrease = etxFromBroadcast*MINHOPRANKINCREASE;
-				openserial_printError(COMPONENT_NEIGHBORS,ERR_NEIGHBORS_DESYNC,(errorparameter_t)rankIncrease,(errorparameter_t)broadcastRx);
+				if(maxBroadcast == minBroadcast) {
+					rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
+				} else {
+					float etxFromBroadcast = 1/(((float)broadcastRx - minBroadcast)/(maxBroadcast - minBroadcast));
+					rankIncrease = (3*etxFromBroadcast - 2)*MINHOPRANKINCREASE;
+				}
 			}
 		}
 		return rankIncrease;
