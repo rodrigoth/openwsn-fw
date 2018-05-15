@@ -52,6 +52,8 @@ if env['useetxn']==1:
     env.Append(CPPDEFINES    = 'USEETXN')
 if env['userssi']==1:
     env.Append(CPPDEFINES    = 'USERSSI')
+if env['usebroadcast']==1:
+    env.Append(CPPDEFINES    = 'USEBROADCAST')
 if env['noadaptivesync']==1:
     env.Append(CPPDEFINES    = 'NOADAPTIVESYNC')
 if env['l2_security']==1:

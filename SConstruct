@@ -140,6 +140,7 @@ command_line_options = {
     'useetx':			['0','1'],
     'useetxn':			['0','1'],
     'userssi':			['0','1'],
+    'usebroadcast':		['0','1'],
     'debug':            ['0','1'],
     'noadaptivesync':   ['0','1'],
     'l2_security':      ['0','1'],
@@ -301,6 +302,13 @@ command_line_vars.AddVariables(
         'userssi',	           		                       # key
         '',                                                # help
         command_line_options['userssi'][0], 	 	       # default
+        validate_option,                                   # validator
+        int,                                               # converter
+    ),
+     (
+        'usebroadcast',	           		                   # key
+        '',                                                # help
+        command_line_options['usebroadcast'][0], 	 	   # default
         validate_option,                                   # validator
         int,                                               # converter
     ),

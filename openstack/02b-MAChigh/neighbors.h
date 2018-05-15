@@ -74,6 +74,8 @@ uint8_t	      neighbors_getParentRSSI(void);
 void          neighbors_setNeighborRank(uint8_t index, dagrank_t rank);
 void          neighbors_setNeighborNoResource(open_addr_t* address);
 void          neighbors_setPreferredParent(uint8_t index, bool isPreferred);
+
+
 // interrogators
 bool          neighbors_isStableNeighbor(open_addr_t* address);
 bool          neighbors_isStableNeighborByIndex(uint8_t index);
@@ -100,6 +102,7 @@ void          neighbors_indicateTx(
 void          neighbors_updateSequenceNumber(open_addr_t* address);
 void          neighbors_updateGeneration(open_addr_t* address);
 void          neighbors_resetGeneration(open_addr_t* address);
+void 		  neighbors_indicateBroadcastReception(open_addr_t* address);
 
 // get addresses
 bool          neighbors_getNeighborEui64(open_addr_t* address,uint8_t addr_type,uint8_t index);

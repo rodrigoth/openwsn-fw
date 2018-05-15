@@ -1847,6 +1847,7 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
             }
         }
 
+
         //drop packet to avoid buffer overflow (parent changing or clear command)
         //if (ieee802514_header.frameType == IEEE154_TYPE_DATA) {
         //	if (openqueue_getCurrentCapacity() >= QUEUELENGTH - 5) {break;}
@@ -1957,6 +1958,7 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
 
             if(ieee154e_vars.dataReceived->l2_frameType == IEEE154_TYPE_BEACON) {
 				 openreport_indicateBroadcastRx(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop),ieee154e_vars.freq,1);
+				 neighbors_indicateBroadcastReception(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop));
             }
 
             // indicate reception to upper layer (no ACK asked)

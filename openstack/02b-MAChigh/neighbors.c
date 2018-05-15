@@ -9,7 +9,7 @@
 #include "openreport.h"
 
 #define CLEARNEIGHBORS 20
-
+#define BROADCAST_FACTOR 20
 //=========================== variables =======================================
 
 static neighbors_vars_t neighbors_vars;
@@ -32,7 +32,8 @@ bool isThisRowMatching(
         open_addr_t* address,
         uint8_t      rowNumber
      );
-
+uint8_t getMaxBroadcastRx(void);
+uint8_t getMinBroadcastRx(void);
 //=========================== public ==========================================
 
 /**
@@ -410,6 +411,23 @@ void neighbors_indicateRx(open_addr_t* l2_src,
    }
 }
 
+void neighbors_indicateBroadcastReception(open_addr_t* address) {
+	uint8_t i;
+	for (i=0;i<MAXNUMNEIGHBORS;i++) {
+		 if (isThisRowMatching(address,i)) {
+			 neighbors_vars.neighbors[i].broadcast_rx++;
+		 }
+	}
+
+	if(getMaxBroadcastRx() >= BROADCAST_FACTOR) {
+		for (i=0;i<MAXNUMNEIGHBORS;i++) {
+			if (neighbors_vars.neighbors[i].used == TRUE) {
+				 neighbors_vars.neighbors[i].broadcast_rx /= 2;
+			 }
+		}
+	}
+}
+
 /**
 \brief Indicate some packet was sent to some neighbor.
 
@@ -694,6 +712,42 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 		}
 		return rankIncrease;
 	#endif
+
+	#ifdef USEBROADCAST
+		uint16_t  rankIncrease;
+
+		uint8_t parentIndex ;
+		if(icmpv6rpl_getPreferredParentIndex(&parentIndex) && index == parentIndex) {
+			uint16_t totalTx = schedule_getTotalTxToNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
+			uint16_t totalAck = schedule_getTotalAckFromNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
+
+			if(totalAck == 0){
+				rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
+			} else {
+				neighbors_vars.pdrWMEMA = 0.8f*neighbors_vars.pdrWMEMA + (0.2f)*(float)totalAck/totalTx;
+				float etx = ((float)totalTx/totalAck);
+				rankIncrease = MINHOPRANKINCREASE*etx;
+				openreport_indicatePDR(&(neighbors_vars.neighbors[parentIndex].addr_64b),totalTx,totalAck,(uint8_t)(neighbors_vars.pdrWMEMA*100));
+
+			}
+		}else{
+			uint8_t broadcastRx = neighbors_vars.neighbors[index].broadcast_rx;
+
+
+			if(broadcastRx == 0) {
+				rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
+			} else {
+				uint8_t maxBroadcast = getMaxBroadcastRx()+1;
+				uint8_t minBroadcast = getMinBroadcastRx()-1;
+
+				float etxFromBroadcast = 1/(((float)broadcastRx - minBroadcast)/(maxBroadcast - minBroadcast));
+				rankIncrease = etxFromBroadcast*MINHOPRANKINCREASE;
+				openserial_printError(COMPONENT_NEIGHBORS,ERR_NEIGHBORS_DESYNC,(errorparameter_t)rankIncrease,(errorparameter_t)broadcastRx);
+			}
+		}
+		return rankIncrease;
+	#endif
+
 	return 0;
 }
 
@@ -795,6 +849,7 @@ void registerNewNeighbor(open_addr_t* address,
             neighbors_vars.neighbors[i].numTx                  = 0;
             neighbors_vars.neighbors[i].numTxACK               = 0;
             neighbors_vars.neighbors[i].generation             = 0;
+            neighbors_vars.neighbors[i].broadcast_rx		   = 0;
             memcpy(&neighbors_vars.neighbors[i].asn,asnTimestamp,sizeof(asn_t));
             //update jp
             if (joinPrioPresent==TRUE){
@@ -844,6 +899,33 @@ void removeNeighbor(uint8_t neighborIndex) {
    neighbors_vars.neighbors[neighborIndex].f6PNORES                  = FALSE;
    neighbors_vars.neighbors[neighborIndex].sequenceNumber            = 0;
    neighbors_vars.neighbors[neighborIndex].generation   	         = 0;
+   neighbors_vars.neighbors[neighborIndex].broadcast_rx   	         = 0;
+}
+
+uint8_t getMaxBroadcastRx(void) {
+	uint8_t i=0;
+	uint8_t maxBroadcastRx = 0;
+	for (i=0;i<MAXNUMNEIGHBORS;i++) {
+		if (neighbors_vars.neighbors[i].used==TRUE) {
+			if(maxBroadcastRx < neighbors_vars.neighbors[i].broadcast_rx) {
+				maxBroadcastRx = neighbors_vars.neighbors[i].broadcast_rx;
+			}
+		}
+	}
+	return maxBroadcastRx;
+}
+
+uint8_t getMinBroadcastRx(void) {
+	uint8_t i=0;
+	uint8_t minBroadcastRx = getMaxBroadcastRx();
+	for (i=0;i<MAXNUMNEIGHBORS;i++) {
+		if (neighbors_vars.neighbors[i].used==TRUE) {
+			if(minBroadcastRx > neighbors_vars.neighbors[i].broadcast_rx) {
+				minBroadcastRx = neighbors_vars.neighbors[i].broadcast_rx;
+			}
+		}
+	}
+	return minBroadcastRx;
 }
 
 //=========================== helpers =========================================

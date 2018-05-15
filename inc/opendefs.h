@@ -401,6 +401,8 @@ typedef struct {
    uint8_t          sequenceNumber;
    uint8_t          backoffExponenton;
    uint8_t          backoff;
+   uint8_t			broadcast_rx; //number of times a node receives broadcast packets from a given neighbor
+
 } neighborRow_t;
 END_PACK
 

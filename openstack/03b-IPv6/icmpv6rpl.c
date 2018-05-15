@@ -438,7 +438,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection() {
 
             if (tentativeDAGrank > 65535) {tentativeDAGrank = 65535;}
 
-            #ifdef USEETX
+            #if defined(USEETX) || defined(USEBROADCAST)
 			if ((previousDAGrank<tentativeDAGrank) || (previousDAGrank-tentativeDAGrank < 2*MINHOPRANKINCREASE)) {
 				continue;
 			}
@@ -544,6 +544,7 @@ void icmpv6rpl_indicateRxDIO(OpenQueueEntry_t* msg) {
 
 
    openreport_indicateBroadcastRx(&(msg->l2_nextORpreviousHop),ieee154e_getLastFreq(),0);
+   neighbors_indicateBroadcastReception(&(msg->l2_nextORpreviousHop));
 
    // take ownership over the packet
    msg->owner = COMPONENT_NEIGHBORS;
