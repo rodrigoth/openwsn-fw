@@ -798,6 +798,15 @@ void  neighbors_removeOld() {
     }
 }
 
+void neighbors_resetBroadcastRx() {
+	uint8_t    i;
+	for (i=0;i<MAXNUMNEIGHBORS;i++) {
+		if(neighbors_vars.neighbors[i].used == TRUE) {
+			neighbors_vars.neighbors[i].broadcast_rx = 0;
+		}
+	}
+}
+
 //===== debug
 
 /**
