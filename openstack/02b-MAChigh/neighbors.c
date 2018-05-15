@@ -415,9 +415,7 @@ void neighbors_indicateBroadcastReception(open_addr_t* address) {
 	uint8_t i;
 	for (i=0;i<MAXNUMNEIGHBORS;i++) {
 		 if (isThisRowMatching(address,i)) {
-			 if(icmpv6rpl_getMyDAGrank() >= neighbors_vars.neighbors[i].DAGrank){
-				 neighbors_vars.neighbors[i].broadcast_rx++;
-			 }
+			 neighbors_vars.neighbors[i].broadcast_rx++;
 		 }
 	}
 
