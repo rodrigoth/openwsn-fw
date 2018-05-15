@@ -836,7 +836,7 @@ port_INLINE void activity_ti1ORri1() {
             ieee154e_stats.numDeSync++;
             openqueue_init();
             sixtop_setDefaultState();
-            neighbors_resetBroadcastRx();
+
                
             // abort
             endSlot();

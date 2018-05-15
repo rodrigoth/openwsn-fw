@@ -726,7 +726,7 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 			} else {
 				neighbors_vars.pdrWMEMA = 0.8f*neighbors_vars.pdrWMEMA + (0.2f)*(float)totalAck/totalTx;
 				float etx = ((float)totalTx/totalAck);
-				rankIncrease = (3*etx - 2)*MINHOPRANKINCREASE;
+				rankIncrease = etx*MINHOPRANKINCREASE;
 				openreport_indicatePDR(&(neighbors_vars.neighbors[parentIndex].addr_64b),totalTx,totalAck,(uint8_t)(neighbors_vars.pdrWMEMA*100));
 
 			}
