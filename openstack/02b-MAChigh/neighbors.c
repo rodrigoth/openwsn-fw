@@ -724,7 +724,7 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 
 		if (totalAck == 0) {
 			if (totalTx<=DEFAULTLINKCOST && ieee154e_getNumOfDesync() - prevDesync < DESYNCTHRESHOLD) {
-				if(isTopN(index,3)) {
+				if(isTopN(index,2)) {
 					rankIncrease = 578; // (70% (3*1.42 -2)*256)
 				} else {
 					rankIncrease = (3*DEFAULTLINKCOST - 2)*MINHOPRANKINCREASE;
