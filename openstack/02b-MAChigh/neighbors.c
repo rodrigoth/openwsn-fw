@@ -9,7 +9,7 @@
 #include "openreport.h"
 
 #define CLEARNEIGHBORS 20
-#define BROADCAST_FACTOR 20
+#define BROADCAST_FACTOR 30
 //=========================== variables =======================================
 
 static neighbors_vars_t neighbors_vars;
@@ -32,8 +32,11 @@ bool isThisRowMatching(
         open_addr_t* address,
         uint8_t      rowNumber
      );
+bool isTopN(uint8_t index, uint8_t top);
+void  neighbors_getAllBroadcastReception(uint8_t* recepetions,uint8_t* indexes);
 uint8_t getMaxBroadcastRx(void);
-uint8_t getMinBroadcastRx(void);
+
+void sort_arrays(uint8_t* receptions, uint8_t* indexes);
 //=========================== public ==========================================
 
 /**
@@ -716,35 +719,29 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 	#ifdef USEBROADCAST
 		uint16_t  rankIncrease;
 
-		uint8_t parentIndex ;
-		if(icmpv6rpl_getPreferredParentIndex(&parentIndex) && index == parentIndex) {
-			uint16_t totalTx = schedule_getTotalTxToNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
-			uint16_t totalAck = schedule_getTotalAckFromNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
+		uint16_t totalTx = schedule_getTotalTxToNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
+		uint16_t totalAck = schedule_getTotalAckFromNeighbor(&(neighbors_vars.neighbors[index].addr_64b));
 
-			if(totalAck == 0){
-				rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
-			} else {
-				neighbors_vars.pdrWMEMA = 0.8f*neighbors_vars.pdrWMEMA + (0.2f)*(float)totalAck/totalTx;
-				float etx = ((float)totalTx/totalAck);
-				rankIncrease = etx*MINHOPRANKINCREASE;
-				openreport_indicatePDR(&(neighbors_vars.neighbors[parentIndex].addr_64b),totalTx,totalAck,(uint8_t)(neighbors_vars.pdrWMEMA*100));
-
-			}
-		}else{
-			uint8_t broadcastRx = neighbors_vars.neighbors[index].broadcast_rx;
-
-			if(broadcastRx == 0) {
-				rankIncrease = LARGESTLINKCOST*MINHOPRANKINCREASE;
-			} else {
-				uint8_t maxBroadcast = getMaxBroadcastRx();
-				uint8_t minBroadcast = getMinBroadcastRx();
-
-				if(maxBroadcast == minBroadcast) {
-					rankIncrease = LARGESTLINKCOST*MINHOPRANKINCREASE;
+		if (totalAck == 0) {
+			if (totalTx<=DEFAULTLINKCOST && ieee154e_getNumOfDesync() - prevDesync < DESYNCTHRESHOLD) {
+				if(isTopN(index,3)) {
+					rankIncrease = 578; // (70% (3*1.42 -2)*256)
 				} else {
-					float etxFromBroadcast = 1/(((float)broadcastRx - minBroadcast)/(maxBroadcast - minBroadcast));
-					rankIncrease = etxFromBroadcast*MINHOPRANKINCREASE;
+					rankIncrease = (3*DEFAULTLINKCOST - 2)*MINHOPRANKINCREASE;
 				}
+
+			} else {
+				rankIncrease = (3*LARGESTLINKCOST-2)*MINHOPRANKINCREASE;
+			}
+
+		} else {
+			neighbors_vars.pdrWMEMA = 0.8f*neighbors_vars.pdrWMEMA + (0.2f)*(float)totalAck/totalTx;
+			float etx = ((float)totalTx/totalAck);
+			rankIncrease = (3*etx - 2)*MINHOPRANKINCREASE;
+
+			uint8_t parentIndex ;
+			if(icmpv6rpl_getPreferredParentIndex(&parentIndex)) {
+				openreport_indicatePDR(&(neighbors_vars.neighbors[parentIndex].addr_64b),totalTx,totalAck,(uint8_t)(neighbors_vars.pdrWMEMA*100));
 			}
 		}
 		return rankIncrease;
@@ -913,31 +910,35 @@ void removeNeighbor(uint8_t neighborIndex) {
    neighbors_vars.neighbors[neighborIndex].broadcast_rx   	         = 0;
 }
 
-uint8_t getMaxBroadcastRx(void) {
-	uint8_t i=0;
-	uint8_t maxBroadcastRx = 0;
-	for (i=0;i<MAXNUMNEIGHBORS;i++) {
-		if (neighbors_vars.neighbors[i].used==TRUE) {
-			if(maxBroadcastRx < neighbors_vars.neighbors[i].broadcast_rx) {
-				maxBroadcastRx = neighbors_vars.neighbors[i].broadcast_rx;
-			}
+bool isTopN(uint8_t index,uint8_t top) {
+	uint8_t i;
+	uint8_t broadcastReceptions[MAXNUMNEIGHBORS];
+	uint8_t neighborsIndexes[MAXNUMNEIGHBORS];
+
+	memset(&broadcastReceptions[0],0,sizeof(uint8_t)*MAXNUMNEIGHBORS);
+	memset(&neighborsIndexes[0],0,sizeof(uint8_t)*MAXNUMNEIGHBORS);
+
+	neighbors_getAllBroadcastReception(&broadcastReceptions[0],&neighborsIndexes[0]);
+	sort_arrays(&broadcastReceptions[0],&neighborsIndexes[0]);
+
+	for(i = 0; i < top; i++) {
+		if(neighborsIndexes[i] == index) {
+			return TRUE;
 		}
 	}
-	return maxBroadcastRx;
+	return FALSE;
 }
 
-uint8_t getMinBroadcastRx(void) {
-	uint8_t i=0;
-	uint8_t minBroadcastRx = getMaxBroadcastRx();
-	for (i=0;i<MAXNUMNEIGHBORS;i++) {
-		if (neighbors_vars.neighbors[i].used==TRUE) {
-			if(minBroadcastRx > neighbors_vars.neighbors[i].broadcast_rx) {
-				minBroadcastRx = neighbors_vars.neighbors[i].broadcast_rx;
-			}
+void neighbors_getAllBroadcastReception(uint8_t* recepetions, uint8_t* indexes) {
+	uint8_t i;
+	for (i = 0; i < MAXNUMNEIGHBORS; i++) {
+		if (neighbors_vars.neighbors[i].used == TRUE) {
+			recepetions[i] = neighbors_vars.neighbors[i].broadcast_rx;
+			indexes[i] = i;
 		}
 	}
-	return minBroadcastRx;
 }
+
 
 //=========================== helpers =========================================
 
@@ -953,3 +954,37 @@ bool isThisRowMatching(open_addr_t* address, uint8_t rowNumber) {
          return FALSE;
    }
 }
+
+uint8_t getMaxBroadcastRx() {
+	uint8_t i=0;
+	uint8_t maxBroadcastRx = 0;
+	for (i=0;i<MAXNUMNEIGHBORS;i++) {
+		if (neighbors_vars.neighbors[i].used==TRUE) {
+			if(maxBroadcastRx < neighbors_vars.neighbors[i].broadcast_rx) {
+				maxBroadcastRx = neighbors_vars.neighbors[i].broadcast_rx;
+			}
+		}
+	}
+	return maxBroadcastRx;
+}
+
+void sort_arrays(uint8_t* receptions, uint8_t* indexes) {
+  uint8_t i, j;
+  uint8_t current_nb,current_broadcast_count;
+
+    for (i = 0; i < MAXNUMNEIGHBORS; i++) {
+        for (j = i +1; j < MAXNUMNEIGHBORS; j++ ) {
+            if (receptions[i] < receptions[j]) {
+                current_broadcast_count = receptions[i];
+                current_nb = indexes[i];
+
+                receptions[i] = receptions[j];
+                receptions[j] = current_broadcast_count;
+
+                indexes[i] = indexes[j];
+                indexes[j] = current_nb;
+            }
+        }
+    }
+}
+
