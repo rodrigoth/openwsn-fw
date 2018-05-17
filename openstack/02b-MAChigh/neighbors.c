@@ -9,7 +9,7 @@
 #include "openreport.h"
 
 #define CLEARNEIGHBORS 20
-#define BROADCAST_FACTOR 30
+#define BROADCAST_FACTOR 60
 //=========================== variables =======================================
 
 static neighbors_vars_t neighbors_vars;
@@ -425,7 +425,7 @@ void neighbors_indicateBroadcastReception(open_addr_t* address) {
 	if(getMaxBroadcastRx() >= BROADCAST_FACTOR) {
 		for (i=0;i<MAXNUMNEIGHBORS;i++) {
 			if (neighbors_vars.neighbors[i].used == TRUE) {
-				 neighbors_vars.neighbors[i].broadcast_rx /= 2;
+				 neighbors_vars.neighbors[i].broadcast_rx /= 6;
 			 }
 		}
 	}
