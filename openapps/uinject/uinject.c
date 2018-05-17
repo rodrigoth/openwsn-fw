@@ -71,6 +71,15 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 		  return;
 	  }
 
+	  uint8_t totalTx = schedule_getNumberSlotToPreferredParent(&neighbor);
+	  uint8_t totalRx = schedule_getNumOfSlotsByType(CELLTYPE_RX);
+
+	  if ((totalRx > totalTx + MAX_DIFF_TX_RX) || (openqueue_getCurrentCapacity() >= MAX_QUEUE_CAPACITY_TO_FORWARD)) {
+		  openqueue_freePacketBuffer(pkt);
+		  return;
+	  }
+
+
 	  new_pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
 	  if (new_pkt==NULL) {
 	      openserial_printError(COMPONENT_UINJECT,ERR_NO_FREE_PACKET_BUFFER,(errorparameter_t)0,(errorparameter_t)0);
