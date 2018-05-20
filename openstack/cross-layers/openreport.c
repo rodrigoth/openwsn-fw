@@ -197,3 +197,22 @@ void openreport_indicateBroadcastRx(open_addr_t *neighbor, uint8_t channel,uint8
 
 	//openserial_printStatus(STATUS_BROADCAST_RX,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntryEB_t));
 }
+
+void openreport_indicateConsistencyRoutine(open_addr_t* node, open_addr_t* parent,uint8_t isTx,uint8_t slotOffset,uint8_t channelOffset) {
+	debug_ScheduleConsistencyEntry_t debug_reportEntry;
+	debug_reportEntry.channelOffset = channelOffset;
+	debug_reportEntry.slotOffset    = slotOffset;
+	debug_reportEntry.isTx = isTx;
+
+	memcpy(&(debug_reportEntry.node.addr_64b[0]),&(node->addr_64b[0]),8);
+	memcpy(&(debug_reportEntry.parent.addr_64b[0]),&(parent->addr_64b[0]),8);
+
+	uint8_t asnArray[5];
+	ieee154e_getAsn(asnArray);
+	debug_reportEntry.asn.bytes0and1 = ((uint16_t)asnArray[1] << 8) | asnArray[0];
+	debug_reportEntry.asn.bytes2and3 = ((uint16_t)asnArray[3] << 8) | asnArray[2];
+	debug_reportEntry.asn.byte4 = asnArray[4];
+	debug_reportEntry.experiment_id = experiment_id;
+
+	openserial_printStatus(STATUS_SCHEDULE_CONSISTENCY,(uint8_t*)&debug_reportEntry,sizeof(debug_ScheduleConsistencyEntry_t));
+}

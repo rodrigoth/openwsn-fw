@@ -106,6 +106,19 @@ typedef struct {
 } debug_reportEntryEB_t;
 END_PACK
 
+BEGIN_PACK
+typedef struct {
+	open_addr_t node;
+	open_addr_t parent;
+	asn_t asn;
+	uint8_t isTx;
+	uint8_t slotOffset;
+	uint8_t channelOffset;
+	uint8_t experiment_id;
+} debug_ScheduleConsistencyEntry_t;
+END_PACK
+
+
 //=========================== variables =======================================
 
 
@@ -122,7 +135,7 @@ void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_
 void openreport_indicatePDR(open_addr_t *destination, uint8_t totalTx, uint8_t totalAck, uint8_t pdrWMEMA);
 void openreport_indicateTxReceived(open_addr_t *sender, uint32_t seqnum,uint8_t *asn);
 void openreport_indicateBroadcastRx(open_addr_t *neighbor, uint8_t channel,uint8_t iseb);
-
+void openreport_indicateConsistencyRoutine(open_addr_t* node, open_addr_t* parent,uint8_t isTx,uint8_t slotOffset,uint8_t channelOffset);
 
 
 

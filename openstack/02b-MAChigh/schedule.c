@@ -9,6 +9,7 @@
 #include "icmpv6rpl.h"
 #include "neighbors.h"
 #include "IEEE802154E.h"
+#include "openreport.h"
 
 //=========================== variables =======================================
 
@@ -19,6 +20,8 @@ uint8_t shared_slots[] = {0,25,50,75,100,125,150,175};
 //=========================== prototypes ======================================
 
 void schedule_resetEntry(scheduleEntry_t* pScheduleEntry);
+void schedule_checkRxConsistency(void);
+void schedule_checkTxConsistency(void);
 
 //=========================== public ==========================================
 
@@ -960,6 +963,9 @@ void schedule_housekeeping(){
         }
     }
 
+    schedule_checkTxConsistency();
+    schedule_checkRxConsistency();
+
     ENABLE_INTERRUPTS();
 }
 
@@ -996,6 +1002,7 @@ void schedule_resetEntry(scheduleEntry_t* e) {
    e->type                   = CELLTYPE_OFF;
    e->shared                 = FALSE;
    e->channelOffset          = 0;
+   e->checkTxCellCounter	 = 0;
 
    e->neighbor.type          = ADDR_NONE;
    memset(&e->neighbor.addr_64b[0], 0x00, sizeof(e->neighbor.addr_64b));
@@ -1007,4 +1014,55 @@ void schedule_resetEntry(scheduleEntry_t* e) {
    e->lastUsedAsn.bytes2and3 = 0;
    e->lastUsedAsn.byte4      = 0;
    e->next                   = NULL;
+}
+
+void schedule_checkTxConsistency() {
+	uint8_t i;
+	open_addr_t neighbor;
+
+	for (i = 0; i < MAXACTIVESLOTS; i++) {
+		if (schedule_vars.scheduleBuf[i].type == CELLTYPE_TX) {
+			if (icmpv6rpl_getPreferredParentEui64(&neighbor)==TRUE) {
+				if(packetfunctions_sameAddress(&neighbor,&(schedule_vars.scheduleBuf[i].neighbor))==TRUE){
+					if(schedule_vars.scheduleBuf[i].numTx > 0 && schedule_vars.scheduleBuf[i].numTxACK == 0) {
+						schedule_vars.scheduleBuf[i].checkTxCellCounter++;
+						if(schedule_vars.scheduleBuf[i].checkTxCellCounter == MIN_NUMTRY_REMOVE_TX) {
+							schedule_removeActiveSlot(schedule_vars.scheduleBuf[i].slotOffset, &(schedule_vars.scheduleBuf[i].neighbor));
+							openserial_printError(COMPONENT_CEXAMPLE,ERR_NEIGHBORS_DESYNC,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset);
+
+							openreport_indicateConsistencyRoutine(idmanager_getMyID(ADDR_64B), &neighbor, 1,
+																  schedule_vars.scheduleBuf[i].slotOffset, schedule_vars.scheduleBuf[i].channelOffset);
+						}
+					} else {
+						if (schedule_vars.scheduleBuf[i].checkTxCellCounter > 0) {
+							schedule_vars.scheduleBuf[i].checkTxCellCounter = 0;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void schedule_checkRxConsistency() {
+	uint8_t i;
+	PORT_TIMER_WIDTH timeSinceHeard;
+
+	for (i = 0; i < MAXACTIVESLOTS; i++) {
+		if (schedule_vars.scheduleBuf[i].type == CELLTYPE_RX) {
+			timeSinceHeard = ieee154e_asnDiff(&schedule_vars.scheduleBuf[i].lastUsedAsn);
+			 //around 6 minutes
+			 if (timeSinceHeard>DESYNCTIMEOUT*10) {
+				 openserial_printError(COMPONENT_UINJECT,ERR_NEIGHBORS_DESYNC,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset);
+				 openreport_indicateConsistencyRoutine(idmanager_getMyID(ADDR_64B),&(schedule_vars.scheduleBuf[i].neighbor),0,
+				 				 									   schedule_vars.scheduleBuf[i].slotOffset, schedule_vars.scheduleBuf[i].channelOffset);
+
+
+				 schedule_removeActiveSlot(schedule_vars.scheduleBuf[i].slotOffset, &(schedule_vars.scheduleBuf[i].neighbor));
+
+
+
+			 }
+		}
+	}
 }

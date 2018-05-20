@@ -858,6 +858,9 @@ void registerNewNeighbor(open_addr_t* address,
             neighbors_vars.neighbors[i].numTxACK               = 0;
             neighbors_vars.neighbors[i].generation             = 0;
             neighbors_vars.neighbors[i].broadcast_rx		   = 0;
+            neighbors_vars.neighbors[i].lastScheduleOperations.lastOperation = 0;
+            memset(&neighbors_vars.neighbors[i].lastScheduleOperations.channels,0,sizeof(CELLLIST_MAX_LEN));
+            memset(&neighbors_vars.neighbors[i].lastScheduleOperations.timeslots,0,sizeof(3*slotOffset_t));
             memcpy(&neighbors_vars.neighbors[i].asn,asnTimestamp,sizeof(asn_t));
             //update jp
             if (joinPrioPresent==TRUE){

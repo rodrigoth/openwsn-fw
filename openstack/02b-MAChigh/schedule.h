@@ -75,6 +75,8 @@ See MINBE for an explanation of backoff.
 #define PDR_THRESHOLD      80 // 80 means 80%
 #define MIN_NUMTX_FOR_PDR  50 // don't calculate PDR when numTx is lower than this value
 
+#define MIN_NUMTRY_REMOVE_TX	5 //how many times to test a tx cell before removing it (no consistency checking)
+
 typedef enum{
     LINKOPTIONS_TX              = 1<<0,
     LINKOPTIONS_RX              = 1<<1,
@@ -108,6 +110,7 @@ typedef struct {
    uint8_t         numTx;
    uint8_t         numTxACK;
    asn_t           lastUsedAsn;
+   uint8_t		   checkTxCellCounter;
    void*           next;
 } scheduleEntry_t;
 
@@ -125,6 +128,8 @@ typedef struct {
    asn_t           lastUsedAsn;
 } debugScheduleEntry_t;
 END_PACK
+
+
 
 typedef struct {
   cellType_t       link_type;

@@ -27,7 +27,7 @@ uint16_t sf0_getMetadata(void);
 metadata_t sf0_translateMetadata(void);
 void sf0_handleRCError(uint8_t code);
 void sf0_allowDelete(bool flag);
-void sf0_task_cb();
+void sf0_task_cb(void);
 void sf0_timer_cb(opentimers_id_t id);
 //=========================== public ==========================================
 
@@ -134,12 +134,12 @@ void sf0_bandwidthEstimate_task(void){
     if(sf0_vars.genErrorCounter >= GEN_ERROR_THRESHOLD) {
 		bool foundNeighbor;
 		open_addr_t    neighbor;
-		owerror_t outcome;
+
 
 		foundNeighbor = icmpv6rpl_getPreferredParentEui64(&neighbor);
 
 		if(foundNeighbor) {
-			outcome = sixtop_request(IANA_6TOP_CMD_CLEAR,&neighbor,0,LINKOPTIONS_TX,NULL,NULL,0,0,0);
+			sixtop_request(IANA_6TOP_CMD_CLEAR,&neighbor,0,LINKOPTIONS_TX,NULL,NULL,0,0,0);
 		}
 
 		return;

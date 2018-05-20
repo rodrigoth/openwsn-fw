@@ -121,6 +121,7 @@ enum {
    STATUS_TX_RECEIVED				   = 18,
    STATUS_PDR				  		   = 19,
    STATUS_BROADCAST_RX				   = 20,
+   STATUS_SCHEDULE_CONSISTENCY		   = 21,
 };
 
 //component identifiers
@@ -379,6 +380,18 @@ typedef struct {
    uint8_t       packet[1+1+125+2+1];                           // 1B spi address, 1B length, 125B data, 2B CRC, 1B LQI
 } OpenQueueEntry_t;
 
+typedef enum {
+	NONE = 0,
+	ADD = 1,
+	REMOVE = 2,
+} ScheduleOperations;
+
+typedef struct {
+	uint8_t  lastOperation; // 0 = none, 1 = add, 2 =remove
+	slotOffset_t timeslots[CELLLIST_MAX_LEN];
+	uint8_t channels[CELLLIST_MAX_LEN];
+}LastScheduleOperation_t;
+
 
 BEGIN_PACK
 typedef struct {
@@ -402,6 +415,7 @@ typedef struct {
    uint8_t          backoffExponenton;
    uint8_t          backoff;
    uint8_t			broadcast_rx; //number of times a node receives broadcast packets from a given neighbor
+   LastScheduleOperation_t  lastScheduleOperations;
 
 } neighborRow_t;
 END_PACK
