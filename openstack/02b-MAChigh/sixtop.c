@@ -1128,13 +1128,17 @@ void sixtop_six2six_notifyReceive(
                 break;
             }
 
-#ifndef NOGENERATIONCHECK
             // generation check
             if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code != IANA_6TOP_CMD_CLEAR){
-                returnCode = IANA_6TOP_RC_GEN_ERR;
-                break;
+            	openserial_printError(COMPONENT_SIXTOP,ERR_SCHEDULE_ROLLBACK,(errorparameter_t)0,(errorparameter_t)0);
+            	if (neighbors_canRollbackLastScheduleOperation(&(pkt->l2_nextORpreviousHop)) == TRUE) {
+            		neighbors_rollbackGenerationCounter(&(pkt->l2_nextORpreviousHop));
+                } else {
+                	openserial_printError(COMPONENT_SIXTOP,ERR_SCHEDULE_ROLLBACK_FAIL,(errorparameter_t)0,(errorparameter_t)0);
+                	returnCode = IANA_6TOP_RC_GEN_ERR;
+                	break;
+                }
             }
-#endif
 
             // block the deletetion for some minutes to allow the node to reallocate the cells
 			if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code == IANA_6TOP_CMD_CLEAR){
@@ -1595,17 +1599,17 @@ void sixtop_six2six_notifyReceive(
 
 //======= helper functions
 
-bool sixtop_addCells(
-    uint8_t      slotframeID,
-    cellInfo_ht* cellList,
-    open_addr_t* previousHop,
-    uint8_t      cellOptions
-){
+bool sixtop_addCells(uint8_t slotframeID, cellInfo_ht* cellList, open_addr_t* previousHop, uint8_t cellOptions){
     uint8_t     i;
     bool        isShared;
     open_addr_t temp_neighbor;
     cellType_t  type;
     bool        hasCellsAdded;
+    uint8_t		addedChanels[CELLLIST_MAX_LEN];
+    uint8_t		addedSlots[CELLLIST_MAX_LEN];
+
+    memset(&addedChanels[0],0,sizeof(uint8_t)*CELLLIST_MAX_LEN);
+    memset(&addedSlots[0],0,sizeof(uint8_t)*CELLLIST_MAX_LEN);
    
     // translate cellOptions to cell type 
     if (cellOptions == LINKOPTIONS_TX){
@@ -1628,14 +1632,14 @@ bool sixtop_addCells(
     for(i = 0;i<CELLLIST_MAX_LEN;i++){
         if (cellList[i].isUsed){
             hasCellsAdded = TRUE;
-            schedule_addActiveSlot(
-                cellList[i].slotoffset,
-                type,
-                isShared,
-                cellList[i].channeloffset,
-                &temp_neighbor
-            );
+            schedule_addActiveSlot(cellList[i].slotoffset,type,isShared,cellList[i].channeloffset,&temp_neighbor);
+            addedChanels[i] = cellList[i].channeloffset;
+            addedSlots[i] = (uint8_t)cellList[i].slotoffset;
          }
+    }
+
+    if(hasCellsAdded) {
+    	neighbors_registerLastScheduleOperation(&temp_neighbor,IANA_6TOP_CMD_ADD,addedSlots, addedChanels);
     }
    
     return hasCellsAdded;

@@ -279,8 +279,11 @@ enum {
    ERR_DECRYPTION_FAILED               = 0x48, // OSCOAP decryption and tag verification failed
    ERR_ABORT_JOIN_PROCESS              = 0x49, // Aborted join process {code location {0}}
 
-   ERR_NEIGHBORS_DESYNC				   = 0X50, // Bad neighbor, desync counter {0},{1}
-   ERR_QUEUE_HIGH_CAPACITY			   = 0X51, // Dropping packet, queue current capacity {0}
+   ERR_NEIGHBORS_DESYNC				   = 0x50, // Bad neighbor, desync counter {0},{1}
+   ERR_QUEUE_HIGH_CAPACITY			   = 0x51, // Dropping packet, queue current capacity {0}
+   ERR_SCHEDULE_ROLLBACK_SLOT		   = 0x52, // Rolling back schedule: reverting slot {0}, failed operation: {1}
+   ERR_SCHEDULE_ROLLBACK		   	   = 0x53, // Schedule inconsistency detected: trying to roll back the last transaction
+   ERR_SCHEDULE_ROLLBACK_FAIL		   = 0x54, // Schedule rollback failed
 };
 
 //=========================== typedef =========================================
@@ -380,18 +383,12 @@ typedef struct {
    uint8_t       packet[1+1+125+2+1];                           // 1B spi address, 1B length, 125B data, 2B CRC, 1B LQI
 } OpenQueueEntry_t;
 
-typedef enum {
-	NONE = 0,
-	ADD = 1,
-	REMOVE = 2,
-} ScheduleOperations;
 
 typedef struct {
-	uint8_t  lastOperation; // 0 = none, 1 = add, 2 =remove
-	slotOffset_t timeslots[CELLLIST_MAX_LEN];
-	uint8_t channels[CELLLIST_MAX_LEN];
-}LastScheduleOperation_t;
-
+	uint8_t lastOperation;
+	uint8_t slots_offset[CELLLIST_MAX_LEN];
+	uint8_t channels_offset[CELLLIST_MAX_LEN];
+} ScheduleLogEntry_t;
 
 BEGIN_PACK
 typedef struct {
@@ -415,7 +412,7 @@ typedef struct {
    uint8_t          backoffExponenton;
    uint8_t          backoff;
    uint8_t			broadcast_rx; //number of times a node receives broadcast packets from a given neighbor
-   LastScheduleOperation_t  lastScheduleOperations;
+   ScheduleLogEntry_t scheduleLog;
 
 } neighborRow_t;
 END_PACK

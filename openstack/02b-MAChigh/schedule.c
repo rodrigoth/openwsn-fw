@@ -129,7 +129,6 @@ bool debugPrint_schedule() {
       &schedule_vars.scheduleBuf[schedule_vars.debugPrintRow].lastUsedAsn,
       sizeof(asn_t)
    );
-   
    // send status data over serial port
    openserial_printStatus(
       STATUS_SCHEDULE,
@@ -361,6 +360,12 @@ owerror_t schedule_addActiveSlot(
    slotContainer->channelOffset             = channelOffset;
    memcpy(&slotContainer->neighbor,neighbor,sizeof(open_addr_t));
    
+   uint8_t asnArray[5];
+   ieee154e_getAsn(asnArray);
+   slotContainer->addedAsn.bytes0and1 = ((uint16_t)asnArray[1] << 8) | asnArray[0];
+   slotContainer->addedAsn.bytes2and3 = ((uint16_t)asnArray[3] << 8) | asnArray[2];
+   slotContainer->addedAsn.byte4 = asnArray[4];
+
    // insert in circular list
    if (schedule_vars.currentScheduleEntry==NULL) {
       // this is the first active slot added
@@ -963,8 +968,8 @@ void schedule_housekeeping(){
         }
     }
 
-    schedule_checkTxConsistency();
-    schedule_checkRxConsistency();
+    //schedule_checkTxConsistency();
+    //schedule_checkRxConsistency();
 
     ENABLE_INTERRUPTS();
 }
@@ -1013,6 +1018,10 @@ void schedule_resetEntry(scheduleEntry_t* e) {
    e->lastUsedAsn.bytes0and1 = 0;
    e->lastUsedAsn.bytes2and3 = 0;
    e->lastUsedAsn.byte4      = 0;
+   e->addedAsn.bytes0and1    = 0;
+   e->addedAsn.bytes2and3 	 = 0;
+   e->addedAsn.byte4      	 = 0;
+   e->housekeepChecked       = FALSE;
    e->next                   = NULL;
 }
 
@@ -1026,12 +1035,10 @@ void schedule_checkTxConsistency() {
 				if(packetfunctions_sameAddress(&neighbor,&(schedule_vars.scheduleBuf[i].neighbor))==TRUE){
 					if(schedule_vars.scheduleBuf[i].numTx > 0 && schedule_vars.scheduleBuf[i].numTxACK == 0) {
 						schedule_vars.scheduleBuf[i].checkTxCellCounter++;
-						if(schedule_vars.scheduleBuf[i].checkTxCellCounter == MIN_NUMTRY_REMOVE_TX) {
-							schedule_removeActiveSlot(schedule_vars.scheduleBuf[i].slotOffset, &(schedule_vars.scheduleBuf[i].neighbor));
+						if(schedule_vars.scheduleBuf[i].checkTxCellCounter >= MIN_NUMTRY_REMOVE_TX) {
 							openserial_printError(COMPONENT_CEXAMPLE,ERR_NEIGHBORS_DESYNC,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset);
-
-							openreport_indicateConsistencyRoutine(idmanager_getMyID(ADDR_64B), &neighbor, 1,
-																  schedule_vars.scheduleBuf[i].slotOffset, schedule_vars.scheduleBuf[i].channelOffset);
+							openreport_indicateConsistencyRoutine(idmanager_getMyID(ADDR_64B), &neighbor, 1, schedule_vars.scheduleBuf[i].slotOffset, schedule_vars.scheduleBuf[i].channelOffset);
+							schedule_removeActiveSlot(schedule_vars.scheduleBuf[i].slotOffset, &(schedule_vars.scheduleBuf[i].neighbor));
 						}
 					} else {
 						if (schedule_vars.scheduleBuf[i].checkTxCellCounter > 0) {
@@ -1047,21 +1054,21 @@ void schedule_checkTxConsistency() {
 void schedule_checkRxConsistency() {
 	uint8_t i;
 	PORT_TIMER_WIDTH timeSinceHeard;
-
 	for (i = 0; i < MAXACTIVESLOTS; i++) {
-		if (schedule_vars.scheduleBuf[i].type == CELLTYPE_RX) {
-			timeSinceHeard = ieee154e_asnDiff(&schedule_vars.scheduleBuf[i].lastUsedAsn);
+		if (schedule_vars.scheduleBuf[i].type == CELLTYPE_RX && schedule_vars.scheduleBuf[i].housekeepChecked == FALSE) {
+			timeSinceHeard = ieee154e_asnDiff(&schedule_vars.scheduleBuf[i].addedAsn);
 			 //around 6 minutes
 			 if (timeSinceHeard>DESYNCTIMEOUT*10) {
-				 openserial_printError(COMPONENT_UINJECT,ERR_NEIGHBORS_DESYNC,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset);
-				 openreport_indicateConsistencyRoutine(idmanager_getMyID(ADDR_64B),&(schedule_vars.scheduleBuf[i].neighbor),0,
-				 				 									   schedule_vars.scheduleBuf[i].slotOffset, schedule_vars.scheduleBuf[i].channelOffset);
+				 schedule_vars.scheduleBuf[i].housekeepChecked = TRUE;
 
+				 asn_t lastUsedAsn;
+				 memcpy(&lastUsedAsn,&schedule_vars.scheduleBuf[i].lastUsedAsn,sizeof(asn_t));
 
-				 schedule_removeActiveSlot(schedule_vars.scheduleBuf[i].slotOffset, &(schedule_vars.scheduleBuf[i].neighbor));
-
-
-
+				 if(lastUsedAsn.bytes0and1 == 0 && lastUsedAsn.bytes2and3 == 0 && lastUsedAsn.byte4 == 0) {
+					 openserial_printError(COMPONENT_UINJECT,ERR_NEIGHBORS_DESYNC,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset);
+					 openreport_indicateConsistencyRoutine(idmanager_getMyID(ADDR_64B),&(schedule_vars.scheduleBuf[i].neighbor),0,schedule_vars.scheduleBuf[i].slotOffset, schedule_vars.scheduleBuf[i].channelOffset);
+					 schedule_removeActiveSlot(schedule_vars.scheduleBuf[i].slotOffset, &(schedule_vars.scheduleBuf[i].neighbor));
+				 }
 			 }
 		}
 	}

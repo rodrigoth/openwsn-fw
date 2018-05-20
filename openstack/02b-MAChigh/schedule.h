@@ -110,6 +110,8 @@ typedef struct {
    uint8_t         numTx;
    uint8_t         numTxACK;
    asn_t           lastUsedAsn;
+   asn_t           addedAsn;
+   bool		       housekeepChecked;
    uint8_t		   checkTxCellCounter;
    void*           next;
 } scheduleEntry_t;
