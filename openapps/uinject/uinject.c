@@ -12,7 +12,7 @@
 
 
 #define PAYLOADLEN 17
-#define MAX_DIFF_TX_RX 3
+#define MAX_DIFF_TX_RX 9
 #define MAX_QUEUE_CAPACITY_TO_FORWARD 20
 
 //=========================== variables =======================================
