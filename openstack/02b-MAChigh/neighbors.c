@@ -11,7 +11,6 @@
 
 #define CLEARNEIGHBORS 20
 #define BROADCAST_FACTOR 60
-#define MAX_GENERATION_VALUE 9
 //=========================== variables =======================================
 
 static neighbors_vars_t neighbors_vars;
@@ -504,7 +503,11 @@ void neighbors_updateGeneration(open_addr_t* address){
     uint8_t i;
     for (i=0;i<MAXNUMNEIGHBORS;i++){
         if (packetfunctions_sameAddress(address, &neighbors_vars.neighbors[i].addr_64b)){
-            neighbors_vars.neighbors[i].generation = (neighbors_vars.neighbors[i].generation+1)%MAX_GENERATION_VALUE;
+            neighbors_vars.neighbors[i].generation = (neighbors_vars.neighbors[i].generation+1) & 0xFF;
+            // rollover from 0xff to 0x01
+            if (neighbors_vars.neighbors[i].generation == 0){
+                neighbors_vars.neighbors[i].generation = 1;
+            }
             break;
         }
     }
@@ -520,19 +523,6 @@ void neighbors_resetGeneration(open_addr_t* address){
     }
 }
 
-void neighbors_rollbackGenerationCounter(open_addr_t* address) {
-	uint8_t i;
-	for (i=0;i<MAXNUMNEIGHBORS;i++){
-	   if (isThisRowMatching(address,i)) {
-		   if( neighbors_vars.neighbors[i].generation == 0) {
-			   neighbors_vars.neighbors[i].generation = MAX_GENERATION_VALUE - 1;
-		   } else {
-			   neighbors_vars.neighbors[i].generation--;
-		   }
-		   break;
-	   }
-	}
-}
 
 //===== write addresses
 
@@ -876,10 +866,6 @@ void registerNewNeighbor(open_addr_t* address,
             neighbors_vars.neighbors[i].broadcast_rx		   = 0;
             memcpy(&neighbors_vars.neighbors[i].asn,asnTimestamp,sizeof(asn_t));
 
-            neighbors_vars.neighbors[i].scheduleLog.lastOperation = 0;
-            memset(&neighbors_vars.neighbors[i].scheduleLog.channels_offset[0],0,sizeof(uint8_t)*CELLLIST_MAX_LEN);
-            memset(&neighbors_vars.neighbors[i].scheduleLog.slots_offset[0],0,sizeof(uint8_t)*CELLLIST_MAX_LEN);
-
             //update jp
             if (joinPrioPresent==TRUE){
                neighbors_vars.neighbors[i].joinPrio=joinPrio;
@@ -929,9 +915,6 @@ void removeNeighbor(uint8_t neighborIndex) {
    neighbors_vars.neighbors[neighborIndex].sequenceNumber            = 0;
    neighbors_vars.neighbors[neighborIndex].generation   	         = 0;
    neighbors_vars.neighbors[neighborIndex].broadcast_rx   	         = 0;
-   neighbors_vars.neighbors[neighborIndex].scheduleLog.lastOperation = 0;
-   memset(&neighbors_vars.neighbors[neighborIndex].scheduleLog.channels_offset[0],0,sizeof(uint8_t)*CELLLIST_MAX_LEN);
-   memset(&neighbors_vars.neighbors[neighborIndex].scheduleLog.slots_offset[0],0,sizeof(uint8_t)*CELLLIST_MAX_LEN);
 }
 
 bool isTopN(uint8_t index,uint8_t top) {
@@ -967,13 +950,13 @@ void neighbors_getAllBroadcastReception(uint8_t* recepetions, uint8_t* indexes) 
 void neighbors_registerLastScheduleOperation(open_addr_t* address, uint8_t operation, uint8_t* slotoffset, uint8_t* channeloffset) {
 	uint8_t i,j;
 
-	for (i = 0; i < MAXNUMNEIGHBORS; i++) {
+	/*for (i = 0; i < MAXNUMNEIGHBORS; i++) {
 		if (isThisRowMatching(address, i)) {
 			neighbors_vars.neighbors[i].scheduleLog.lastOperation = operation;
 			memcpy(&neighbors_vars.neighbors[i].scheduleLog.channels_offset[0],channeloffset,sizeof(uint8_t)*CELLLIST_MAX_LEN);
 			memcpy(&neighbors_vars.neighbors[i].scheduleLog.slots_offset[0],slotoffset,sizeof(uint8_t)*CELLLIST_MAX_LEN);
 		}
-	}
+	}*/
 }
 
 bool neighbors_canRollbackLastScheduleOperation(open_addr_t* address) {
@@ -981,7 +964,7 @@ bool neighbors_canRollbackLastScheduleOperation(open_addr_t* address) {
 	uint8_t lastOperation;
 	bool returnValue = FALSE;
 
-	for (i = 0; i < MAXNUMNEIGHBORS; i++) {
+	/*for (i = 0; i < MAXNUMNEIGHBORS; i++) {
 		if (isThisRowMatching(address, i)) {
 			lastOperation = neighbors_vars.neighbors[i].scheduleLog.lastOperation;
 			switch (lastOperation) {
@@ -999,7 +982,7 @@ bool neighbors_canRollbackLastScheduleOperation(open_addr_t* address) {
 					break;
 			}
 		}
-	}
+	}*/
 	return returnValue;
 }
 

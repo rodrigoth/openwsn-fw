@@ -968,8 +968,8 @@ void schedule_housekeeping(){
         }
     }
 
-    //schedule_checkTxConsistency();
-    //schedule_checkRxConsistency();
+    schedule_checkTxConsistency();
+    schedule_checkRxConsistency();
 
     ENABLE_INTERRUPTS();
 }
@@ -1057,8 +1057,8 @@ void schedule_checkRxConsistency() {
 	for (i = 0; i < MAXACTIVESLOTS; i++) {
 		if (schedule_vars.scheduleBuf[i].type == CELLTYPE_RX && schedule_vars.scheduleBuf[i].housekeepChecked == FALSE) {
 			timeSinceHeard = ieee154e_asnDiff(&schedule_vars.scheduleBuf[i].addedAsn);
-			 //around 6 minutes
-			 if (timeSinceHeard>DESYNCTIMEOUT*10) {
+			 //around 5 minutes
+			 if (timeSinceHeard>DESYNCTIMEOUT*9) {
 				 schedule_vars.scheduleBuf[i].housekeepChecked = TRUE;
 
 				 asn_t lastUsedAsn;

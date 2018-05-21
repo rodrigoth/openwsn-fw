@@ -384,12 +384,6 @@ typedef struct {
 } OpenQueueEntry_t;
 
 
-typedef struct {
-	uint8_t lastOperation;
-	uint8_t slots_offset[CELLLIST_MAX_LEN];
-	uint8_t channels_offset[CELLLIST_MAX_LEN];
-} ScheduleLogEntry_t;
-
 BEGIN_PACK
 typedef struct {
    bool             used;
@@ -412,8 +406,6 @@ typedef struct {
    uint8_t          backoffExponenton;
    uint8_t          backoff;
    uint8_t			broadcast_rx; //number of times a node receives broadcast packets from a given neighbor
-   ScheduleLogEntry_t scheduleLog;
-
 } neighborRow_t;
 END_PACK
 

@@ -1129,7 +1129,7 @@ void sixtop_six2six_notifyReceive(
             }
 
             // generation check
-            if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code != IANA_6TOP_CMD_CLEAR){
+            /*if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code != IANA_6TOP_CMD_CLEAR){
             	openserial_printError(COMPONENT_SIXTOP,ERR_SCHEDULE_ROLLBACK,(errorparameter_t)0,(errorparameter_t)0);
             	if (neighbors_canRollbackLastScheduleOperation(&(pkt->l2_nextORpreviousHop)) == TRUE) {
             		neighbors_rollbackGenerationCounter(&(pkt->l2_nextORpreviousHop));
@@ -1138,12 +1138,12 @@ void sixtop_six2six_notifyReceive(
                 	returnCode = IANA_6TOP_RC_GEN_ERR;
                 	break;
                 }
-            }
+            }*/
 
             // block the deletetion for some minutes to allow the node to reallocate the cells
-			if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code == IANA_6TOP_CMD_CLEAR){
+			/*if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code == IANA_6TOP_CMD_CLEAR){
 				sf0_blockDeletionTemporarily();
-			}
+			}*/
 
             // previous 6p transcation check
             if (sixtop_vars.six2six_state != SIX_STATE_IDLE){
@@ -1626,16 +1626,9 @@ bool sixtop_addCells(uint8_t slotframeID, cellInfo_ht* cellList, open_addr_t* pr
         if (cellList[i].isUsed){
             hasCellsAdded = TRUE;
             schedule_addActiveSlot(cellList[i].slotoffset,type,isShared,cellList[i].channeloffset,&temp_neighbor);
-            addedChanels[i] = cellList[i].channeloffset;
-            addedSlots[i] = (uint8_t)cellList[i].slotoffset;
-            openreport_indicateConsistencyRoutine(idmanager_getMyID(ADDR_64B),&temp_neighbor,0,(uint8_t)cellList[i].slotoffset, cellList[i].channeloffset);
          }
     }
 
-    if(hasCellsAdded) {
-    	neighbors_registerLastScheduleOperation(&temp_neighbor,IANA_6TOP_CMD_ADD,addedSlots, addedChanels);
-    }
-   
     return hasCellsAdded;
 }
 
