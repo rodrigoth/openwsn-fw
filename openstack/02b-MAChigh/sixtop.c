@@ -1490,14 +1490,7 @@ void sixtop_six2six_notifyReceive(
                     pktLen -= 4;
                     i++;
                 }
-                if (
-                    sixtop_addCells(
-                        sixtop_vars.cb_sf_getMetadata(),     // frame id 
-                        pkt->l2_sixtop_celllist_add,  // celllist to be added
-                        &(pkt->l2_nextORpreviousHop), // neighbor that cells to be added to
-                        sixtop_vars.cellOptions       // cell options
-                    ) == TRUE
-                ) { 
+                if (sixtop_addCells(sixtop_vars.cb_sf_getMetadata(),pkt->l2_sixtop_celllist_add,&(pkt->l2_nextORpreviousHop),sixtop_vars.cellOptions) == TRUE) {
                     neighbors_updateGeneration(&(pkt->l2_nextORpreviousHop));
                 }
                 break;
@@ -1635,6 +1628,7 @@ bool sixtop_addCells(uint8_t slotframeID, cellInfo_ht* cellList, open_addr_t* pr
             schedule_addActiveSlot(cellList[i].slotoffset,type,isShared,cellList[i].channeloffset,&temp_neighbor);
             addedChanels[i] = cellList[i].channeloffset;
             addedSlots[i] = (uint8_t)cellList[i].slotoffset;
+            openreport_indicateConsistencyRoutine(idmanager_getMyID(ADDR_64B),&temp_neighbor,0,(uint8_t)cellList[i].slotoffset, cellList[i].channeloffset);
          }
     }
 

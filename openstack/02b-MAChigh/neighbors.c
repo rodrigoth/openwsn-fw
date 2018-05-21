@@ -965,7 +965,7 @@ void neighbors_getAllBroadcastReception(uint8_t* recepetions, uint8_t* indexes) 
 
 
 void neighbors_registerLastScheduleOperation(open_addr_t* address, uint8_t operation, uint8_t* slotoffset, uint8_t* channeloffset) {
-	uint8_t i;
+	uint8_t i,j;
 
 	for (i = 0; i < MAXNUMNEIGHBORS; i++) {
 		if (isThisRowMatching(address, i)) {
@@ -990,8 +990,8 @@ bool neighbors_canRollbackLastScheduleOperation(open_addr_t* address) {
 						if(neighbors_vars.neighbors[i].scheduleLog.slots_offset[j] != 0) {
 							openserial_printError(COMPONENT_NEIGHBORS,ERR_SCHEDULE_ROLLBACK_SLOT,
 									(errorparameter_t)neighbors_vars.neighbors[i].scheduleLog.slots_offset[j],(errorparameter_t)IANA_6TOP_CMD_ADD);
-							owerror_t error = schedule_removeActiveSlot(neighbors_vars.neighbors[i].scheduleLog.slots_offset[j], address);
-							if(error == E_SUCCESS) {returnValue = TRUE;}
+							schedule_removeActiveSlot(neighbors_vars.neighbors[i].scheduleLog.slots_offset[j], address);
+							returnValue = TRUE;
 						}
 					}
 					break;
