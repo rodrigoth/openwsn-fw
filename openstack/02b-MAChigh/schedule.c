@@ -1036,8 +1036,8 @@ void schedule_checkTxConsistency() {
 					if(schedule_vars.scheduleBuf[i].numTx > 0 && schedule_vars.scheduleBuf[i].numTxACK == 0) {
 						schedule_vars.scheduleBuf[i].checkTxCellCounter++;
 						if(schedule_vars.scheduleBuf[i].checkTxCellCounter >= MIN_NUMTRY_REMOVE_TX) {
-							openserial_printError(COMPONENT_CEXAMPLE,ERR_NEIGHBORS_DESYNC,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset);
-							openreport_indicateConsistencyRoutine(idmanager_getMyID(ADDR_64B), &neighbor, 1, schedule_vars.scheduleBuf[i].slotOffset, schedule_vars.scheduleBuf[i].channelOffset);
+							//openserial_printError(COMPONENT_CEXAMPLE,ERR_NEIGHBORS_DESYNC,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset);
+							//openreport_indicateConsistencyRoutine(idmanager_getMyID(ADDR_64B), &neighbor, 1, schedule_vars.scheduleBuf[i].slotOffset, schedule_vars.scheduleBuf[i].channelOffset);
 							//schedule_removeActiveSlot(schedule_vars.scheduleBuf[i].slotOffset, &(schedule_vars.scheduleBuf[i].neighbor));
 						}
 					} else {
