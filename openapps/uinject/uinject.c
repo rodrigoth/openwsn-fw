@@ -74,7 +74,7 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 	  uint8_t totalTx = schedule_getNumberSlotToPreferredParent(&neighbor);
 	  uint8_t totalRx = schedule_getNumOfSlotsByType(CELLTYPE_RX);
 
-	  if ((totalRx > totalTx + MAX_DIFF_TX_RX) || (openqueue_getCurrentCapacity() >= MAX_QUEUE_CAPACITY_TO_FORWARD)) {
+	  if (openqueue_getCurrentCapacity() >= MAX_QUEUE_CAPACITY_TO_FORWARD) {
 		  openqueue_freePacketBuffer(pkt);
 		  return;
 	  }
