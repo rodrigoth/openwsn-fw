@@ -54,7 +54,7 @@ if env['userssi']==1:
     env.Append(CPPDEFINES    = 'USERSSI')
 if env['usebroadcast']==1:
     env.Append(CPPDEFINES    = 'USEBROADCAST')
-if env['userandomtraffic'] == 1:
+if env['userandomtraffic'] in range(0,5):
     env.Append(CPPDEFINES    = 'VARIABLE_TRAFFIC_RATE')
 if env['noconsistencycheck']==1:
     env.Append(CPPDEFINES    = 'NOGENERATIONCHECK')

@@ -47,8 +47,7 @@ void uinject_init() {
 
 
 #ifdef VARIABLE_TRAFFIC_RATE
-    uint8_t traffic_index = openrandom_get16b() % (sizeof(traffic_rates)/sizeof(uint32_t));
-    current_traffic_rate = traffic_rates[traffic_index];
+     current_traffic_rate = traffic_rates[VARIABLE_TRAFFIC_RATE];
 #else
     current_traffic_rate = UINJECT_PERIOD_MS;
 #endif

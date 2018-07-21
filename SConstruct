@@ -141,7 +141,7 @@ command_line_options = {
     'useetxn':			['0','1'],
     'userssi':			['0','1'],
     'usebroadcast':		['0','1'],
-    'userandomtraffic': ['0','1'],
+    'userandomtraffic': ['0','1','2','3','4'],
     'noconsistencycheck':['0','1'],
     'debug':            ['0','1'],
     'noadaptivesync':   ['0','1'],
