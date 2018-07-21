@@ -54,6 +54,8 @@ if env['userssi']==1:
     env.Append(CPPDEFINES    = 'USERSSI')
 if env['usebroadcast']==1:
     env.Append(CPPDEFINES    = 'USEBROADCAST')
+if env['traffic_load'] in [1000,30000,60000,90000,120000]:
+    env.Append(CPPDEFINES    = 'TRAFFIC_LOAD')
 if env['noconsistencycheck']==1:
     env.Append(CPPDEFINES    = 'NOGENERATIONCHECK')
 if env['noadaptivesync']==1:
