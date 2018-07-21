@@ -48,9 +48,14 @@ void uinject_init() {
 
 #ifdef VARIABLE_TRAFFIC_RATE
      current_traffic_rate = traffic_rates[VARIABLE_TRAFFIC_RATE];
+     openserial_printError(COMPONENT_IEEE802154E,ERR_WRONG_STATE_IN_ENDOFFRAME,
+                                       (errorparameter_t)VARIABLE_TRAFFIC_RATE,
+                                       (errorparameter_t)VARIABLE_TRAFFIC_RATE);
 #else
     current_traffic_rate = UINJECT_PERIOD_MS;
 #endif
+
+
 
     uinject_vars.period = current_traffic_rate;
     // start periodic timer
@@ -81,8 +86,6 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 		  return;
 	  }
 
-	  uint8_t totalTx = schedule_getNumberSlotToPreferredParent(&neighbor);
-	  uint8_t totalRx = schedule_getNumOfSlotsByType(CELLTYPE_RX);
 
 	  if (openqueue_getCurrentCapacity() >= MAX_QUEUE_CAPACITY_TO_FORWARD) {
 		  openqueue_freePacketBuffer(pkt);
