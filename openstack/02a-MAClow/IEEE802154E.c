@@ -112,7 +112,7 @@ void ieee154e_init() {
    memset(&ieee154e_vars,0,sizeof(ieee154e_vars_t));
    memset(&ieee154e_dbg,0,sizeof(ieee154e_dbg_t));
    
-   ieee154e_vars.singleChannel     = 20; // 0 means channel hopping
+   ieee154e_vars.singleChannel     = 0; // 0 means channel hopping
    ieee154e_vars.isAckEnabled      = TRUE;
    ieee154e_vars.isSecurityEnabled = FALSE;
    ieee154e_vars.slotDuration      = TsSlotDuration;
@@ -534,7 +534,7 @@ port_INLINE void activity_synchronize_newSlot() {
         radio_rfOff();
         
         // update record of current channel
-        ieee154e_vars.freq = 20;//(openrandom_get16b()&0x0F) + 11;
+        ieee154e_vars.freq = (openrandom_get16b()&0x0F) + 11;
         
         // configure the radio to listen to the default synchronizing channel
         radio_setFrequency(ieee154e_vars.freq);
