@@ -15,12 +15,8 @@
 
 //=========================== define ==========================================
 
-#ifdef TRAFFIC_LOAD
-		#define UINJECT_PERIOD_MS TRAFFIC_LOAD
-#else
-		#define UINJECT_PERIOD_MS 10000
-#endif
 
+#define UINJECT_PERIOD_MS 10000
 
 
 //=========================== typedef =========================================

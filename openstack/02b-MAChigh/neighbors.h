@@ -117,10 +117,6 @@ void          neighbors_removeOld(void);
 
 // debug
 bool          debugPrint_neighbors(void);
-void 		  neighbors_registerLastScheduleOperation(open_addr_t* address, uint8_t operation, uint8_t* slotoffset, uint8_t* channeloffset);
-bool 		  neighbors_canRollbackLastScheduleOperation(open_addr_t* address);
-void		  neighbors_rollbackGenerationCounter(open_addr_t* address);
-
 /**
 \}
 \}

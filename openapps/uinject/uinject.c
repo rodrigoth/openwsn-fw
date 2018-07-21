@@ -24,6 +24,9 @@ uint8_t prefix[8] = {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 uint32_t seqnum = 0;
 
+uint32_t traffic_rates[5] = {1000,30000,60000,90000,120000};
+uint32_t current_traffic_rate;
+
 //=========================== prototypes ======================================
 
 void uinject_timer_cb(opentimers_id_t id);
@@ -42,12 +45,20 @@ void uinject_init() {
     uinject_vars.desc.callbackSendDone  = &uinject_sendDone;
     openudp_register(&uinject_vars.desc);
 
-    uinject_vars.period = UINJECT_PERIOD_MS;
+
+#ifdef VARIABLE_TRAFFIC_RATE
+    uint8_t traffic_index = openrandom_get16b() % (sizeof(traffic_rates)/sizeof(uint32_t));
+    current_traffic_rate = traffic_rates[traffic_index];
+#else
+    current_traffic_rate = UINJECT_PERIOD_MS;
+#endif
+
+    uinject_vars.period = current_traffic_rate;
     // start periodic timer
     uinject_vars.timerId = opentimers_create();
     opentimers_scheduleIn(
         uinject_vars.timerId,
-        UINJECT_PERIOD_MS,
+		current_traffic_rate,
         TIME_MS,
         TIMER_ONESHOT,
         uinject_timer_cb
@@ -133,8 +144,8 @@ void uinject_task_cb() {
    uint8_t              asnArray[5];
    bool foundNeighbor;
 
-   //uint16_t newTime =  UINJECT_PERIOD_MS - 5000+(openrandom_get16b()%(2*5000));
-   opentimers_scheduleIn(uinject_vars.timerId,UINJECT_PERIOD_MS,TIME_MS,TIMER_ONESHOT,uinject_timer_cb);
+   //uint16_t newTime =  current_traffic_rate - 5000+(openrandom_get16b()%(2*5000));
+   opentimers_scheduleIn(uinject_vars.timerId,current_traffic_rate,TIME_MS,TIMER_ONESHOT,uinject_timer_cb);
 
    seqnum++;
 

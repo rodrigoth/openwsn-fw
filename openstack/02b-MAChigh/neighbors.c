@@ -947,47 +947,6 @@ void neighbors_getAllBroadcastReception(uint8_t* recepetions, uint8_t* indexes) 
 		}
 	}
 }
-
-
-void neighbors_registerLastScheduleOperation(open_addr_t* address, uint8_t operation, uint8_t* slotoffset, uint8_t* channeloffset) {
-	uint8_t i,j;
-
-	/*for (i = 0; i < MAXNUMNEIGHBORS; i++) {
-		if (isThisRowMatching(address, i)) {
-			neighbors_vars.neighbors[i].scheduleLog.lastOperation = operation;
-			memcpy(&neighbors_vars.neighbors[i].scheduleLog.channels_offset[0],channeloffset,sizeof(uint8_t)*CELLLIST_MAX_LEN);
-			memcpy(&neighbors_vars.neighbors[i].scheduleLog.slots_offset[0],slotoffset,sizeof(uint8_t)*CELLLIST_MAX_LEN);
-		}
-	}*/
-}
-
-bool neighbors_canRollbackLastScheduleOperation(open_addr_t* address) {
-	uint8_t i,j;
-	uint8_t lastOperation;
-	bool returnValue = FALSE;
-
-	/*for (i = 0; i < MAXNUMNEIGHBORS; i++) {
-		if (isThisRowMatching(address, i)) {
-			lastOperation = neighbors_vars.neighbors[i].scheduleLog.lastOperation;
-			switch (lastOperation) {
-				case IANA_6TOP_CMD_ADD:
-					for(j=0; j < CELLLIST_MAX_LEN; j++) {
-						if(neighbors_vars.neighbors[i].scheduleLog.slots_offset[j] != 0) {
-							openserial_printError(COMPONENT_NEIGHBORS,ERR_SCHEDULE_ROLLBACK_SLOT,
-									(errorparameter_t)neighbors_vars.neighbors[i].scheduleLog.slots_offset[j],(errorparameter_t)IANA_6TOP_CMD_ADD);
-							schedule_removeActiveSlot(neighbors_vars.neighbors[i].scheduleLog.slots_offset[j], address);
-							returnValue = TRUE;
-						}
-					}
-					break;
-				default:
-					break;
-			}
-		}
-	}*/
-	return returnValue;
-}
-
 //=========================== helpers =========================================
 
 bool isThisRowMatching(open_addr_t* address, uint8_t rowNumber) {

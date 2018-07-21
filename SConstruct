@@ -141,7 +141,7 @@ command_line_options = {
     'useetxn':			['0','1'],
     'userssi':			['0','1'],
     'usebroadcast':		['0','1'],
-    'traffic_load':     ['1000','30000','60000','90000','120000'],
+    'userandomtraffic': ['0','1'],
     'noconsistencycheck':['0','1'],
     'debug':            ['0','1'],
     'noadaptivesync':   ['0','1'],
@@ -315,9 +315,9 @@ command_line_vars.AddVariables(
         int,                                               # converter
     ),
     (
-        'traffic_load',	           		                   # key
+        'userandomtraffic',	           		               # key
         '',                                                # help
-        command_line_options['traffic_load'][1], 	       # default
+        command_line_options['userandomtraffic'][0], 	   # default
         validate_option,                                   # validator
         int,                                               # converter
     ),
