@@ -1065,7 +1065,6 @@ void schedule_checkRxConsistency() {
 				 memcpy(&lastUsedAsn,&schedule_vars.scheduleBuf[i].lastUsedAsn,sizeof(asn_t));
 
 				 if(lastUsedAsn.bytes0and1 == 0 && lastUsedAsn.bytes2and3 == 0 && lastUsedAsn.byte4 == 0) {
-					 openserial_printError(COMPONENT_UINJECT,ERR_NEIGHBORS_DESYNC,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset);
 					 openreport_indicateConsistencyRoutine(idmanager_getMyID(ADDR_64B),&(schedule_vars.scheduleBuf[i].neighbor),0,schedule_vars.scheduleBuf[i].slotOffset, schedule_vars.scheduleBuf[i].channelOffset);
 					 schedule_removeActiveSlot(schedule_vars.scheduleBuf[i].slotOffset, &(schedule_vars.scheduleBuf[i].neighbor));
 				 }
