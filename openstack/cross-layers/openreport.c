@@ -195,7 +195,7 @@ void openreport_indicateBroadcastRx(open_addr_t *neighbor, uint8_t channel,uint8
 
 	debug_reportEntry.experiment_id = experiment_id;
 
-	//openserial_printStatus(STATUS_BROADCAST_RX,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntryEB_t));
+	openserial_printStatus(STATUS_BROADCAST_RX,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntryEB_t));
 }
 
 void openreport_indicateConsistencyRoutine(open_addr_t* node, open_addr_t* parent,uint8_t isTx,uint8_t slotOffset,uint8_t channelOffset) {
