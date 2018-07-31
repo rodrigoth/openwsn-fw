@@ -968,8 +968,8 @@ void schedule_housekeeping(){
         }
     }
 
-    schedule_checkTxConsistency();
-    schedule_checkRxConsistency();
+    //schedule_checkTxConsistency();
+    //schedule_checkRxConsistency();
 
     ENABLE_INTERRUPTS();
 }

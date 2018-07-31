@@ -1129,16 +1129,10 @@ void sixtop_six2six_notifyReceive(
             }
 
             // generation check
-            /*if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code != IANA_6TOP_CMD_CLEAR){
-            	openserial_printError(COMPONENT_SIXTOP,ERR_SCHEDULE_ROLLBACK,(errorparameter_t)0,(errorparameter_t)0);
-            	if (neighbors_canRollbackLastScheduleOperation(&(pkt->l2_nextORpreviousHop)) == TRUE) {
-            		neighbors_rollbackGenerationCounter(&(pkt->l2_nextORpreviousHop));
-                } else {
-                	openserial_printError(COMPONENT_SIXTOP,ERR_SCHEDULE_ROLLBACK_FAIL,(errorparameter_t)0,(errorparameter_t)0);
-                	returnCode = IANA_6TOP_RC_GEN_ERR;
-                	break;
-                }
-            }*/
+           if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code != IANA_6TOP_CMD_CLEAR){
+				returnCode = IANA_6TOP_RC_GEN_ERR;
+				break;
+            }
 
             // block the deletetion for some minutes to allow the node to reallocate the cells
 			/*if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code == IANA_6TOP_CMD_CLEAR){

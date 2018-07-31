@@ -24,7 +24,7 @@ uint8_t prefix[8] = {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 uint32_t seqnum = 0;
 
-uint32_t traffic_rates[5] = {3000,33000,63000,93000,123000};
+uint32_t traffic_rates[5] = {10000,33000,63000,93000,123000};
 uint32_t current_traffic_rate;
 
 //=========================== prototypes ======================================
@@ -75,10 +75,18 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 	  OpenQueueEntry_t* new_pkt;
 	  open_addr_t neighbor;
 	  bool foundNeighbor;
+	  uint8_t asnArray[5];
+	  open_addr_t sender;
 
 	  foundNeighbor = icmpv6rpl_getPreferredParentEui64(&neighbor);
 
 	  if(!foundNeighbor || schedule_getNumberSlotToPreferredParent(&neighbor) == 0) {
+		  memcpy(&(sender.addr_64b[0]),&(pkt->payload[2]),8);
+		  memcpy(&asnArray,&(pkt->payload[10]),5);
+		  uint32_t uinject_seqnum = pkt->payload[18] | (pkt->payload[17] << 8) | (pkt->payload[16] << 16) | (pkt->payload[15] << 24);
+
+		  openreport_indicateDroppedPacket(&sender,uinject_seqnum,&asnArray[0]);
+
 		  openqueue_freePacketBuffer(pkt);
 		  return;
 	  }
@@ -113,16 +121,6 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 	  if ((openudp_send(new_pkt))==E_FAIL) {
 	      openqueue_freePacketBuffer(new_pkt);
 	  }
-
-	  uint8_t asnArray[5];
-	  open_addr_t sender;
-
-
-	  memcpy(&(sender.addr_64b[0]),&(pkt->payload[2]),8);
-	  memcpy(&asnArray,&(pkt->payload[10]),5);
-	  uint32_t uinject_seqnum = pkt->payload[18] | (pkt->payload[17] << 8) | (pkt->payload[16] << 16) | (pkt->payload[15] << 24);
-
-	  openreport_indicateTxReceived(&sender,uinject_seqnum,&asnArray[0]);
 
 	  openqueue_freePacketBuffer(pkt);
 }

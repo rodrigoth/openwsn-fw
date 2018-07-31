@@ -256,7 +256,6 @@ bool neighbors_isInsecureNeighbor(open_addr_t* address) {
          break;
       }
    }
-   
    return returnVal;
 }
 

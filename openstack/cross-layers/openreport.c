@@ -163,10 +163,10 @@ void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_
 	openserial_printStatus(STATUS_TX,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }
 
-void openreport_indicateTxReceived(open_addr_t *sender, uint32_t seqnum,uint8_t *asn) {
-	debug_reportTxReceivedEntry_t debug_reportEntry;
+void openreport_indicateDroppedPacket(open_addr_t *sender, uint32_t seqnum,uint8_t *asn) {
+	debug_reportDroppedPacketEntry_t debug_reportEntry;
 
-	memset(&debug_reportEntry,0,sizeof(debug_reportTxReceivedEntry_t));
+	memset(&debug_reportEntry,0,sizeof(debug_reportDroppedPacketEntry_t));
 
 	debug_reportEntry.asn.bytes0and1 = ((uint16_t)asn[1] << 8) | asn[0];
 	debug_reportEntry.asn.bytes2and3 = ((uint16_t)asn[3] << 8) | asn[2];
@@ -178,7 +178,7 @@ void openreport_indicateTxReceived(open_addr_t *sender, uint32_t seqnum,uint8_t 
 
 	memcpy(&(debug_reportEntry.sender.addr_64b[0]),&(sender->addr_64b[0]),8);
 
-	//openserial_printStatus(STATUS_TX_RECEIVED,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
+	openserial_printStatus(STATUS_TX_RECEIVED,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }
 
 void openreport_indicateBroadcastRx(open_addr_t *neighbor, uint8_t channel,uint8_t iseb) {
