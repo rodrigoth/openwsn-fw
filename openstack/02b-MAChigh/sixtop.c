@@ -727,6 +727,7 @@ port_INLINE void sixtop_sendEB() {
     }
    
     // if I get here, I will send an EB
+    openreport_indicateBroadcastTx();
     
     // get a free packet buffer
     eb = openqueue_getFreePacketBuffer(COMPONENT_SIXTOP);

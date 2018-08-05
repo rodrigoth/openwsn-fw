@@ -1376,7 +1376,7 @@ port_INLINE void activity_tie5() {
 		memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
 
 		uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
-		openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),0,1,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0]);
+		openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),0,1,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0],neighbors_getParentBroadcastRank());
 	}
 
    
@@ -1578,7 +1578,7 @@ port_INLINE void activity_ti9(PORT_TIMER_WIDTH capturedTime) {
 			memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
 
 			uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
-			openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),1,1,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0]);
+			openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),1,1, ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0],neighbors_getParentBroadcastRank());
 		}
 
       
@@ -1958,7 +1958,7 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
             }
 
             if(ieee154e_vars.dataReceived->l2_frameType == IEEE154_TYPE_BEACON) {
-				 openreport_indicateBroadcastRx(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop),ieee154e_vars.freq,1);
+				 openreport_indicateBroadcastRx();
 				 neighbors_indicateBroadcastReception(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop));
             }
 

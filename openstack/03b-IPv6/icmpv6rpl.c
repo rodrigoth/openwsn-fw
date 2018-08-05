@@ -543,8 +543,10 @@ void icmpv6rpl_indicateRxDIO(OpenQueueEntry_t* msg) {
    uint8_t          optionsLen;
 
 
-   openreport_indicateBroadcastRx(&(msg->l2_nextORpreviousHop),ieee154e_getLastFreq(),0);
+   openreport_indicateBroadcastRx();
    neighbors_indicateBroadcastReception(&(msg->l2_nextORpreviousHop));
+
+
 
    // take ownership over the packet
    msg->owner = COMPONENT_NEIGHBORS;
@@ -725,6 +727,9 @@ void sendDIO() {
    
    // if you get here, all good to send a DIO
    
+   openreport_indicateBroadcastTx();
+
+
    // reserve a free packet buffer for DIO
    msg = openqueue_getFreePacketBuffer(COMPONENT_ICMPv6RPL);
    if (msg==NULL) {

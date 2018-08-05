@@ -71,6 +71,7 @@ typedef struct {
 	uint8_t totalTx;
 	uint8_t totalRx;
 	uint8_t queueCapacity;
+	uint8_t broadcast_rank;
 } debug_reportTxEntry_t;
 END_PACK
 
@@ -98,10 +99,9 @@ END_PACK
 
 BEGIN_PACK
 typedef struct {
-	open_addr_t neighbor;
 	asn_t asn;
-	uint8_t channel;
-	uint8_t iseb;
+	uint16_t total_rx;
+	uint16_t total_tx;
 	uint8_t experiment_id;
 } debug_reportEntryEB_t;
 END_PACK
@@ -119,6 +119,11 @@ typedef struct {
 END_PACK
 
 
+typedef struct {
+   uint16_t total_broadcast_rx;
+   uint16_t total_broadcast_tx;
+} openreportEntry_t;
+
 //=========================== variables =======================================
 
 
@@ -131,12 +136,15 @@ void openreport_indicateParentSwitch(open_addr_t *newParent, uint16_t previousRa
 void openreport_indicate6pRequest(uint8_t code,uint8_t requestedCells,open_addr_t *destination, uint8_t totalTx, uint8_t totalRx);
 void openreport_indicate6pReceived(uint8_t code,uint8_t requestedCells,open_addr_t *sender, uint8_t totalTx, uint8_t totalRx,uint8_t state);
 void openreport_indicate6pResponse(uint8_t code,uint8_t requestedCells,open_addr_t *destination, uint8_t totalTx, uint8_t totalRx,uint8_t state);
-void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_t ack, uint8_t tx, uint8_t channel, uint32_t seqnum,uint8_t component,uint8_t *asn);
+void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_t ack, uint8_t tx, uint8_t channel, uint32_t seqnum,uint8_t component,uint8_t *asn,
+		uint8_t broadcast_rank);
 void openreport_indicatePDR(open_addr_t *destination, uint8_t totalTx, uint8_t totalAck, uint8_t pdrWMEMA);
 void openreport_indicateDroppedPacket(open_addr_t *sender, uint32_t seqnum,uint8_t *asn);
-void openreport_indicateBroadcastRx(open_addr_t *neighbor, uint8_t channel,uint8_t iseb);
+void openreport_indicateBroadcastRate(void);
 void openreport_indicateConsistencyRoutine(open_addr_t* node, open_addr_t* parent,uint8_t isTx,uint8_t slotOffset,uint8_t channelOffset);
-
+void openreport_indicateBroadcastRx(void);
+void openreport_indicateBroadcastTx(void);
+void openreport_resetBroadcastRate(void);
 
 
 

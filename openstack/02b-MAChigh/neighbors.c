@@ -16,6 +16,7 @@
 static neighbors_vars_t neighbors_vars;
 uint8_t clearInactiveNeighborsCounter;
 uint8_t prevDesync;
+uint8_t indicateBroadcastRateCounter;
 
 //=========================== prototypes ======================================
 
@@ -798,6 +799,13 @@ void  neighbors_removeOld() {
     } else {
     	clearInactiveNeighborsCounter++;
     }
+
+    if(indicateBroadcastRateCounter == 0) {
+    	indicateBroadcastRateCounter++;
+    } else {
+    	openreport_indicateBroadcastRate();
+    	indicateBroadcastRateCounter = 0;
+    }
 }
 
 void neighbors_resetBroadcastRx() {
@@ -935,6 +943,29 @@ bool isTopN(uint8_t index,uint8_t top) {
 		}
 	}
 	return FALSE;
+}
+
+uint8_t neighbors_getParentBroadcastRank(void) {
+	uint8_t i;
+	uint8_t broadcastReceptions[MAXNUMNEIGHBORS];
+	uint8_t neighborsIndexes[MAXNUMNEIGHBORS];
+	uint8_t preferredParentIndex;
+
+	memset(&broadcastReceptions[0],0,sizeof(uint8_t)*MAXNUMNEIGHBORS);
+	memset(&neighborsIndexes[0],0,sizeof(uint8_t)*MAXNUMNEIGHBORS);
+
+	if (icmpv6rpl_getPreferredParentIndex(&preferredParentIndex)){
+		neighbors_getAllBroadcastReception(&broadcastReceptions[0],&neighborsIndexes[0]);
+		sort_arrays(&broadcastReceptions[0],&neighborsIndexes[0]);
+
+		for(i = 0; i < MAXNUMNEIGHBORS; i++) {
+			if(neighborsIndexes[i] == preferredParentIndex) {
+				return i+1;
+			}
+		}
+	}
+
+	return 0;
 }
 
 void neighbors_getAllBroadcastReception(uint8_t* recepetions, uint8_t* indexes) {
