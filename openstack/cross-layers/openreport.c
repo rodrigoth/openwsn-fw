@@ -192,6 +192,17 @@ void openreport_indicateDroppedPacket(open_addr_t *sender, uint32_t seqnum,uint8
 
 	debug_reportEntry.experiment_id = experiment_id;
 
+	open_addr_t neighbor;
+	if (icmpv6rpl_getPreferredParentEui64(&neighbor)) {
+		debug_reportEntry.totalTx = schedule_getNumberSlotToPreferredParent(&neighbor);
+	} else {
+		debug_reportEntry.totalTx = 0;
+	}
+
+	debug_reportEntry.totalRx = schedule_getNumOfSlotsByType(CELLTYPE_RX);
+
+	debug_reportEntry.queueCapacity = openqueue_getCurrentCapacity();
+
 	memcpy(&(debug_reportEntry.sender.addr_64b[0]),&(sender->addr_64b[0]),8);
 
 	openserial_printStatus(STATUS_TX_RECEIVED,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));

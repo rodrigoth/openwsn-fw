@@ -94,6 +94,9 @@ typedef struct {
 	asn_t asn;
 	uint32_t seqnum;
 	uint8_t experiment_id;
+	uint8_t totalTx;
+	uint8_t totalRx;
+	uint8_t queueCapacity;
 } debug_reportDroppedPacketEntry_t;
 END_PACK
 
