@@ -84,11 +84,11 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 	  memcpy(&asnArray,&(pkt->payload[10]),5);
 	  uint32_t uinject_seqnum = pkt->payload[18] | (pkt->payload[17] << 8) | (pkt->payload[16] << 16) | (pkt->payload[15] << 24);
 
-	  if(!foundNeighbor || schedule_getNumberSlotToPreferredParent(&neighbor) == 0) {
+	  /*if(!foundNeighbor || schedule_getNumberSlotToPreferredParent(&neighbor) == 0) {
 		  openreport_indicateDroppedPacket(&sender,uinject_seqnum,&asnArray[0]);
 		  openqueue_freePacketBuffer(pkt);
 		  return;
-	  }
+	  }*/
 
 
 	  if (openqueue_getCurrentCapacity() >= MAX_QUEUE_CAPACITY_TO_FORWARD) {
