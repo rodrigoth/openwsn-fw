@@ -173,6 +173,16 @@ uint8_t	neighbors_getParentRSSI() {
 }
 
 
+uint8_t	 neighbors_getNeighborRSSI(uint8_t index) {
+	 uint8_t i;
+	 for (i=0;i<MAXNUMNEIGHBORS;i++){
+		 if (neighbors_vars.neighbors[i].used==TRUE && i == index) {
+			 return (-1)*neighbors_vars.neighbors[i].rssi;
+		 }
+	 }
+	 return 0;
+}
+
 //===== interrogators
 
 /**
@@ -945,26 +955,22 @@ bool isTopN(uint8_t index,uint8_t top) {
 	return FALSE;
 }
 
-uint8_t neighbors_getParentBroadcastRank(void) {
+uint8_t neighbors_getNeighborBroadcastRank(uint8_t index) {
 	uint8_t i;
 	uint8_t broadcastReceptions[MAXNUMNEIGHBORS];
 	uint8_t neighborsIndexes[MAXNUMNEIGHBORS];
-	uint8_t preferredParentIndex;
 
 	memset(&broadcastReceptions[0],0,sizeof(uint8_t)*MAXNUMNEIGHBORS);
 	memset(&neighborsIndexes[0],0,sizeof(uint8_t)*MAXNUMNEIGHBORS);
 
-	if (icmpv6rpl_getPreferredParentIndex(&preferredParentIndex)){
-		neighbors_getAllBroadcastReception(&broadcastReceptions[0],&neighborsIndexes[0]);
-		sort_arrays(&broadcastReceptions[0],&neighborsIndexes[0]);
+	neighbors_getAllBroadcastReception(&broadcastReceptions[0],&neighborsIndexes[0]);
+	sort_arrays(&broadcastReceptions[0],&neighborsIndexes[0]);
 
-		for(i = 0; i < MAXNUMNEIGHBORS; i++) {
-			if(neighborsIndexes[i] == preferredParentIndex) {
-				return i+1;
-			}
+	for(i = 0; i < MAXNUMNEIGHBORS; i++) {
+		if(neighborsIndexes[i] == index) {
+			return i+1;
 		}
 	}
-
 	return 0;
 }
 

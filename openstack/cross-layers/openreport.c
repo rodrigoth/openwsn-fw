@@ -37,7 +37,7 @@ void openreport_resetBroadcastRate(void) {
 }
 
 
-void openreport_indicateParentSwitch(open_addr_t *newParent, uint16_t previousRank, uint16_t newRank) {
+void openreport_indicateParentSwitch(open_addr_t *newParent, uint16_t previousRank, uint16_t newRank, uint8_t prevParentIndex) {
 	uint8_t asnArray[5];
 	debug_reportParentChangeEntry_t debug_reportEntry;
     ieee154e_getAsn(asnArray);
@@ -47,6 +47,26 @@ void openreport_indicateParentSwitch(open_addr_t *newParent, uint16_t previousRa
     debug_reportEntry.experiment_id = experiment_id;
     debug_reportEntry.previousRank = previousRank;
     debug_reportEntry.newRank = newRank;
+
+
+    //TODO:FIX THIS REDUNDANCY
+
+    debug_reportEntry.new_parent_rssi = neighbors_getParentRSSI();
+    uint8_t parentIndex ;
+    if(icmpv6rpl_getPreferredParentIndex(&parentIndex)) {
+    	debug_reportEntry.new_parent_broadcast_rank = neighbors_getNeighborBroadcastRank(parentIndex);
+    } else {
+    	debug_reportEntry.new_parent_broadcast_rank = 0;
+    }
+
+    if(prevParentIndex < MAXNUMNEIGHBORS) {
+    	debug_reportEntry.old_parent_broadcast_rank = neighbors_getNeighborBroadcastRank(prevParentIndex);
+    	debug_reportEntry.old_parent_rssi = neighbors_getNeighborRSSI(prevParentIndex);
+    } else {
+    	debug_reportEntry.old_parent_broadcast_rank = 0;
+    	debug_reportEntry.old_parent_rssi = 0;
+    }
+
 
     memcpy(&(debug_reportEntry.newParent.addr_64b[0]),&(newParent->addr_64b[0]),8);
 

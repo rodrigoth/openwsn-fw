@@ -1376,7 +1376,13 @@ port_INLINE void activity_tie5() {
 		memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
 
 		uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
-		openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),0,1,ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0],neighbors_getParentBroadcastRank());
+		uint8_t parentIndex ;
+
+		if (icmpv6rpl_getPreferredParentIndex(&parentIndex)) {
+			openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),0,1,
+										  ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0],
+										  neighbors_getNeighborBroadcastRank(parentIndex));
+		}
 	}
 
    
@@ -1578,7 +1584,14 @@ port_INLINE void activity_ti9(PORT_TIMER_WIDTH capturedTime) {
 			memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
 
 			uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
-			openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),1,1, ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0],neighbors_getParentBroadcastRank());
+			uint8_t parentIndex ;
+
+			if (icmpv6rpl_getPreferredParentIndex(&parentIndex)) {
+				openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),1,1,
+											  ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0],
+											  neighbors_getNeighborBroadcastRank(parentIndex));
+			}
+
 		}
 
       
