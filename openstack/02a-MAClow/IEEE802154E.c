@@ -112,7 +112,7 @@ void ieee154e_init() {
    memset(&ieee154e_vars,0,sizeof(ieee154e_vars_t));
    memset(&ieee154e_dbg,0,sizeof(ieee154e_dbg_t));
    
-   ieee154e_vars.singleChannel     = 20; // 0 means channel hopping
+   ieee154e_vars.singleChannel     = 0; // 0 means channel hopping
    ieee154e_vars.isAckEnabled      = TRUE;
    ieee154e_vars.isSecurityEnabled = FALSE;
    ieee154e_vars.slotDuration      = TsSlotDuration;
@@ -534,7 +534,7 @@ port_INLINE void activity_synchronize_newSlot() {
         radio_rfOff();
         
         // update record of current channel
-        ieee154e_vars.freq = 20;//(openrandom_get16b()&0x0F) + 11;
+        ieee154e_vars.freq = (openrandom_get16b()&0x0F) + 11;
         
         // configure the radio to listen to the default synchronizing channel
         radio_setFrequency(ieee154e_vars.freq);
@@ -1865,33 +1865,13 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
         //drop packet to avoid buffer overflow (parent changing or clear command)
         if (ieee802514_header.frameType == IEEE154_TYPE_DATA) {
         	if (openqueue_getCurrentCapacity() >= QUEUELENGTH - 5) {
+        		uint8_t asnArray[5];
+        		ieee154e_getAsn(asnArray);
 
+        		openreport_indicateDroppedPacket(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop),0,&(asnArray[0]));
         		break;
         	}
         }
-
-        uint8_t packetLengh = ieee154e_vars.dataReceived->length;
-        openserial_printError(COMPONENT_IEEE802154E,ERR_MAXTXACKPREPARE_OVERFLOWS,
-                                 (errorparameter_t)packetLengh,
-                                 (errorparameter_t)packetLengh);
-
-        /*if ((packetLengh == 64 || packetLengh == 65) &&
-        		(ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT || ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT_FORWARDING)) {
-        		open_addr_t sender;
-        		uint8_t asnArray[5];
-
-        		memcpy(&asnArray,&(ieee154e_vars.dataToSend->payload[packetLengh-9]),5);
-        		memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
-
-        		uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
-        		uint8_t parentIndex ;
-
-        		if (icmpv6rpl_getPreferredParentIndex(&parentIndex)) {
-        			openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),0,1,
-        										  ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0],
-        										  neighbors_getNeighborBroadcastRank(parentIndex));
-        		}}
-        */
 
         // toss the IEs including Synch
         packetfunctions_tossHeader(ieee154e_vars.dataReceived,lenIE);
