@@ -1862,7 +1862,7 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
         }
 
 
-        //drop packet to avoid buffer overflow (parent changing or clear command)
+       /* //drop packet to avoid buffer overflow (parent changing or clear command)
         if (ieee802514_header.frameType == IEEE154_TYPE_DATA) {
         	if (openqueue_getCurrentCapacity() >= QUEUELENGTH - 5) {
         		uint8_t asnArray[5];
@@ -1871,7 +1871,7 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
         		openreport_indicateDroppedPacket(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop),0,&(asnArray[0]));
         		break;
         	}
-        }
+        }*/
 
         // toss the IEs including Synch
         packetfunctions_tossHeader(ieee154e_vars.dataReceived,lenIE);
