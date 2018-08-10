@@ -76,6 +76,7 @@ typedef struct {
 	uint8_t totalRx;
 	uint8_t queueCapacity;
 	uint8_t broadcast_rank;
+	uint16_t senderRank;
 } debug_reportTxEntry_t;
 END_PACK
 

@@ -72,6 +72,7 @@ uint8_t	      neighbors_getpdrWMEMA(void);
 uint8_t	      neighbors_getParentRSSI(void);
 uint8_t       neighbors_getNeighborBroadcastRank(uint8_t index);
 uint8_t	      neighbors_getNeighborRSSI(uint8_t index);
+uint16_t	  neighbors_getNeighborRankByAdrress(open_addr_t* address);
 
 // setters
 void          neighbors_setNeighborRank(uint8_t index, dagrank_t rank);

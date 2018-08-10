@@ -149,6 +149,17 @@ uint8_t neighbors_getGeneration(open_addr_t* address){
     return neighbors_vars.neighbors[i].generation;
 }
 
+
+uint16_t neighbors_getNeighborRankByAdrress(open_addr_t* address) {
+	uint8_t i;
+	for (i=0;i<MAXNUMNEIGHBORS;i++){
+		if (packetfunctions_sameAddress(address, &neighbors_vars.neighbors[i].addr_64b)){
+			break;
+		}
+	}
+	    return neighbors_vars.neighbors[i].DAGrank;
+}
+
 uint8_t neighbors_getSequenceNumber(open_addr_t* address){
     uint8_t i;
     for (i=0;i<MAXNUMNEIGHBORS;i++){

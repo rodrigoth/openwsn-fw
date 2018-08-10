@@ -196,6 +196,8 @@ void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_
 
 	debug_reportEntry.broadcast_rank = broadcast_rank;
 
+	debug_reportEntry.senderRank = neighbors_getNeighborRankByAdrress(sender);
+
 	openserial_printStatus(STATUS_TX,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
 }
 
