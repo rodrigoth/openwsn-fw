@@ -24,7 +24,7 @@ uint8_t prefix[8] = {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 uint32_t seqnum = 0;
 
-uint32_t traffic_rates[5] = {1000,30000,60000,90000,120000};
+uint32_t traffic_rates[5] = {2000,4000,8000,16000,32000,64000,128000};
 uint32_t current_traffic_rate;
 
 //=========================== prototypes ======================================
@@ -46,12 +46,16 @@ void uinject_init() {
     openudp_register(&uinject_vars.desc);
 
 
-#ifdef VARIABLE_TRAFFIC_RATE
-     current_traffic_rate = traffic_rates[VARIABLE_TRAFFIC_RATE];
-#else
-    current_traffic_rate = UINJECT_PERIOD_MS;
-#endif
 
+    current_traffic_rate = openrandom_get16b()%sizeof(traffic_rates);
+
+    /*
+    #ifdef VARIABLE_TRAFFIC_RATE
+     current_traffic_rate = traffic_rates[VARIABLE_TRAFFIC_RATE];
+	#else
+    current_traffic_rate = UINJECT_PERIOD_MS;
+	#endif
+     */
 
 
     uinject_vars.period = current_traffic_rate;
