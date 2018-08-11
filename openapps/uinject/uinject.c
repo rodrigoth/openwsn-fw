@@ -47,8 +47,8 @@ void uinject_init() {
 
 
 
-    current_traffic_rate = traffic_rates[openrandom_get16b()%sizeof(traffic_rates)];
-
+    //current_traffic_rate = traffic_rates[openrandom_get16b()%sizeof(traffic_rates)];
+    current_traffic_rate = 10000;
     /*
     #ifdef VARIABLE_TRAFFIC_RATE
      current_traffic_rate = traffic_rates[VARIABLE_TRAFFIC_RATE];
