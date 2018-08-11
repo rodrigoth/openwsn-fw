@@ -24,7 +24,7 @@ uint8_t prefix[8] = {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 uint32_t seqnum = 0;
 
-uint32_t traffic_rates[5] = {10000,33000,63000,93000,123000};
+uint32_t traffic_rates[5] = {1000,30000,60000,90000,120000};
 uint32_t current_traffic_rate;
 
 //=========================== prototypes ======================================

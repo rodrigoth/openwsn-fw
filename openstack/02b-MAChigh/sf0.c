@@ -33,7 +33,7 @@ void sf0_timer_cb(opentimers_id_t id);
 
 void sf0_init(void) {
     memset(&sf0_vars,0,sizeof(sf0_vars_t));
-    sf0_vars.numAppPacketsPerSlotFrame = 0;
+    sf0_vars.numAppPacketsPerSlotFrame = 2;
     sf0_vars.allowDelete = TRUE;
     sf0_vars.genErrorCounter = 0;
     sf0_vars.timerId = opentimers_create();
