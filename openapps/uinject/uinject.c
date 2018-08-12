@@ -24,7 +24,7 @@ uint8_t prefix[8] = {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 uint32_t seqnum = 0;
 
-uint32_t traffic_rates[6] = {2500,5000,7500,10000,12500,15000};
+uint32_t traffic_rates[6] = {10000,12000,15000,20000,30000,60000};
 uint32_t current_traffic_rate;
 
 //=========================== prototypes ======================================
@@ -48,14 +48,14 @@ void uinject_init() {
 
 
     //current_traffic_rate = traffic_rates[openrandom_get16b()%sizeof(traffic_rates)];
-    current_traffic_rate = 10000;
-    /*
+    //current_traffic_rate = 10000;
+
     #ifdef VARIABLE_TRAFFIC_RATE
-     current_traffic_rate = traffic_rates[VARIABLE_TRAFFIC_RATE];
+     	 current_traffic_rate = traffic_rates[VARIABLE_TRAFFIC_RATE];
 	#else
-    current_traffic_rate = UINJECT_PERIOD_MS;
+     	 current_traffic_rate = UINJECT_PERIOD_MS;
 	#endif
-     */
+
 
 
     uinject_vars.period = current_traffic_rate;
