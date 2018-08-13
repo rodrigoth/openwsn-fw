@@ -989,8 +989,10 @@ void neighbors_getAllBroadcastReception(uint8_t* recepetions, uint8_t* indexes) 
 	uint8_t i;
 	for (i = 0; i < MAXNUMNEIGHBORS; i++) {
 		if (neighbors_vars.neighbors[i].used == TRUE) {
-			recepetions[i] = neighbors_vars.neighbors[i].broadcast_rx;
-			indexes[i] = i;
+			 if(icmpv6rpl_getMyDAGrank() > neighbors_vars.neighbors[i].DAGrank) {
+				 recepetions[i] = neighbors_vars.neighbors[i].broadcast_rx;
+				 indexes[i] = i;
+			 }
 		}
 	}
 }
