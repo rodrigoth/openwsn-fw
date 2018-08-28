@@ -914,7 +914,7 @@ port_INLINE void activity_ti1ORri1() {
          ieee154e_vars.dataToSend = NULL;
          // check whether we can send
          if (schedule_getOkToSend()) {
-        	 schedule_getNeighbor(&neighbor);
+        	 /*schedule_getNeighbor(&neighbor);
 			 if (cellType==CELLTYPE_TXRX) {
 				ieee154e_vars.dataToSend = openqueue_macGetEBPacket();
 				if(ieee154e_vars.dataToSend != NULL) {
@@ -928,6 +928,13 @@ port_INLINE void activity_ti1ORri1() {
 				}
 			 } else {
 				  ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
+			}*/
+
+        	schedule_getNeighbor(&neighbor);
+			ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
+			if ((ieee154e_vars.dataToSend == NULL) && (cellType == CELLTYPE_TXRX)) {
+				couldSendEB = TRUE;
+				ieee154e_vars.dataToSend = openqueue_macGetEBPacket();
 			}
          }
 

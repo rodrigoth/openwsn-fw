@@ -95,11 +95,11 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 	  }*/
 
 
-	  if (openqueue_getCurrentCapacity() >= MAX_QUEUE_CAPACITY_TO_FORWARD) {
+	  /*if (openqueue_getCurrentCapacity() >= MAX_QUEUE_CAPACITY_TO_FORWARD) {
 		  openreport_indicateDroppedPacket(&sender,uinject_seqnum,&asnArray[0]);
 		  openqueue_freePacketBuffer(pkt);
 		  return;
-	  }
+	  }*/
 
 
 	  new_pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
