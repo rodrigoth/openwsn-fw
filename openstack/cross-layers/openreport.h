@@ -126,11 +126,22 @@ typedef struct {
 } debug_ScheduleConsistencyEntry_t;
 END_PACK
 
+BEGIN_PACK
+typedef struct {
+	asn_t asn;
+	uint8_t experiment_id;
+	uint8_t is_shared;
+} debug_AllTransmissionsEntry_t;
+END_PACK
+
+
 
 typedef struct {
    uint16_t total_broadcast_rx;
    uint16_t total_broadcast_tx;
 } openreportEntry_t;
+
+
 
 //=========================== variables =======================================
 
@@ -148,6 +159,7 @@ void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_
 		uint8_t broadcast_rank);
 void openreport_indicatePDR(open_addr_t *destination, uint8_t totalTx, uint8_t totalAck, uint8_t pdrWMEMA);
 void openreport_indicateDroppedPacket(open_addr_t *sender, uint32_t seqnum,uint8_t *asn);
+void openreport_indicateAllTransmissions(uint8_t is_shared);
 void openreport_indicateBroadcastRate(void);
 void openreport_indicateConsistencyRoutine(open_addr_t* node, open_addr_t* parent,uint8_t isTx,uint8_t slotOffset,uint8_t channelOffset);
 void openreport_indicateBroadcastRx(void);

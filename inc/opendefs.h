@@ -122,6 +122,7 @@ enum {
    STATUS_PDR				  		   = 19,
    STATUS_BROADCAST_RX				   = 20,
    STATUS_SCHEDULE_CONSISTENCY		   = 21,
+   STATUS_ALL_TRANSMISSIONS			   = 22,
 };
 
 //component identifiers

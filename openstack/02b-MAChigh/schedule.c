@@ -868,10 +868,13 @@ void schedule_indicateTx(asn_t* asnTimestamp, bool succesfullTx) {
         schedule_vars.currentScheduleEntry->numTx/=2;
         schedule_vars.currentScheduleEntry->numTxACK/=2;
     }
+
     schedule_vars.currentScheduleEntry->numTx++;
     if (succesfullTx==TRUE) {
         schedule_vars.currentScheduleEntry->numTxACK++;
     }
+
+    openreport_indicateAllTransmissions(schedule_vars.currentScheduleEntry->shared);
 
     // update last used timestamp
     memcpy(&schedule_vars.currentScheduleEntry->lastUsedAsn, asnTimestamp, sizeof(asn_t));
