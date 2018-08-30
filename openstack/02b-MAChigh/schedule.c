@@ -16,7 +16,7 @@
 schedule_vars_t schedule_vars;
 uint8_t slotframeRepetition;
 //uint8_t shared_slots[] = {0,25,50,75,100,125,150,175};
-uint8_t shared_slots[] = {0,1,2,3,4,5,6,7};
+uint8_t shared_slots[] = {0,1,2,3,4};
 
 //=========================== prototypes ======================================
 
