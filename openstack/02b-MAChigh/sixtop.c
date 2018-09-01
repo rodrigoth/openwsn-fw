@@ -23,6 +23,8 @@
 // in seconds: sixtop maintaince is called every 30 seconds
 #define MAINTENANCE_PERIOD        30
 
+#define EBPERIOD_RANDOM_RANG     15000
+
 //=========================== variables =======================================
 
 sixtop_vars_t sixtop_vars;
@@ -107,21 +109,30 @@ void sixtop_init() {
     sixtop_vars.dsn                = 0;
     sixtop_vars.mgtTaskCounter     = 0;
     sixtop_vars.kaPeriod           = MAXKAPERIOD;
-    sixtop_vars.ebPeriod           = 23;//EB_PORTION*(neighbors_getNumNeighbors()+1);
+    sixtop_vars.ebPeriod           = 30;//EB_PORTION*(neighbors_getNumNeighbors()+1);
     sixtop_vars.isResponseEnabled  = TRUE;
     sixtop_vars.six2six_state      = SIX_STATE_IDLE;
     
 
-    sixtop_vars.ebCounter = openrandom_get16b()%(1<<4);
+    //sixtop_vars.ebCounter = openrandom_get16b()%(1<<4);
 
     sixtop_vars.ebSendingTimerId   = opentimers_create();
-    opentimers_scheduleIn(
+    /*opentimers_scheduleIn(
         sixtop_vars.ebSendingTimerId,
         sixtop_vars.periodMaintenance,
         TIME_MS,
         TIMER_ONESHOT,
         sixtop_sendingEb_timer_cb
-    );
+    );*/
+
+    opentimers_scheduleIn(
+            sixtop_vars.ebSendingTimerId,
+			(sixtop_vars.ebPeriod-EBPERIOD_RANDOM_RANG+(openrandom_get16b()%(2*EBPERIOD_RANDOM_RANG))),
+            TIME_MS,
+            TIMER_ONESHOT,
+            sixtop_sendingEb_timer_cb
+        );
+
     
     sixtop_vars.maintenanceTimerId   = opentimers_create();
     opentimers_scheduleIn(
@@ -621,13 +632,18 @@ void sixtop_sendingEb_timer_cb(opentimers_id_t id){
     scheduler_push_task(timer_sixtop_sendEb_fired,TASKPRIO_SIXTOP);
     // update the period
     sixtop_vars.periodMaintenance  = 872 +(openrandom_get16b()&0xff);
-    opentimers_scheduleIn(
+   /* opentimers_scheduleIn(
         sixtop_vars.ebSendingTimerId,
         sixtop_vars.periodMaintenance,
         TIME_MS,
         TIMER_ONESHOT,
         sixtop_sendingEb_timer_cb
-    );
+    );*/
+
+    opentimers_scheduleIn(sixtop_vars.ebSendingTimerId,
+			(sixtop_vars.ebPeriod - EBPERIOD_RANDOM_RANG
+					+ (openrandom_get16b() % (2 * EBPERIOD_RANDOM_RANG))),
+			TIME_MS, TIMER_ONESHOT, sixtop_sendingEb_timer_cb);
 }
 
 void sixtop_maintenance_timer_cb(opentimers_id_t id) {
@@ -641,7 +657,7 @@ void sixtop_timeout_timer_cb(opentimers_id_t id) {
 //======= EB/KA task
 
 void timer_sixtop_sendEb_fired(){
-    
+    /*
     uint16_t newPeriod;
     // current period 
     newPeriod = 23;//EB_PORTION*(neighbors_getNumNeighbors()+1);
@@ -663,7 +679,8 @@ void timer_sixtop_sendEb_fired(){
         default:
             break;
         }
-    }
+    }*/
+	sixtop_sendEB();
 }
 
 /**

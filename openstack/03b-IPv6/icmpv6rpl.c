@@ -12,6 +12,8 @@
 #include "IEEE802154E.h"
 #include "openreport.h"
 
+#define DIOPERIOD_RANDOM_RANG     15000
+
 //=========================== variables =======================================
 
 icmpv6rpl_vars_t             icmpv6rpl_vars;
@@ -81,10 +83,10 @@ void icmpv6rpl_init() {
    icmpv6rpl_vars.dioDestination.type = ADDR_128B;
    memcpy(&icmpv6rpl_vars.dioDestination.addr_128b[0],all_routers_multicast,sizeof(all_routers_multicast));
    
-   icmpv6rpl_vars.dioPeriod                 = 17;//DIO_PORTION*(neighbors_getNumNeighbors()+1);
+   icmpv6rpl_vars.dioPeriod                 = 30;//DIO_PORTION*(neighbors_getNumNeighbors()+1);
    icmpv6rpl_vars.timerIdDIO                = opentimers_create();
 
-   icmpv6rpl_vars.dioTimerCounter = openrandom_get16b()%(1<<4);
+   //icmpv6rpl_vars.dioTimerCounter = openrandom_get16b()%(1<<4);
 
    //initialize PIO -> move this to dagroot code
    icmpv6rpl_vars.pio.type                  = RPL_OPTION_PIO;
@@ -121,13 +123,23 @@ void icmpv6rpl_init() {
    icmpv6rpl_vars.conf.defLifetime = 0xff; //infinite - limit for DAO period  -> 0xff 
    icmpv6rpl_vars.conf.lifetimeUnit = 0xffff; // 0xffff
    
-   opentimers_scheduleIn(
+   /*opentimers_scheduleIn(
        icmpv6rpl_vars.timerIdDIO,
        872 +(openrandom_get16b()&0xff),
        TIME_MS,
        TIMER_ONESHOT,
        icmpv6rpl_timer_DIO_cb
-   );
+   );*/
+
+   opentimers_scheduleIn(
+          icmpv6rpl_vars.timerIdDIO,
+		  (icmpv6rpl_vars.dioPeriod-DIOPERIOD_RANDOM_RANG+(openrandom_get16b()%(2*DIOPERIOD_RANDOM_RANG))),
+          TIME_MS,
+          TIMER_ONESHOT,
+          icmpv6rpl_timer_DIO_cb
+      );
+
+
 
    //=== DAO
    
@@ -655,13 +667,20 @@ void icmpv6rpl_killPreferredParent() {
 void icmpv6rpl_timer_DIO_cb(opentimers_id_t id) {
     scheduler_push_task(icmpv6rpl_timer_DIO_task,TASKPRIO_RPL);
     // update the period
-    opentimers_scheduleIn(
+    /*opentimers_scheduleIn(
         icmpv6rpl_vars.timerIdDIO,
         872 +(openrandom_get16b()&0xff),
         TIME_MS,
         TIMER_ONESHOT,
        icmpv6rpl_timer_DIO_cb
-    );
+    );*/
+    opentimers_scheduleIn(
+              icmpv6rpl_vars.timerIdDIO,
+    		  (icmpv6rpl_vars.dioPeriod-DIOPERIOD_RANDOM_RANG+(openrandom_get16b()%(2*DIOPERIOD_RANDOM_RANG))),
+              TIME_MS,
+              TIMER_ONESHOT,
+              icmpv6rpl_timer_DIO_cb
+          );
 }
 
 /**
@@ -671,7 +690,7 @@ void icmpv6rpl_timer_DIO_cb(opentimers_id_t id) {
 */
 void icmpv6rpl_timer_DIO_task() {
     
-    uint16_t newPeriod;
+    /*uint16_t newPeriod;
     // current period 
     newPeriod = 17;//DIO_PORTION*(neighbors_getNumNeighbors()+1);
     if (
@@ -692,7 +711,8 @@ void icmpv6rpl_timer_DIO_task() {
         default:
             break;
         }
-    }
+    }*/
+	sendDIO();
 }
 
 /**
