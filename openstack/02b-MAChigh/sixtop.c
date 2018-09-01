@@ -109,7 +109,7 @@ void sixtop_init() {
     sixtop_vars.dsn                = 0;
     sixtop_vars.mgtTaskCounter     = 0;
     sixtop_vars.kaPeriod           = MAXKAPERIOD;
-    sixtop_vars.ebPeriod           = 30;//EB_PORTION*(neighbors_getNumNeighbors()+1);
+    sixtop_vars.ebPeriod           = 30000;//EB_PORTION*(neighbors_getNumNeighbors()+1);
     sixtop_vars.isResponseEnabled  = TRUE;
     sixtop_vars.six2six_state      = SIX_STATE_IDLE;
     

@@ -83,7 +83,7 @@ void icmpv6rpl_init() {
    icmpv6rpl_vars.dioDestination.type = ADDR_128B;
    memcpy(&icmpv6rpl_vars.dioDestination.addr_128b[0],all_routers_multicast,sizeof(all_routers_multicast));
    
-   icmpv6rpl_vars.dioPeriod                 = 30;//DIO_PORTION*(neighbors_getNumNeighbors()+1);
+   icmpv6rpl_vars.dioPeriod                 = 30000;//DIO_PORTION*(neighbors_getNumNeighbors()+1);
    icmpv6rpl_vars.timerIdDIO                = opentimers_create();
 
    //icmpv6rpl_vars.dioTimerCounter = openrandom_get16b()%(1<<4);
