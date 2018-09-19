@@ -75,7 +75,7 @@ See MINBE for an explanation of backoff.
 #define PDR_THRESHOLD      80 // 80 means 80%
 #define MIN_NUMTX_FOR_PDR  50 // don't calculate PDR when numTx is lower than this value
 
-#define MIN_NUMTRY_REMOVE_TX	5 //how many times to test a tx cell before removing it (no consistency checking)
+#define MIN_NUMTRY_REMOVE_TX	10 //how many times to test a tx cell before removing it (no consistency checking)
 
 typedef enum{
     LINKOPTIONS_TX              = 1<<0,

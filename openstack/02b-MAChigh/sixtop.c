@@ -1146,11 +1146,11 @@ void sixtop_six2six_notifyReceive(
                 break;
             }
 
-            // generation check
+           /* // generation check
            if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code != IANA_6TOP_CMD_CLEAR){
 				returnCode = IANA_6TOP_RC_GEN_ERR;
 				break;
-            }
+            }*/
 
             // block the deletetion for some minutes to allow the node to reallocate the cells
 			/*if (gen != neighbors_getGeneration(&(pkt->l2_nextORpreviousHop)) && code == IANA_6TOP_CMD_CLEAR){

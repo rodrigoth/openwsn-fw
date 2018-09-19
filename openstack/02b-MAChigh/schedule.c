@@ -972,8 +972,8 @@ void schedule_housekeeping(){
         }
     }
 
-    //schedule_checkTxConsistency();
-    //schedule_checkRxConsistency();
+    schedule_checkTxConsistency();
+    schedule_checkRxConsistency();
 
     ENABLE_INTERRUPTS();
 }
@@ -1041,8 +1041,8 @@ void schedule_checkTxConsistency() {
 						schedule_vars.scheduleBuf[i].checkTxCellCounter++;
 						if(schedule_vars.scheduleBuf[i].checkTxCellCounter >= MIN_NUMTRY_REMOVE_TX) {
 							//openserial_printError(COMPONENT_CEXAMPLE,ERR_NEIGHBORS_DESYNC,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset,(errorparameter_t)schedule_vars.scheduleBuf[i].slotOffset);
-							//openreport_indicateConsistencyRoutine(idmanager_getMyID(ADDR_64B), &neighbor, 1, schedule_vars.scheduleBuf[i].slotOffset, schedule_vars.scheduleBuf[i].channelOffset);
-							//schedule_removeActiveSlot(schedule_vars.scheduleBuf[i].slotOffset, &(schedule_vars.scheduleBuf[i].neighbor));
+							openreport_indicateConsistencyRoutine(idmanager_getMyID(ADDR_64B), &neighbor, 1, schedule_vars.scheduleBuf[i].slotOffset, schedule_vars.scheduleBuf[i].channelOffset);
+							schedule_removeActiveSlot(schedule_vars.scheduleBuf[i].slotOffset, &(schedule_vars.scheduleBuf[i].neighbor));
 						}
 					} else {
 						if (schedule_vars.scheduleBuf[i].checkTxCellCounter > 0) {
@@ -1061,8 +1061,8 @@ void schedule_checkRxConsistency() {
 	for (i = 0; i < MAXACTIVESLOTS; i++) {
 		if (schedule_vars.scheduleBuf[i].type == CELLTYPE_RX && schedule_vars.scheduleBuf[i].housekeepChecked == FALSE) {
 			timeSinceHeard = ieee154e_asnDiff(&schedule_vars.scheduleBuf[i].addedAsn);
-			 //around 5 minutes
-			 if (timeSinceHeard>DESYNCTIMEOUT*9) {
+			 //around 10 minutes
+			 if (timeSinceHeard>DESYNCTIMEOUT*17) {
 				 schedule_vars.scheduleBuf[i].housekeepChecked = TRUE;
 
 				 asn_t lastUsedAsn;
