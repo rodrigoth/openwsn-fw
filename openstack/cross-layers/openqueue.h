@@ -47,6 +47,8 @@ OpenQueueEntry_t*  openqueue_macGetDataPacket(open_addr_t* toNeighbor);
 OpenQueueEntry_t*  openqueue_macGetEBPacket(void);
 OpenQueueEntry_t*  openqueue_macGetDioPacket(void);
 OpenQueueEntry_t*  openqueue_macGet6pPacket(void);
+OpenQueueEntry_t*  openqueue_macGetAnycastPacket(void);
+
 
 uint8_t 		   openqueue_getCurrentCapacity(void);
 

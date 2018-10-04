@@ -24,7 +24,7 @@ uint8_t prefix[8] = {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 uint32_t seqnum = 0;
 
-uint32_t traffic_rates[6] = {10000,12000,15000,20000,30000,60000};
+uint32_t traffic_rates[6] = {5000,12000,15000,20000,30000,60000};
 uint32_t current_traffic_rate;
 
 //=========================== prototypes ======================================
@@ -76,7 +76,7 @@ void uinject_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
 
 //I suspect there is a problem in the forwarding module that makes the most demanding nodes to reboot occasionally
 void uinject_receive(OpenQueueEntry_t* pkt) {
-	  OpenQueueEntry_t* new_pkt;
+	  /*OpenQueueEntry_t* new_pkt;
 	  open_addr_t neighbor;
 	  bool foundNeighbor;
 	  uint8_t asnArray[5];
@@ -88,11 +88,11 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 	  memcpy(&asnArray,&(pkt->payload[10]),5);
 	  uint32_t uinject_seqnum = pkt->payload[18] | (pkt->payload[17] << 8) | (pkt->payload[16] << 16) | (pkt->payload[15] << 24);
 
-	  /*if(!foundNeighbor || schedule_getNumberSlotToPreferredParent(&neighbor) == 0) {
+	  if(!foundNeighbor || schedule_getNumberSlotToPreferredParent(&neighbor) == 0) {
 		  openreport_indicateDroppedPacket(&sender,uinject_seqnum,&asnArray[0]);
 		  openqueue_freePacketBuffer(pkt);
 		  return;
-	  }*/
+	  }
 
 
 	  if (openqueue_getCurrentCapacity() >= MAX_QUEUE_CAPACITY_TO_FORWARD) {
@@ -124,9 +124,9 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 	  memcpy(&(new_pkt->payload[0]),&(pkt->payload[2]),PAYLOADLEN);
 	  if ((openudp_send(new_pkt))==E_FAIL) {
 	      openqueue_freePacketBuffer(new_pkt);
-	  }
-
-	  openqueue_freePacketBuffer(pkt);
+	  }*/
+	openserial_printError(COMPONENT_UINJECT,ERR_JOINED,(errorparameter_t)0,(errorparameter_t)0);
+	openqueue_freePacketBuffer(pkt);
 }
 
 //=========================== private =========================================
@@ -145,6 +145,13 @@ void uinject_task_cb() {
    uint8_t              asnArray[5];
    bool foundNeighbor;
 
+
+   open_addr_t *my_address_16B = idmanager_getMyID(ADDR_16B);
+   if(my_address_16B->addr_16b[0] != 0x93 && my_address_16B->addr_16b[1] != 0x81) {
+	   return;
+   }
+
+
    //uint16_t newTime =  current_traffic_rate - 5000+(openrandom_get16b()%(2*5000));
    opentimers_scheduleIn(uinject_vars.timerId,current_traffic_rate,TIME_MS,TIMER_ONESHOT,uinject_timer_cb);
 
@@ -158,22 +165,12 @@ void uinject_task_cb() {
       opentimers_destroy(uinject_vars.timerId);
       return;
    }
-	 //uint8_t slots = schedule_getNumOfSlotsByType(CELLTYPE_TX);
-	 //if(slots == 0) return;
-
-	 //don't run if I dont have slots to my preferred parent
-	 open_addr_t neighbor;
-	 foundNeighbor = icmpv6rpl_getPreferredParentEui64(&neighbor);
-	 if(!foundNeighbor || schedule_getNumberSlotToPreferredParent(&neighbor) == 0) {
-		 return;
-	  }
 
 
 	 // if you get here, send a packet
 
 	 memset(&(ipAddr_node[0]), 0x00, sizeof(ipAddr_node));
-	 memcpy(&(ipAddr_node[0]),&(prefix[0]),8);
-	 memcpy(&(ipAddr_node[8]),&neighbor.addr_64b[0],8);
+	 memcpy(&(ipAddr_node[0]),&all_routers_multicast,sizeof(all_routers_multicast));
 
 	 // get a free packet buffer
 	 pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);

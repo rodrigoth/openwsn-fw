@@ -180,6 +180,24 @@ OpenQueueEntry_t* openqueue_sixtopGetSentPacket() {
    return NULL;
 }
 
+OpenQueueEntry_t*  openqueue_macGetAnycastPacket(void) {
+	uint8_t i;
+	INTERRUPT_DECLARATION();
+	DISABLE_INTERRUPTS();
+
+	for (i = 0; i < QUEUELENGTH; i++) {
+		if (openqueue_vars.queue[i].creator == COMPONENT_UINJECT && packetfunctions_isBroadcastMulticast(&(openqueue_vars.queue[i].l2_nextORpreviousHop))) {
+			ENABLE_INTERRUPTS();
+			return &openqueue_vars.queue[i];
+		}
+	}
+
+	ENABLE_INTERRUPTS();
+	return NULL;
+}
+
+
+
 OpenQueueEntry_t* openqueue_sixtopGetReceivedPacket() {
    uint8_t i;
    INTERRUPT_DECLARATION();
@@ -264,8 +282,9 @@ OpenQueueEntry_t*  openqueue_macGetDioPacket() {
 
     ENABLE_INTERRUPTS();
     return NULL;
-
 }
+
+
 OpenQueueEntry_t*  openqueue_macGet6pPacket() {
     uint8_t i;
     INTERRUPT_DECLARATION();

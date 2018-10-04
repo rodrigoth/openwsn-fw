@@ -17,10 +17,10 @@
 
 The superframe reappears over time and can be arbitrarily long.
 */
-#define SLOTFRAME_LENGTH    199 //should be 101
+#define SLOTFRAME_LENGTH    31 //should be 101
 
 //draft-ietf-6tisch-minimal-06
-#define SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS                      8
+#define SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS                      5
 #define SCHEDULE_MINIMAL_6TISCH_SLOTOFFSET                        0
 #define SCHEDULE_MINIMAL_6TISCH_CHANNELOFFSET                     0
 #define SCHEDULE_MINIMAL_6TISCH_DEFAULT_SLOTFRAME_HANDLE          0 //id of slotframe
@@ -39,7 +39,7 @@ The superframe reappears over time and can be arbitrarily long.
   for serial port to transmit data to dagroot.
 */
 
-#define NUMSLOTSOFF          185
+#define NUMSLOTSOFF          10
 
 /**
 \brief Maximum number of active slots in a superframe.
@@ -97,7 +97,8 @@ typedef enum {
    CELLTYPE_RX               = 2,
    CELLTYPE_TXRX             = 3,
    CELLTYPE_SERIALRX         = 4,
-   CELLTYPE_MORESERIALRX     = 5
+   CELLTYPE_MORESERIALRX     = 5,
+   CELLTYPE_ANYCAST          = 6
 } cellType_t;
 
 typedef struct {

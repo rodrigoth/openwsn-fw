@@ -112,8 +112,8 @@ void ieee154e_init() {
    memset(&ieee154e_vars,0,sizeof(ieee154e_vars_t));
    memset(&ieee154e_dbg,0,sizeof(ieee154e_dbg_t));
    
-   ieee154e_vars.singleChannel     = 0; // 0 means channel hopping
-   ieee154e_vars.isAckEnabled      = TRUE;
+   ieee154e_vars.singleChannel     = 20; // 0 means channel hopping
+   ieee154e_vars.isAckEnabled      = FALSE;
    ieee154e_vars.isSecurityEnabled = FALSE;
    ieee154e_vars.slotDuration      = TsSlotDuration;
    ieee154e_vars.numOfSleepSlots   = 1;
@@ -534,7 +534,7 @@ port_INLINE void activity_synchronize_newSlot() {
         radio_rfOff();
         
         // update record of current channel
-        ieee154e_vars.freq = (openrandom_get16b()&0x0F) + 11;
+        ieee154e_vars.freq = 20;//(openrandom_get16b()&0x0F) + 11;
         
         // configure the radio to listen to the default synchronizing channel
         radio_setFrequency(ieee154e_vars.freq);
@@ -908,28 +908,33 @@ port_INLINE void activity_ti1ORri1() {
    switch (cellType) {
       case CELLTYPE_TXRX:
       case CELLTYPE_TX:
+      case CELLTYPE_ANYCAST:
          // stop using serial
          openserial_stop();
          // assuming that there is nothing to send
          ieee154e_vars.dataToSend = NULL;
          // check whether we can send
-         if (schedule_getOkToSend()) {
-        	 schedule_getNeighbor(&neighbor);
-			 if (cellType==CELLTYPE_TXRX) {
+		if (schedule_getOkToSend()) {
+			schedule_getNeighbor(&neighbor);
+			if (cellType == CELLTYPE_TXRX) {
 				ieee154e_vars.dataToSend = openqueue_macGetEBPacket();
-				if(ieee154e_vars.dataToSend != NULL) {
-					 couldSendEB=TRUE;
+				if (ieee154e_vars.dataToSend != NULL) {
+					couldSendEB = TRUE;
 				} else {
-					 //DIO
-					 ieee154e_vars.dataToSend = openqueue_macGetDioPacket();
-					 if (ieee154e_vars.dataToSend == NULL) {
-						   ieee154e_vars.dataToSend = openqueue_macGet6pPacket();
-					 }
+					//DIO
+					ieee154e_vars.dataToSend = openqueue_macGetDioPacket();
+					if (ieee154e_vars.dataToSend == NULL) {
+						ieee154e_vars.dataToSend = openqueue_macGet6pPacket();
+					}
 				}
-			 } else {
-				  ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
+			} else {
+				if (cellType == CELLTYPE_ANYCAST) {
+					ieee154e_vars.dataToSend = openqueue_macGetAnycastPacket();
+				} else {
+					ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
+				}
 			}
-         }
+		}
 
          if (ieee154e_vars.dataToSend==NULL) {
             if (cellType==CELLTYPE_TX) {
@@ -995,6 +1000,7 @@ port_INLINE void activity_ti1ORri1() {
 #endif
             break;
          }
+
       case CELLTYPE_RX:
          if (changeToRX==FALSE) {
             // stop using serial

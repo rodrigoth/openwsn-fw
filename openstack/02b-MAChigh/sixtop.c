@@ -23,7 +23,7 @@
 // in seconds: sixtop maintaince is called every 30 seconds
 #define MAINTENANCE_PERIOD        30
 
-#define EBPERIOD_RANDOM_RANG     15000
+#define EBPERIOD_RANDOM_RANG     5000
 
 //=========================== variables =======================================
 
@@ -109,7 +109,7 @@ void sixtop_init() {
     sixtop_vars.dsn                = 0;
     sixtop_vars.mgtTaskCounter     = 0;
     sixtop_vars.kaPeriod           = MAXKAPERIOD;
-    sixtop_vars.ebPeriod           = 30000;//EB_PORTION*(neighbors_getNumNeighbors()+1);
+    sixtop_vars.ebPeriod           = 10000;//EB_PORTION*(neighbors_getNumNeighbors()+1);
     sixtop_vars.isResponseEnabled  = TRUE;
     sixtop_vars.six2six_state      = SIX_STATE_IDLE;
     
@@ -703,7 +703,7 @@ void timer_sixtop_management_fired(void) {
         break;
     default:
         // called every second, except once every MAINTENANCE_PERIOD seconds
-        sixtop_sendKA();
+        //sixtop_sendKA();
         break;
     }
 }
