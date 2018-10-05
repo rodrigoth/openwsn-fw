@@ -908,7 +908,8 @@ port_INLINE void activity_ti1ORri1() {
    switch (cellType) {
       case CELLTYPE_TXRX:
       case CELLTYPE_TX:
-      case CELLTYPE_ANYCAST:
+      case CELLTYPE_ANYCAST_TX:
+      case CELLTYPE_ANYCAST_RX:
          // stop using serial
          openserial_stop();
          // assuming that there is nothing to send
@@ -928,10 +929,12 @@ port_INLINE void activity_ti1ORri1() {
 					}
 				}
 			} else {
-				if (cellType == CELLTYPE_ANYCAST) {
+				if (cellType == CELLTYPE_ANYCAST_TX) {
 					ieee154e_vars.dataToSend = openqueue_macGetAnycastPacket();
 				} else {
-					ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
+					if(cellType == CELLTYPE_TX) {
+						ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
+					}
 				}
 			}
 		}
@@ -1976,11 +1979,9 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
         } else {
             // synchronize to the received packet if I'm not a DAGroot and this is my preferred parent
             // or in case I'm in the middle of the join process when parent is not yet selected
-            if ((idmanager_getIsDAGroot()==FALSE && 
-                icmpv6rpl_isPreferredParent(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop))) ||
-                IEEE802154_security_isConfigured() == FALSE) {
-            synchronizePacket(ieee154e_vars.syncCapturedTime);
-            }
+			if (idmanager_getIsDAGroot() == FALSE) {
+				synchronizePacket(ieee154e_vars.syncCapturedTime);
+			}
 
             if(ieee154e_vars.dataReceived->l2_frameType == IEEE154_TYPE_BEACON) {
 				 openreport_indicateBroadcastRx();

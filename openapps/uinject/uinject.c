@@ -9,6 +9,7 @@
 #include "icmpv6rpl.h"
 #include "openrandom.h"
 #include "openreport.h"
+#include "schedule.h"
 
 
 #define PAYLOADLEN 17
@@ -76,31 +77,7 @@ void uinject_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
 
 //I suspect there is a problem in the forwarding module that makes the most demanding nodes to reboot occasionally
 void uinject_receive(OpenQueueEntry_t* pkt) {
-	  /*OpenQueueEntry_t* new_pkt;
-	  open_addr_t neighbor;
-	  bool foundNeighbor;
-	  uint8_t asnArray[5];
-	  open_addr_t sender;
-
-	  foundNeighbor = icmpv6rpl_getPreferredParentEui64(&neighbor);
-
-	  memcpy(&(sender.addr_64b[0]),&(pkt->payload[2]),8);
-	  memcpy(&asnArray,&(pkt->payload[10]),5);
-	  uint32_t uinject_seqnum = pkt->payload[18] | (pkt->payload[17] << 8) | (pkt->payload[16] << 16) | (pkt->payload[15] << 24);
-
-	  if(!foundNeighbor || schedule_getNumberSlotToPreferredParent(&neighbor) == 0) {
-		  openreport_indicateDroppedPacket(&sender,uinject_seqnum,&asnArray[0]);
-		  openqueue_freePacketBuffer(pkt);
-		  return;
-	  }
-
-
-	  if (openqueue_getCurrentCapacity() >= MAX_QUEUE_CAPACITY_TO_FORWARD) {
-		  openreport_indicateDroppedPacket(&sender,uinject_seqnum,&asnArray[0]);
-		  openqueue_freePacketBuffer(pkt);
-		  return;
-	  }
-
+	  OpenQueueEntry_t* new_pkt;
 
 	  new_pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
 	  if (new_pkt==NULL) {
@@ -109,8 +86,7 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 	  }
 
 	  memset(&(ipAddr_node[0]), 0x00, sizeof(ipAddr_node));
-	  memcpy(&(ipAddr_node[0]),&(prefix[0]),8);
-	  memcpy(&(ipAddr_node[8]),&neighbor.addr_64b[0],8);
+	  memcpy(&(ipAddr_node[0]),&all_routers_multicast,sizeof(all_routers_multicast));
 
 	  new_pkt->owner                         = COMPONENT_UINJECT_FORWARDING;
 	  new_pkt->creator                       = COMPONENT_UINJECT_FORWARDING;
@@ -124,7 +100,7 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 	  memcpy(&(new_pkt->payload[0]),&(pkt->payload[2]),PAYLOADLEN);
 	  if ((openudp_send(new_pkt))==E_FAIL) {
 	      openqueue_freePacketBuffer(new_pkt);
-	  }*/
+	  }
 	openserial_printError(COMPONENT_UINJECT,ERR_JOINED,(errorparameter_t)0,(errorparameter_t)0);
 	openqueue_freePacketBuffer(pkt);
 }
@@ -143,11 +119,10 @@ void uinject_timer_cb(opentimers_id_t id){
 void uinject_task_cb() {
    OpenQueueEntry_t*    pkt;
    uint8_t              asnArray[5];
-   bool foundNeighbor;
-
 
    open_addr_t *my_address_16B = idmanager_getMyID(ADDR_16B);
-   if(my_address_16B->addr_16b[0] != 0x93 && my_address_16B->addr_16b[1] != 0x81) {
+   if(my_address_16B->addr_16b[0] != m3_103[6] && my_address_16B->addr_16b[1] != m3_103[7]) {
+	   opentimers_destroy(uinject_vars.timerId);
 	   return;
    }
 
