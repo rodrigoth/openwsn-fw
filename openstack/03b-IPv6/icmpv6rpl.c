@@ -712,7 +712,7 @@ void icmpv6rpl_timer_DIO_task() {
             break;
         }
     }*/
-	sendDIO();
+	//sendDIO();
 }
 
 /**
