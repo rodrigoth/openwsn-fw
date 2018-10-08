@@ -78,11 +78,14 @@ void uinject_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
 //I suspect there is a problem in the forwarding module that makes the most demanding nodes to reboot occasionally
 void uinject_receive(OpenQueueEntry_t* pkt) {
 	  OpenQueueEntry_t* new_pkt;
+	  open_addr_t sender;
+
+	  memcpy(&(sender.addr_64b[0]),&(pkt->payload[2]),8);
+	  uint32_t uinject_seqnum = pkt->payload[18] | (pkt->payload[17] << 8) | (pkt->payload[16] << 16) | (pkt->payload[15] << 24);
+	  openreport_indicateAnycastTx(ieee154e_getLastFreq(), uinject_seqnum, 0, &sender);
 
 	  open_addr_t *my_address_16B = idmanager_getMyID(ADDR_16B);
-
 	  if(my_address_16B->addr_16b[0] == m3_52[6] && my_address_16B->addr_16b[1] == m3_52[7]) {
-		  openserial_printError(COMPONENT_UINJECT,ERR_JOINED,(errorparameter_t)0,(errorparameter_t)0);
 		  openqueue_freePacketBuffer(pkt);
 		  return;
 	  }
@@ -106,11 +109,23 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 	  memcpy(&new_pkt->l3_destinationAdd.addr_128b[0],&ipAddr_node[0],16);
 	  packetfunctions_reserveHeaderSize(new_pkt,PAYLOADLEN);
 
+	  //the new sender
+
+	  open_addr_t* my_address = idmanager_getMyID(ADDR_64B);
+	  pkt->payload[2] = my_address->addr_64b[0];
+	  pkt->payload[3] = my_address->addr_64b[1];
+	  pkt->payload[4] = my_address->addr_64b[2];
+	  pkt->payload[5] = my_address->addr_64b[3];
+	  pkt->payload[6] = my_address->addr_64b[4];
+	  pkt->payload[7] = my_address->addr_64b[5];
+	  pkt->payload[8] = my_address->addr_64b[6];
+	  pkt->payload[9] = my_address->addr_64b[7];
+
 	  memcpy(&(new_pkt->payload[0]),&(pkt->payload[2]),PAYLOADLEN);
 	  if ((openudp_send(new_pkt))==E_FAIL) {
 	      openqueue_freePacketBuffer(new_pkt);
 	  }
-	openserial_printError(COMPONENT_UINJECT,ERR_JOINED,(errorparameter_t)0,(errorparameter_t)0);
+
 	openqueue_freePacketBuffer(pkt);
 }
 

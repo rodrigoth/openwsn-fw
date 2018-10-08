@@ -1293,6 +1293,26 @@ port_INLINE void activity_ti5(PORT_TIMER_WIDTH capturedTime) {
         // radiotimer_schedule(DURATION_tt5);
 #endif
     } else {
+
+
+    	//64 or 65 = expected payload size for uinject packets
+		uint8_t packetLengh = ieee154e_vars.dataToSend->length;
+
+		if ((packetLengh == 39 || packetLengh == 40) &&
+			(ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT || ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT_FORWARDING)) {
+
+			uint8_t asnArray[5];
+			open_addr_t sender;
+
+			memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
+			memcpy(&asnArray,&(ieee154e_vars.dataToSend->payload[packetLengh-9]),5);
+			//memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
+
+			uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
+			openreport_indicateAnycastTx(ieee154e_vars.freq, uinject_seqnum, 1, &sender);
+		}
+
+
         // indicate succesful Tx to schedule to keep statistics
         schedule_indicateTx(&ieee154e_vars.asn,TRUE);
         // indicate to upper later the packet was sent successfully
@@ -1580,28 +1600,6 @@ port_INLINE void activity_ti9(PORT_TIMER_WIDTH capturedTime) {
         ) {
             synchronizeAck(ieee802514_header.timeCorrection);
         }
-
-
-        //64 or 65 = expected payload size for uinject packets
-		uint8_t packetLengh = ieee154e_vars.dataToSend->length;
-		if ((packetLengh == 64 || packetLengh == 65) &&
-			(ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT || ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT_FORWARDING)) {
-			open_addr_t sender;
-			uint8_t asnArray[5];
-
-			memcpy(&asnArray,&(ieee154e_vars.dataToSend->payload[packetLengh-9]),5);
-			memcpy(&(sender.addr_64b[0]),&(ieee154e_vars.dataToSend->payload[packetLengh-17]),8);
-
-			uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
-			uint8_t parentIndex ;
-
-			if (icmpv6rpl_getPreferredParentIndex(&parentIndex)) {
-				openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),1,1,
-											  ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0],
-											  neighbors_getNeighborBroadcastRank(parentIndex));
-			}
-
-		}
 
       
         // inform schedule of successful transmission
