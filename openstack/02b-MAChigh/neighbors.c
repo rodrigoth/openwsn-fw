@@ -437,7 +437,7 @@ void neighbors_indicateRx(open_addr_t* l2_src,
 }
 
 void neighbors_indicateBroadcastReception(open_addr_t* address) {
-	uint8_t i;
+	/*uint8_t i;
 	for (i=0;i<MAXNUMNEIGHBORS;i++) {
 		 if (isThisRowMatching(address,i)) {
 			 if(icmpv6rpl_getMyDAGrank() > neighbors_vars.neighbors[i].DAGrank) {
@@ -452,7 +452,7 @@ void neighbors_indicateBroadcastReception(open_addr_t* address) {
 				 neighbors_vars.neighbors[i].broadcast_rx /= 6;
 			 }
 		}
-	}
+	}*/
 }
 
 /**
@@ -782,7 +782,7 @@ uint16_t neighbors_getLinkMetric(uint8_t index) {
 //===== maintenance
 
 void  neighbors_removeOld() {
-    uint8_t    i, j;
+   /* uint8_t    i, j;
     bool       haveParent;
     PORT_TIMER_WIDTH timeSinceHeard;
     
@@ -826,16 +826,16 @@ void  neighbors_removeOld() {
     } else {
     	openreport_indicateBroadcastRate();
     	indicateBroadcastRateCounter = 0;
-    }
+    }*/
 }
 
 void neighbors_resetBroadcastRx() {
-	uint8_t    i;
+	/*uint8_t    i;
 	for (i=0;i<MAXNUMNEIGHBORS;i++) {
 		if(neighbors_vars.neighbors[i].used == TRUE) {
 			neighbors_vars.neighbors[i].broadcast_rx = 0;
 		}
-	}
+	}*/
 }
 
 //===== debug

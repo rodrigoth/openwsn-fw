@@ -698,8 +698,8 @@ void timer_sixtop_management_fired(void) {
     switch (sixtop_vars.mgtTaskCounter) {
     case 0:
         // called every MAINTENANCE_PERIOD seconds
-    	schedule_housekeeping();
-        neighbors_removeOld();
+    	//schedule_housekeeping();
+        //neighbors_removeOld();
         break;
     default:
         // called every second, except once every MAINTENANCE_PERIOD seconds

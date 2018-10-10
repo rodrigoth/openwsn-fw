@@ -1107,25 +1107,34 @@ void schedule_createStaticSchedule() {
 		schedule_addActiveSlot(13,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
 	}
 
-	if(my_address_16B->addr_16b[0] == m3_106[6] && my_address_16B->addr_16b[1] == m3_106[7]) {
+	if(my_address_16B->addr_16b[0] == m3_104[6] && my_address_16B->addr_16b[1] == m3_104[7]) {
 		schedule_addActiveSlot(11,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
 		schedule_addActiveSlot(12,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
 		schedule_addActiveSlot(13,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+
 		schedule_addActiveSlot(14,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(15,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(16,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
 	}
 
 	if(my_address_16B->addr_16b[0] == m3_57[6] && my_address_16B->addr_16b[1] == m3_57[7]) {
 		schedule_addActiveSlot(11,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
 		schedule_addActiveSlot(12,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
 		schedule_addActiveSlot(13,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
-		schedule_addActiveSlot(15,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+
+		schedule_addActiveSlot(17,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(18,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(19,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
 	}
 
 	if(my_address_16B->addr_16b[0] == m3_98[6] && my_address_16B->addr_16b[1] == m3_98[7]) {
 		schedule_addActiveSlot(11,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
 		schedule_addActiveSlot(12,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
 		schedule_addActiveSlot(13,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
-		schedule_addActiveSlot(16,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+
+		schedule_addActiveSlot(20,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(21,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(22,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
 
 	}
 
@@ -1133,27 +1142,100 @@ void schedule_createStaticSchedule() {
 		schedule_addActiveSlot(14,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
 		schedule_addActiveSlot(15,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
 		schedule_addActiveSlot(16,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
-		schedule_addActiveSlot(17,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
-	}
-
-	if(my_address_16B->addr_16b[0] == m3_47[6] && my_address_16B->addr_16b[1] == m3_47[7]) {
-		schedule_addActiveSlot(14,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
-		schedule_addActiveSlot(15,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
-		schedule_addActiveSlot(16,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
-		schedule_addActiveSlot(18,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
-	}
-
-	if(my_address_16B->addr_16b[0] == m3_108[6] && my_address_16B->addr_16b[1] == m3_108[7]) {
-		schedule_addActiveSlot(14,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
-		schedule_addActiveSlot(15,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
-		schedule_addActiveSlot(16,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
-		schedule_addActiveSlot(19,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
-	}
-
-	if(my_address_16B->addr_16b[0] == m3_52[6] && my_address_16B->addr_16b[1] == m3_52[7]) {
 		schedule_addActiveSlot(17,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
 		schedule_addActiveSlot(18,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
 		schedule_addActiveSlot(19,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(20,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(21,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(22,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+
+
+		schedule_addActiveSlot(23,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(24,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(25,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(26,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(27,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(28,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(29,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(30,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(31,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+	}
+
+	if(my_address_16B->addr_16b[0] == m3_48[6] && my_address_16B->addr_16b[1] == m3_48[7]) {
+		schedule_addActiveSlot(14,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(15,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(16,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(17,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(18,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(19,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(20,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(21,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(22,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+
+		schedule_addActiveSlot(32,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(33,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(34,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(35,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(36,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(37,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(38,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(39,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(40,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+
+	}
+
+	if(my_address_16B->addr_16b[0] == m3_109[6] && my_address_16B->addr_16b[1] == m3_109[7]) {
+		schedule_addActiveSlot(14,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(15,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(16,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(17,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(18,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(19,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(20,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(21,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(22,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+
+		schedule_addActiveSlot(41,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(42,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(43,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(44,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(45,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(46,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(47,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(48,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(49,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);
+	}
+
+	if(my_address_16B->addr_16b[0] == m3_52[6] && my_address_16B->addr_16b[1] == m3_52[7]) {
+		schedule_addActiveSlot(23,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(24,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(25,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(26,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(27,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(28,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(29,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(30,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(31,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+
+		schedule_addActiveSlot(32,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(33,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(34,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(35,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(36,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(37,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(38,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(39,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(40,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+
+		schedule_addActiveSlot(41,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(42,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(43,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(44,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(45,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(46,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(47,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(48,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
+		schedule_addActiveSlot(49,CELLTYPE_ANYCAST_RX,TRUE,0,&temp_neighbor);
 	}
 }
 

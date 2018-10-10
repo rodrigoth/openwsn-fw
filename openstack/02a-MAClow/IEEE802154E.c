@@ -112,7 +112,7 @@ void ieee154e_init() {
    memset(&ieee154e_vars,0,sizeof(ieee154e_vars_t));
    memset(&ieee154e_dbg,0,sizeof(ieee154e_dbg_t));
    
-   ieee154e_vars.singleChannel     = 20; // 0 means channel hopping
+   ieee154e_vars.singleChannel     = 0; // 0 means channel hopping
    ieee154e_vars.isAckEnabled      = FALSE;
    ieee154e_vars.isSecurityEnabled = FALSE;
    ieee154e_vars.slotDuration      = TsSlotDuration;
@@ -534,7 +534,7 @@ port_INLINE void activity_synchronize_newSlot() {
         radio_rfOff();
         
         // update record of current channel
-        ieee154e_vars.freq = 20;//(openrandom_get16b()&0x0F) + 11;
+        ieee154e_vars.freq = (openrandom_get16b()&0x0F) + 11;
         
         // configure the radio to listen to the default synchronizing channel
         radio_setFrequency(ieee154e_vars.freq);
@@ -956,7 +956,8 @@ port_INLINE void activity_ti1ORri1() {
                //copy synch IE  -- should be Little endian???
                // fill in the ASN field of the EB
                ieee154e_getAsn(asn);
-               join_priority = (icmpv6rpl_getMyDAGrank()/MINHOPRANKINCREASE)-1; //poipoi -- use dagrank(rank)-1
+               //join_priority = (icmpv6rpl_getMyDAGrank()/MINHOPRANKINCREASE)-1; //poipoi -- use dagrank(rank)
+               join_priority = 1;
                memcpy(ieee154e_vars.dataToSend->l2_ASNpayload,&asn[0],sizeof(asn_t));
                memcpy(ieee154e_vars.dataToSend->l2_ASNpayload+sizeof(asn_t),&join_priority,sizeof(uint8_t));
             }
@@ -1394,7 +1395,7 @@ port_INLINE void activity_tie5() {
     // indicate transmit failed to schedule to keep stats
     schedule_indicateTx(&ieee154e_vars.asn,FALSE);
 
-
+    /*
     uint8_t packetLengh = ieee154e_vars.dataToSend->length;
 	if ((packetLengh == 64 || packetLengh == 65) &&
 		(ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT || ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT_FORWARDING)) {
@@ -1411,8 +1412,8 @@ port_INLINE void activity_tie5() {
 			openreport_indicateTx(&sender,&(ieee154e_vars.dataToSend->l2_nextORpreviousHop),0,1,
 										  ieee154e_vars.freq,uinject_seqnum,ieee154e_vars.dataToSend->creator,&asnArray[0],
 										  neighbors_getNeighborBroadcastRank(parentIndex));
-		}
-	}
+
+	}*/
 
    
     // decrement transmits left counter
@@ -1981,10 +1982,10 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
 				synchronizePacket(ieee154e_vars.syncCapturedTime);
 			}
 
-            if(ieee154e_vars.dataReceived->l2_frameType == IEEE154_TYPE_BEACON) {
+            /*if(ieee154e_vars.dataReceived->l2_frameType == IEEE154_TYPE_BEACON) {
 				 openreport_indicateBroadcastRx();
 				 neighbors_indicateBroadcastReception(&(ieee154e_vars.dataReceived->l2_nextORpreviousHop));
-            }
+            }*/
 
             // indicate reception to upper layer (no ACK asked)
             notif_receive(ieee154e_vars.dataReceived);

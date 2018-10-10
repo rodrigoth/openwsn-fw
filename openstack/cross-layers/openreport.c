@@ -37,7 +37,7 @@ void openreport_resetBroadcastRate(void) {
 }
 
 void openreport_indicateAllTransmissions(uint8_t is_shared) {
-	uint8_t asnArray[5];
+	/*uint8_t asnArray[5];
 	debug_AllTransmissionsEntry_t debug_reportEntry;
 
 	ieee154e_getAsn(asnArray);
@@ -47,12 +47,12 @@ void openreport_indicateAllTransmissions(uint8_t is_shared) {
 	debug_reportEntry.experiment_id = experiment_id;
 	debug_reportEntry.is_shared = is_shared;
 
-    //openserial_printStatus(STATUS_ALL_TRANSMISSIONS,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
+    //openserial_printStatus(STATUS_ALL_TRANSMISSIONS,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));*/
 }
 
 
 void openreport_indicateParentSwitch(open_addr_t *newParent, uint16_t previousRank, uint16_t newRank, uint8_t prevParentIndex) {
-	uint8_t asnArray[5];
+	/*uint8_t asnArray[5];
 	debug_reportParentChangeEntry_t debug_reportEntry;
     ieee154e_getAsn(asnArray);
     debug_reportEntry.asn.bytes0and1 = ((uint16_t)asnArray[1] << 8) | asnArray[0];
@@ -84,7 +84,7 @@ void openreport_indicateParentSwitch(open_addr_t *newParent, uint16_t previousRa
 
     memcpy(&(debug_reportEntry.newParent.addr_64b[0]),&(newParent->addr_64b[0]),8);
 
-    //openserial_printStatus(STATUS_PARENTSWITCH,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
+    //openserial_printStatus(STATUS_PARENTSWITCH,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));*/
 }
 
 void openreport_indicate6pRequest(uint8_t code,uint8_t requestedCells,open_addr_t *destination, uint8_t totalTx, uint8_t totalRx) {
@@ -153,7 +153,7 @@ void openreport_indicate6pResponse(uint8_t code,uint8_t requestedCells,open_addr
 }
 
 void openreport_indicatePDR(open_addr_t *destination, uint8_t totalTx, uint8_t totalAck, uint8_t pdrWMEMA) {
-	uint8_t asnArray[5];
+	/*uint8_t asnArray[5];
 	debug_reportPDR_t debug_reportEntry;
 
 	ieee154e_getAsn(asnArray);
@@ -168,11 +168,12 @@ void openreport_indicatePDR(open_addr_t *destination, uint8_t totalTx, uint8_t t
 	debug_reportEntry.experiment_id = experiment_id;
 	debug_reportEntry.pdrWMEMA = pdrWMEMA;
 
-	//openserial_printStatus(STATUS_PDR,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
+	//openserial_printStatus(STATUS_PDR,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));*/
 }
 
 void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_t ack, uint8_t tx,
-	uint8_t channel, uint32_t seqnum,uint8_t component, uint8_t *asn, uint8_t broadcast_rank) {
+	 uint8_t channel, uint32_t seqnum,uint8_t component, uint8_t *asn, uint8_t broadcast_rank) {
+	/*
 	debug_reportTxEntry_t debug_reportEntry;
 
 	memset(&debug_reportEntry,0,sizeof(debug_reportTxEntry_t));
@@ -213,11 +214,11 @@ void openreport_indicateTx(open_addr_t *sender, open_addr_t *destination, uint8_
 	//debug_reportEntry.senderRank = neighbors_getNeighborRankByAdrress(sender);
 	debug_reportEntry.senderRank = 0;
 
-	//openserial_printStatus(STATUS_TX,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
+	//openserial_printStatus(STATUS_TX,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));*/
 }
 
 void openreport_indicateDroppedPacket(open_addr_t *sender, uint32_t seqnum,uint8_t *asn) {
-	debug_reportDroppedPacketEntry_t debug_reportEntry;
+	/*debug_reportDroppedPacketEntry_t debug_reportEntry;
 
 	memset(&debug_reportEntry,0,sizeof(debug_reportDroppedPacketEntry_t));
 
@@ -242,11 +243,11 @@ void openreport_indicateDroppedPacket(open_addr_t *sender, uint32_t seqnum,uint8
 
 	memcpy(&(debug_reportEntry.sender.addr_64b[0]),&(sender->addr_64b[0]),8);
 
-	//openserial_printStatus(STATUS_TX_RECEIVED,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));
+	//openserial_printStatus(STATUS_TX_RECEIVED,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntry));*/
 }
 
 void openreport_indicateBroadcastRate(){
-	debug_reportEntryEB_t debug_reportEntry;
+	/*debug_reportEntryEB_t debug_reportEntry;
 	debug_reportEntry.total_rx = openreportEntry.total_broadcast_rx;
 	debug_reportEntry.total_tx = openreportEntry.total_broadcast_tx;
 
@@ -260,11 +261,11 @@ void openreport_indicateBroadcastRate(){
 
 	openserial_printStatus(STATUS_BROADCAST_RX,(uint8_t*)&debug_reportEntry,sizeof(debug_reportEntryEB_t));
 
-	//openreport_resetBroadcastRate();
+	//openreport_resetBroadcastRate();*/
 }
 
 void openreport_indicateConsistencyRoutine(open_addr_t* node, open_addr_t* parent,uint8_t isTx,uint8_t slotOffset,uint8_t channelOffset) {
-	debug_ScheduleConsistencyEntry_t debug_reportEntry;
+	/*debug_ScheduleConsistencyEntry_t debug_reportEntry;
 	debug_reportEntry.channelOffset = channelOffset;
 	debug_reportEntry.slotOffset    = slotOffset;
 	debug_reportEntry.isTx = isTx;
@@ -279,7 +280,7 @@ void openreport_indicateConsistencyRoutine(open_addr_t* node, open_addr_t* paren
 	debug_reportEntry.asn.byte4 = asnArray[4];
 	debug_reportEntry.experiment_id = experiment_id;
 
-	//openserial_printStatus(STATUS_SCHEDULE_CONSISTENCY,(uint8_t*)&debug_reportEntry,sizeof(debug_ScheduleConsistencyEntry_t));
+	//openserial_printStatus(STATUS_SCHEDULE_CONSISTENCY,(uint8_t*)&debug_reportEntry,sizeof(debug_ScheduleConsistencyEntry_t));*/
 }
 
 void openreport_indicateAnycastTx(uint8_t channel, uint32_t seqnum, uint8_t is_tx, open_addr_t *sender) {

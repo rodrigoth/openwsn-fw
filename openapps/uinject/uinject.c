@@ -25,7 +25,7 @@ uint8_t prefix[8] = {0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 uint32_t seqnum = 0;
 
-uint32_t traffic_rates[6] = {10000,12000,15000,20000,30000,60000};
+uint32_t traffic_rates[6] = {1000,12000,15000,20000,30000,60000};
 uint32_t current_traffic_rate;
 
 //=========================== prototypes ======================================
@@ -151,7 +151,6 @@ void uinject_task_cb() {
 		opentimers_scheduleIn(uinject_vars.timerId, current_traffic_rate,
 				TIME_MS, TIMER_ONESHOT, uinject_timer_cb);
 
-		seqnum++;
 
 		// don't run if not synch
 		if (ieee154e_isSynch() == FALSE)
@@ -162,6 +161,8 @@ void uinject_task_cb() {
 			opentimers_destroy(uinject_vars.timerId);
 			return;
 		}
+
+		seqnum++;
 
 		// if you get here, send a packet
 
