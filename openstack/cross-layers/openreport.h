@@ -142,6 +142,7 @@ typedef struct {
 	uint32_t seqnum;
 	uint8_t is_tx;
 	open_addr_t sender;
+	uint8_t timeslot;
 } debug_Anycast_t;
 END_PACK
 
@@ -174,7 +175,7 @@ void openreport_indicateConsistencyRoutine(open_addr_t* node, open_addr_t* paren
 void openreport_indicateBroadcastRx(void);
 void openreport_indicateBroadcastTx(void);
 void openreport_resetBroadcastRate(void);
-void openreport_indicateAnycastTx(uint8_t channel, uint32_t seqnum, uint8_t is_tx, open_addr_t *sender);
+void openreport_indicateAnycastTx(uint8_t channel, uint32_t seqnum, uint8_t is_tx, open_addr_t *sender, uint8_t timeslot);
 
 
 

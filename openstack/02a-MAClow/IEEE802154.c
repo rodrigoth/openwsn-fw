@@ -239,9 +239,9 @@ void ieee802154_retrieveHeader(OpenQueueEntry_t*      msg,
          ieee802514_header->dest.type = ADDR_64B;
          break;
       default:
-         openserial_printError(COMPONENT_IEEE802154,ERR_IEEE154_UNSUPPORTED,
+         /*openserial_printError(COMPONENT_IEEE802154,ERR_IEEE154_UNSUPPORTED,
                                (errorparameter_t)1,
-                               (errorparameter_t)(temp_8b >> IEEE154_FCF_DEST_ADDR_MODE ) & 0x03);
+                               (errorparameter_t)(temp_8b >> IEEE154_FCF_DEST_ADDR_MODE ) & 0x03);*/
          return; // this is an invalid packet, return
    }
    switch ( (temp_8b >> IEEE154_FCF_SRC_ADDR_MODE ) & 0x03 ) {
@@ -255,9 +255,9 @@ void ieee802154_retrieveHeader(OpenQueueEntry_t*      msg,
          ieee802514_header->src.type = ADDR_64B;
          break;
       default:
-         openserial_printError(COMPONENT_IEEE802154,ERR_IEEE154_UNSUPPORTED,
+         /*openserial_printError(COMPONENT_IEEE802154,ERR_IEEE154_UNSUPPORTED,
                                (errorparameter_t)2,
-                               (errorparameter_t)(temp_8b >> IEEE154_FCF_SRC_ADDR_MODE ) & 0x03);
+                               (errorparameter_t)(temp_8b >> IEEE154_FCF_SRC_ADDR_MODE ) & 0x03);*/
          return; // this is an invalid packet, return
    }
    ieee802514_header->headerLength += 1;

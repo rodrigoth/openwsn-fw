@@ -680,7 +680,10 @@ void timer_sixtop_sendEb_fired(){
             break;
         }
     }*/
-	sixtop_sendEB();
+	if(idmanager_getIsDAGroot()) {
+		sixtop_sendEB();
+	}
+
 }
 
 /**

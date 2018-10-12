@@ -368,9 +368,9 @@ void isr_ieee154e_timer(opentimers_id_t id) {
          break;
       default:
          // log the error
-         openserial_printError(COMPONENT_IEEE802154E,ERR_WRONG_STATE_IN_TIMERFIRES,
+         /*openserial_printError(COMPONENT_IEEE802154E,ERR_WRONG_STATE_IN_TIMERFIRES,
                                (errorparameter_t)ieee154e_vars.state,
-                               (errorparameter_t)ieee154e_vars.slotOffset);
+                               (errorparameter_t)ieee154e_vars.slotOffset);*/
          // abort
          endSlot();
          break;
@@ -416,9 +416,9 @@ void ieee154e_startOfFrame(PORT_TIMER_WIDTH capturedTime) {
             break;
          default:
             // log the error
-            openserial_printError(COMPONENT_IEEE802154E,ERR_WRONG_STATE_IN_NEWSLOT,
+            /*openserial_printError(COMPONENT_IEEE802154E,ERR_WRONG_STATE_IN_NEWSLOT,
                                   (errorparameter_t)ieee154e_vars.state,
-                                  (errorparameter_t)ieee154e_vars.slotOffset);
+                                  (errorparameter_t)ieee154e_vars.slotOffset);*/
             // abort
             endSlot();
             break;
@@ -452,9 +452,9 @@ void ieee154e_endOfFrame(PORT_TIMER_WIDTH capturedTime) {
             break;
          default:
             // log the error
-            openserial_printError(COMPONENT_IEEE802154E,ERR_WRONG_STATE_IN_ENDOFFRAME,
+            /*openserial_printError(COMPONENT_IEEE802154E,ERR_WRONG_STATE_IN_ENDOFFRAME,
                                   (errorparameter_t)ieee154e_vars.state,
-                                  (errorparameter_t)ieee154e_vars.slotOffset);
+                                  (errorparameter_t)ieee154e_vars.slotOffset);*/
             // abort
             endSlot();
             break;
@@ -608,9 +608,9 @@ port_INLINE void activity_synchronize_endOfFrame(PORT_TIMER_WIDTH capturedTime) 
    // check state
    if (ieee154e_vars.state!=S_SYNCRX) {
       // log the error
-      openserial_printError(COMPONENT_IEEE802154E,ERR_WRONG_STATE_IN_ENDFRAME_SYNC,
+      /*openserial_printError(COMPONENT_IEEE802154E,ERR_WRONG_STATE_IN_ENDFRAME_SYNC,
                             (errorparameter_t)ieee154e_vars.state,
-                            (errorparameter_t)0);
+                            (errorparameter_t)0);*/
       // abort
       endSlot();
    }
@@ -847,9 +847,9 @@ port_INLINE void activity_ti1ORri1() {
    // if the previous slot took too long, we will not be in the right state
    if (ieee154e_vars.state!=S_SLEEP) {
       // log the error
-      openserial_printError(COMPONENT_IEEE802154E,ERR_WRONG_STATE_IN_STARTSLOT,
+      /*openserial_printError(COMPONENT_IEEE802154E,ERR_WRONG_STATE_IN_STARTSLOT,
                             (errorparameter_t)ieee154e_vars.state,
-                            (errorparameter_t)ieee154e_vars.slotOffset);
+                            (errorparameter_t)ieee154e_vars.slotOffset);*/
       // abort
       endSlot();
       return;
@@ -1229,9 +1229,9 @@ port_INLINE void activity_ti4(PORT_TIMER_WIDTH capturedTime) {
 
 port_INLINE void activity_tie3() {
     // log the error
-    openserial_printError(COMPONENT_IEEE802154E,ERR_WDDATADURATION_OVERFLOWS,
+    /*openserial_printError(COMPONENT_IEEE802154E,ERR_WDDATADURATION_OVERFLOWS,
                          (errorparameter_t)ieee154e_vars.state,
-                         (errorparameter_t)ieee154e_vars.slotOffset);
+                         (errorparameter_t)ieee154e_vars.slotOffset);*/
    
     // abort
     endSlot();
@@ -1297,7 +1297,7 @@ port_INLINE void activity_ti5(PORT_TIMER_WIDTH capturedTime) {
 
 
     	//64 or 65 = expected payload size for uinject packets
-		uint8_t packetLengh = ieee154e_vars.dataToSend->length;
+		/*uint8_t packetLengh = ieee154e_vars.dataToSend->length;
 
 		if ((packetLengh == 39 || packetLengh == 40) &&
 			(ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT || ieee154e_vars.dataToSend->creator == COMPONENT_UINJECT_FORWARDING)) {
@@ -1311,7 +1311,7 @@ port_INLINE void activity_ti5(PORT_TIMER_WIDTH capturedTime) {
 
 			uint32_t uinject_seqnum = ieee154e_vars.dataToSend->payload[packetLengh -1] | (ieee154e_vars.dataToSend->payload[packetLengh -2] << 8) | (ieee154e_vars.dataToSend->payload[packetLengh -3] << 16) | (ieee154e_vars.dataToSend->payload[packetLengh - 4] << 24);
 			openreport_indicateAnycastTx(ieee154e_vars.freq, uinject_seqnum, 1, &sender);
-		}
+		}*/
 
 
         // indicate succesful Tx to schedule to keep statistics
@@ -1732,10 +1732,10 @@ port_INLINE void activity_ri4(PORT_TIMER_WIDTH capturedTime) {
 
 port_INLINE void activity_rie3() {
     // log the error
-    openserial_printError(COMPONENT_IEEE802154E,ERR_WDDATADURATION_OVERFLOWS,
+    /*openserial_printError(COMPONENT_IEEE802154E,ERR_WDDATADURATION_OVERFLOWS,
                          (errorparameter_t)ieee154e_vars.state,
                          (errorparameter_t)ieee154e_vars.slotOffset);
-   
+   */
     // abort
     endSlot();
 }
@@ -2672,9 +2672,9 @@ void synchronizePacket(PORT_TIMER_WIDTH timeReceived) {
    if (
          ieee154e_vars.isSync==TRUE
       ) {
-      openserial_printError(COMPONENT_IEEE802154E,ERR_LARGE_TIMECORRECTION,
-                            (errorparameter_t)timeCorrection,
-                            (errorparameter_t)0);
+      //openserial_printError(COMPONENT_IEEE802154E,ERR_LARGE_TIMECORRECTION,
+      //                      (errorparameter_t)timeCorrection,
+      //                      (errorparameter_t)0);
    }
    
    // update the stats
@@ -2716,9 +2716,9 @@ void synchronizeAck(PORT_SIGNED_INT_WIDTH timeCorrection) {
    if (
          ieee154e_vars.isSync==TRUE
       ) {
-      openserial_printError(COMPONENT_IEEE802154E,ERR_LARGE_TIMECORRECTION,
-                            (errorparameter_t)timeCorrection,
-                            (errorparameter_t)1);
+      //openserial_printError(COMPONENT_IEEE802154E,ERR_LARGE_TIMECORRECTION,
+      //                      (errorparameter_t)timeCorrection,
+      //                      (errorparameter_t)1);
    }
 
    // update the stats

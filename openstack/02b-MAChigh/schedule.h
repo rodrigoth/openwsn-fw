@@ -17,10 +17,10 @@
 
 The superframe reappears over time and can be arbitrarily long.
 */
-#define SLOTFRAME_LENGTH    61 //should be 101
+#define SLOTFRAME_LENGTH    101 //should be 101
 
 //draft-ietf-6tisch-minimal-06
-#define SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS                      5
+#define SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS                      1
 #define SCHEDULE_MINIMAL_6TISCH_SLOTOFFSET                        0
 #define SCHEDULE_MINIMAL_6TISCH_CHANNELOFFSET                     0
 #define SCHEDULE_MINIMAL_6TISCH_DEFAULT_SLOTFRAME_HANDLE          0 //id of slotframe
@@ -39,7 +39,7 @@ The superframe reappears over time and can be arbitrarily long.
   for serial port to transmit data to dagroot.
 */
 
-#define NUMSLOTSOFF          52
+#define NUMSLOTSOFF          90
 
 /**
 \brief Maximum number of active slots in a superframe.
@@ -159,16 +159,6 @@ typedef struct {
 
 
 static const uint8_t m3_52[] =  {0x05, 0x43, 0x32, 0xff, 0x02, 0xd8, 0x36, 0x58};
-static const uint8_t m3_63[] =  {0x05, 0x43, 0x32, 0xff, 0x03, 0xd8, 0xc0, 0x70};
-static const uint8_t m3_48[] =  {0x05, 0x43, 0x32, 0xff, 0x02, 0xd8, 0x09, 0x56}; //48
-static const uint8_t m3_109[] = {0x05, 0x43, 0x32, 0xff, 0x03, 0xd9, 0x86, 0x73};//109
-static const uint8_t m3_104[] = {0x05, 0x43, 0x32, 0xff, 0x02, 0xd4, 0x13, 0x59};//104
-static const uint8_t m3_57[] =  {0x05, 0x43, 0x32, 0xff, 0x02, 0xd7, 0x12, 0x56};
-static const uint8_t m3_98[] =  {0x05, 0x43, 0x32, 0xff, 0x02, 0xd9, 0x17, 0x51};
-static const uint8_t m3_79[] =  {0x05, 0x43, 0x32, 0xff, 0x02, 0xd6, 0x08, 0x61};
-static const uint8_t m3_102[] = {0x05, 0x43, 0x32, 0xff, 0x02, 0xda, 0x18, 0x59};
-static const uint8_t m3_56[] =  {0x05, 0x43, 0x32, 0xff, 0x03, 0xdd, 0xa2, 0x73};
-static const uint8_t m3_103[] = {0x05, 0x43, 0x32, 0xff, 0x02, 0xda, 0x09, 0x58};
 
 
 
