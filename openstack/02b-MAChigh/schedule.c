@@ -1093,7 +1093,7 @@ void schedule_createStaticSchedule() {
 	memset(&temp_neighbor,0,sizeof(temp_neighbor));
 	temp_neighbor.type = ADDR_ANYCAST;
 
-	for (i = 0; i < 60; i++) {
+	for (i = 0; i <= 60; i++) {
 		if(i % 2 == 0) {
 			if(idmanager_getIsDAGroot()) {
 				schedule_addActiveSlot(starting_timeslot+i,CELLTYPE_ANYCAST_TX,TRUE,0,&temp_neighbor);

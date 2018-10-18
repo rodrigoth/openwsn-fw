@@ -23,6 +23,7 @@ uint8_t ipAddr_node[16] = { 0x00 };
 uint8_t prefix[8] = { 0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 uint32_t seqnum = 0;
+uint32_t burst = 0;
 
 uint32_t traffic_rates[6] = {2000, 12000, 15000, 20000, 30000, 60000 };
 uint32_t current_traffic_rate;
@@ -74,9 +75,10 @@ void uinject_receive(OpenQueueEntry_t* pkt) {
 
 	memcpy(&(sender.addr_64b[0]), &(pkt->payload[2]), 8);
 	uint32_t uinject_seqnum = pkt->payload[18] | (pkt->payload[17] << 8)| (pkt->payload[16] << 16) | (pkt->payload[15] << 24);
+	uint32_t uinject_burst = pkt->payload[22] | (pkt->payload[21] << 8)| (pkt->payload[20] << 16) | (pkt->payload[19] << 24);
 
 
-	openreport_indicateAnycastTx(ieee154e_getLastFreq(), uinject_seqnum, 0,&sender,schedule_getCurrentScheduleEntry()->slotOffset);
+	openreport_indicateAnycastTx(ieee154e_getLastFreq(), uinject_seqnum, 0,&sender,schedule_getCurrentScheduleEntry()->slotOffset,uinject_burst);
 	openqueue_freePacketBuffer(pkt);
 }
 
@@ -96,6 +98,8 @@ void uinject_enqueuePackets(void) {
 	OpenQueueEntry_t* pkt;
 	uint8_t asnArray[5];
 	uint8_t i;
+
+	burst++;
 
 	if (idmanager_getIsDAGroot()) {
 		for (i = 0; i < 30; i++) {
@@ -117,6 +121,13 @@ void uinject_enqueuePackets(void) {
 			pkt->l4_sourcePortORicmpv6Type = WKP_UDP_INJECT;
 			pkt->l3_destinationAdd.type = ADDR_128B;
 			memcpy(&pkt->l3_destinationAdd.addr_128b[0], &ipAddr_node[0], 16);
+
+			packetfunctions_reserveHeaderSize(pkt, sizeof(uint32_t));
+			pkt->payload[0] = (burst & 0xff000000) >> 24; //63
+			pkt->payload[1] = (burst & 0x00ff0000) >> 16; //62
+			pkt->payload[2] = (burst & 0x0000ff00) >> 8; //61
+			pkt->payload[3] = (burst & 0x000000ff); //60
+
 
 			packetfunctions_reserveHeaderSize(pkt, sizeof(uint32_t));
 			pkt->payload[0] = (seqnum & 0xff000000) >> 24; //63

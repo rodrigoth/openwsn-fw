@@ -283,12 +283,13 @@ void openreport_indicateConsistencyRoutine(open_addr_t* node, open_addr_t* paren
 	//openserial_printStatus(STATUS_SCHEDULE_CONSISTENCY,(uint8_t*)&debug_reportEntry,sizeof(debug_ScheduleConsistencyEntry_t));*/
 }
 
-void openreport_indicateAnycastTx(uint8_t channel, uint32_t seqnum, uint8_t is_tx, open_addr_t *sender, uint8_t timeslot) {
+void openreport_indicateAnycastTx(uint8_t channel, uint32_t seqnum, uint8_t is_tx, open_addr_t *sender, uint8_t timeslot,uint32_t burst) {
 	debug_Anycast_t debug_reportEntry;
 	debug_reportEntry.experiment_id = experiment_id;
 	debug_reportEntry.channel = channel;
 	debug_reportEntry.is_tx = is_tx;
 	debug_reportEntry.seqnum = seqnum;
+	debug_reportEntry.burst = burst;
 
 	memcpy(&(debug_reportEntry.sender.addr_64b[0]),&(sender->addr_64b[0]),8);
 
